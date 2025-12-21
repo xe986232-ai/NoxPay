@@ -65,7 +65,6 @@
             z-index: 5000; display: none; opacity: 0; transition: 0.3s;
         }
 
-        /* Styling Tombol Upload Baru */
         .btn-upload-prominent {
             display: flex;
             align-items: center;
@@ -100,20 +99,12 @@
             font-size: 16px;
         }
 
-        .side-menu-item {
-            display: flex; align-items: center; gap: 12px; padding: 14px;
-            border-radius: 12px; margin-bottom: 8px; cursor: pointer;
-            font-weight: 700; color: var(--dark); transition: 0.2s;
-        }
-        .side-menu-item:hover { background: var(--primary-light); color: var(--primary); }
-
         .btn-home-header {
             background: var(--btn-home-bg); color: white; text-decoration: none;
             padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 800;
             box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
         }
 
-        /* Fitur Baru: Tombol Cara Upload */
         .btn-guide-header {
             background: white; color: var(--primary); border: 1.5px solid var(--primary); 
             text-decoration: none; padding: 5px 10px; border-radius: 10px; font-size: 11px; 
@@ -160,7 +151,6 @@
         .project-info span { font-size: 14px; color: var(--primary); font-weight: 800; }
         .btn-buy { background: var(--btn-buy-bg); color: white; border: none; padding: 10px 16px; border-radius: 14px; font-weight: 700; font-size: 10px; cursor: pointer; align-self: center; }
 
-        /* --- PLAYER BAR --- */
         .player-controls { 
             background: #f8fafc; padding: 8px 12px; border-radius: 12px; 
             display: flex; align-items: center; gap: 10px; margin-top: 4px;
@@ -179,7 +169,6 @@
         }
         .time-display { font-size: 9px; font-weight: 800; color: var(--gray); min-width: 30px; }
 
-        /* --- CATEGORY / CREATOR GRID --- */
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 5px; }
         .creator-card { background: white; padding: 20px 10px; border-radius: 24px; text-align: center; border: 1px solid rgba(139, 92, 246, 0.08); cursor: pointer; }
         .avatar-wrapper { width: 70px; height: 70px; margin: 0 auto 10px; background: var(--avatar-gradient); padding: 2px; border-radius: 50%; }
@@ -192,20 +181,20 @@
         .form-label { display: block; font-size: 11px; font-weight: 800; color: var(--gray); margin-bottom: 6px; text-transform: uppercase; }
         .form-control { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9; background: #f8fafc; font-size: 13px; font-weight: 700; margin-bottom: 15px; outline: none; }
         
-        /* Guide Styles */
         .guide-step { display: flex; gap: 12px; margin-bottom: 15px; }
         .step-num { width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
         .step-text { font-size: 12px; font-weight: 600; color: var(--dark); line-height: 1.5; }
 
-        .file-input-wrapper {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        .file-input-wrapper input[type="file"] {
-            position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2;
-        }
-        .custom-file-btn {
-            display: block; width: 100%; padding: 14px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; text-align: center; color: var(--gray); font-size: 12px; font-weight: 700;
+        /* Modified Info Box */
+        .info-box-wa {
+            background: var(--primary-light);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px dashed var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
         .hidden { display: none !important; }
@@ -220,13 +209,9 @@
             <div class="logo-box">N</div>
             <b style="font-size: 16px;">Creator Hub</b>
         </div>
-
         <div class="btn-upload-prominent" onclick="handleMenuUpload()">
             <div class="icon-bg">📤</div>
             <span>UPLOAD PROJECT</span>
-        </div>
-
-        <div style="margin-top: 25px;">
         </div>
     </div>
 
@@ -284,7 +269,6 @@
         <div class="modal-content">
             <div class="modal-drag"></div>
             <h3 style="margin-bottom:20px; font-weight:800;">Panduan Upload Project</h3>
-            
             <div class="guide-step">
                 <div class="step-num">1</div>
                 <div class="step-text">Klik <b>Logo N (Kiri Atas)</b> untuk membuka Sidebar Creator.</div>
@@ -299,13 +283,8 @@
             </div>
             <div class="guide-step">
                 <div class="step-num">4</div>
-                <div class="step-text">Isi data project, upload <b>Audio Preview (.mp3)</b>, dan masukkan <b>Link Download Zip</b>.</div>
+                <div class="step-text">Isi data project dan kirim audio preview via WhatsApp admin.</div>
             </div>
-            <div class="guide-step">
-                <div class="step-num">5</div>
-                <div class="step-text">Klik <b>Kirim ke Admin</b>, data akan diverifikasi via WhatsApp sebelum dipublish.</div>
-            </div>
-
             <button onclick="closeModalGeneric('modal-guide')" style="background:var(--primary); color:white; width:100%; border:none; padding:16px; border-radius:15px; font-weight:800; margin-top:10px;">Saya Mengerti</button>
         </div>
     </div>
@@ -333,14 +312,13 @@
             <label class="form-label">Harga (Rp)</label>
             <input type="number" id="up-price" class="form-control" placeholder="Contoh: 50000">
             
-            <label class="form-label">Audio Preview (.mp3)</label>
-            <div class="file-input-wrapper">
-                <input type="file" id="up-audio-file" accept=".mp3,audio/*" onchange="updateFileNameDisplay(this)">
-                <div class="custom-file-btn" id="file-display-name">Klik untuk Pilih MP3</div>
+            <label class="form-label">Audio Preview</label>
+            <div class="info-box-wa">
+                <span style="font-size: 20px;">ℹ️</span>
+                <p style="font-size: 11px; font-weight: 700; color: var(--primary); line-height: 1.4;">
+                    File Audio Preview (.mp3) dapat Anda kirimkan langsung melalui WhatsApp Admin setelah menekan tombol kirim di bawah.
+                </p>
             </div>
-            
-            <label class="form-label">Link File Project (.zip)</label>
-            <input type="text" id="up-file" class="form-control" placeholder="Link Download">
             
             <button onclick="submitToAdmin()" style="background:var(--whatsapp-green); color:white; width:100%; border:none; padding:16px; border-radius:15px; font-weight:800;">Kirim ke Admin</button>
             <button onclick="closeModalGeneric('modal-upload-project')" style="width:100%; border:none; background:none; margin-top:10px; color:var(--gray);">Batal</button>
@@ -383,7 +361,12 @@
     <footer>&copy; 2025 NoxPay Marketplace</footer>
 
     <script>
-        const creatorDatabase = { "dyon_creator": "pass123", "feri": "gombel" };
+        // Database Creator dengan No WhatsApp masing-masing
+        const creatorDatabase = { 
+            "dyon_creator": { pass: "pass123", wa: "6281211413521", name: "Dyon Yete" },
+            "artist_user": { pass: "artist123", wa: "6281234567890", name: "Artist" } 
+        };
+        
         const licenseDatabase = {
             "NOX-KANE-2025": { title: "DJ MALAM TAHUN BARU STYLE VINKY", link: "#" },
             "DEMO-FREE": { title: "Project Sample Free", link: "#" }
@@ -401,6 +384,7 @@
         let currentProgress = null;
         let currentTimeText = null;
         let selectedProduct = null;
+        let loggedInCreator = null; 
 
         function toggleSidebarCreator() {
             const sb = document.getElementById('creator-sidebar');
@@ -420,7 +404,8 @@
         function checkLoginCreator() {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
-            if(creatorDatabase[user] && creatorDatabase[user] === pass) {
+            if(creatorDatabase[user] && creatorDatabase[user].pass === pass) {
+                loggedInCreator = creatorDatabase[user];
                 closeModalGeneric('modal-login-creator');
                 document.getElementById('modal-upload-project').style.display = 'flex';
             } else { alert("Creator Tidak Ditemukan!"); }
@@ -564,49 +549,40 @@
         function closeModalGeneric(id) { document.getElementById(id).style.display = 'none'; }
 
         function confirmPurchase() {
-            const msg = `Halo NoxPay, saya beli project: ${selectedProduct.name} dari ${selectedProduct.creator}`;
-            window.open(`https://wa.me/6283129555763?text=${encodeURIComponent(msg)}`, '_blank');
-        }
+            // Mencari data creator di database untuk mendapatkan nomor WA mereka
+            let creatorData = Object.values(creatorDatabase).find(c => c.name === selectedProduct.creator);
+            let targetWA = creatorData ? creatorData.wa : "6281211413521"; // fallback ke admin jika tak ketemu
 
-        function updateFileNameDisplay(input) {
-            const display = document.getElementById('file-display-name');
-            if(input.files && input.files[0]) {
-                display.innerText = "📁 " + input.files[0].name;
-                display.style.color = "var(--primary)";
-                display.style.borderColor = "var(--primary)";
-            } else {
-                display.innerText = "Klik untuk Pilih MP3";
-                display.style.color = "var(--gray)";
-            }
+            const msg = `Halo *${selectedProduct.creator}*,\n\n` +
+                        `Saya tertarik untuk membeli project Anda melalui *NoxPay*:\n\n` +
+                        `🎵 *Judul:* ${selectedProduct.name}\n` +
+                        `💰 *Harga:* Rp ${selectedProduct.price}\n\n` +
+                        `Mohon info instruksi pembayarannya. Terima kasih!`;
+
+            window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         function submitToAdmin() {
             const title = document.getElementById('up-title').value;
             const genre = document.getElementById('up-genre').value;
             const price = document.getElementById('up-price').value;
-            const fileLink = document.getElementById('up-file').value;
-            const audioInput = document.getElementById('up-audio-file');
 
-            if(!title || !fileLink || !price) return alert("Harap isi semua data!");
+            if(!title || !price) return alert("Harap isi Judul dan Harga!");
 
-            let audioName = "Tidak ada file";
-            if(audioInput.files.length > 0) {
-                audioName = audioInput.files[0].name;
-            } else {
-                return alert("Pilih file audio preview dulu!");
-            }
+            // Nomor tujuan (Biasanya ke Admin untuk verifikasi upload)
+            const targetWA = "6281211413521"; 
 
-            const msg = `🚀 *UPLOAD PROJECT NOXPAY*\n\n` +
-                        `👤 Project: ${title}\n` +
-                        `🎹 Genre: ${genre}\n` +
-                        `💰 Harga: Rp ${price}\n` +
-                        `🔗 Link: ${fileLink}\n` +
-                        `🎵 Preview: ${audioName}\n\n` +
-                        `_Admin, saya akan mengirimkan file audio preview setelah pesan ini._`;
+            const msg = `🚀 *UPLOAD PROJECT BARU - NOXPAY*\n\n` +
+                        `👤 *Creator:* ${loggedInCreator.name}\n` +
+                        `🎵 *Judul:* ${title}\n` +
+                        `🎹 *Genre:* ${genre}\n` +
+                        `💰 *Harga:* Rp ${price}\n\n` +
+                        `_Mohon segera diverifikasi. Saya akan mengirimkan file audio preview setelah ini._`;
 
-            window.open(`https://wa.me/6283129555763?text=${encodeURIComponent(msg)}`, '_blank');
+            window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
             closeModalGeneric('modal-upload-project');
         }
     </script>
 </body>
 </html>
+
