@@ -22,6 +22,7 @@
             --btn-change-bg: #ffffff; 
             --accent-new: #ff3e3e;
             --whatsapp-green: #25d366;
+            --dana-blue: #008ced;
         }
 
         /* Base Reset */
@@ -185,7 +186,6 @@
         .step-num { width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
         .step-text { font-size: 12px; font-weight: 600; color: var(--dark); line-height: 1.5; }
 
-        /* Modified Info Box */
         .info-box-wa {
             background: var(--primary-light);
             padding: 15px;
@@ -195,6 +195,44 @@
             display: flex;
             gap: 10px;
             align-items: center;
+        }
+
+        .fee-section {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .fee-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .btn-show-qris {
+            background: var(--dana-blue);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            width: 100%;
+            cursor: pointer;
+        }
+        #qris-container {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        #qris-container img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 8px;
         }
 
         .hidden { display: none !important; }
@@ -312,11 +350,23 @@
             <label class="form-label">Harga (Rp)</label>
             <input type="number" id="up-price" class="form-control" placeholder="Contoh: 50000">
             
+            <div class="fee-section">
+                <div class="fee-info">
+                    <span style="font-size: 11px; font-weight: 800; color: var(--gray);">BIAYA UPLOAD</span>
+                    <span style="font-size: 13px; font-weight: 800; color: var(--secondary);">Rp 5.000 / Produk</span>
+                </div>
+                <button class="btn-show-qris" onclick="toggleQrisUpload()">📱 Lihat QRIS Pembayaran (DANA)</button>
+                <div id="qris-container">
+                    <p style="font-size: 9px; font-weight: 700; color: var(--gray); margin-bottom: 5px;">Silakan Scan & Bayar Rp 5.000</p>
+                    <img src="HERO/qrisdana.jpg" alt="QRIS DANA">
+                </div>
+            </div>
+
             <label class="form-label">Audio Preview</label>
             <div class="info-box-wa">
                 <span style="font-size: 20px;">ℹ️</span>
                 <p style="font-size: 11px; font-weight: 700; color: var(--primary); line-height: 1.4;">
-                    File Audio Preview (.mp3) dapat Anda kirimkan langsung melalui WhatsApp Admin setelah menekan tombol kirim di bawah.
+                    File Audio (.mp3) & Bukti Bayar dikirim via WA setelah menekan tombol di bawah.
                 </p>
             </div>
             
@@ -361,9 +411,8 @@
     <footer>&copy; 2025 NoxPay Marketplace</footer>
 
     <script>
-        // Database Creator dengan No WhatsApp masing-masing
         const creatorDatabase = { 
-            "DyonYte": { pass: "DIONYETE234", wa: "6281211413521", name: "Dyon Yete" },
+            "dyon_creator": { pass: "pass123", wa: "6281211413521", name: "Dyon Yete" },
             "artist_user": { pass: "artist123", wa: "6281234567890", name: "Artist" } 
         };
         
@@ -374,7 +423,8 @@
 
         const projectData = {
             "Dyon Yete": [
-                { name: "DJ MALAM TAHUN BARU STYLE VINKY", price: "70.000", audio: "DYONYETE/1.mp3", isNew: true }
+                { name: "DJ MALAM TAHUN BARU STYLE VINKY", price: "70.000", audio: "DYONYETE/1.mp3", isNew: true },
+                { name: "DJ SLOW STYLE HUDA FVNKY", price: "50.000", audio: "DYONYETE/2.mp3", isNew: true }
             ],
             "Artist": []
         };
@@ -549,9 +599,8 @@
         function closeModalGeneric(id) { document.getElementById(id).style.display = 'none'; }
 
         function confirmPurchase() {
-            // Mencari data creator di database untuk mendapatkan nomor WA mereka
             let creatorData = Object.values(creatorDatabase).find(c => c.name === selectedProduct.creator);
-            let targetWA = creatorData ? creatorData.wa : "6281211413521"; // fallback ke admin jika tak ketemu
+            let targetWA = creatorData ? creatorData.wa : "6281211413521"; 
 
             const msg = `Halo *${selectedProduct.creator}*,\n\n` +
                         `Saya tertarik untuk membeli project Anda melalui *NoxPay*:\n\n` +
@@ -562,25 +611,30 @@
             window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
+        function toggleQrisUpload() {
+            const q = document.getElementById('qris-container');
+            q.style.display = q.style.display === 'block' ? 'none' : 'block';
+        }
+
         function submitToAdmin() {
             const title = document.getElementById('up-title').value;
             const genre = document.getElementById('up-genre').value;
             const price = document.getElementById('up-price').value;
 
             if(!title || !price) return alert("Harap isi Judul dan Harga!");
-
-            // Nomor tujuan (Biasanya ke Admin untuk verifikasi upload)
             const targetWA = "6283129555763"; 
 
-            const msg = `🚀 *UPLOAD PROJECT BARU - NOXPAY*\n\n` +
+            const msg = `🚀 *UPLOAD PRODUK BARU - NOXPAY*\n\n` +
                         `👤 *Creator:* ${loggedInCreator.name}\n` +
                         `🎵 *Judul:* ${title}\n` +
                         `🎹 *Genre:* ${genre}\n` +
-                        `💰 *Harga:* Rp ${price}\n\n` +
-                        `_Mohon segera diverifikasi. Saya akan mengirimkan file audio preview setelah ini._`;
+                        `💰 *Harga Jual:* Rp ${price}\n` +
+                        `💳 *Status Biaya:* Rp 5.000 (Menunggu Bukti)\n\n` +
+                        `_Mohon diverifikasi. Saya melampirkan file audio & bukti transfer setelah ini._`;
 
             window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
             closeModalGeneric('modal-upload-project');
+            document.getElementById('qris-container').style.display = 'none';
         }
     </script>
 </body>
