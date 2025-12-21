@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoxPay - Digital Payment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066ff;
+            --primary-light: #eef4ff;
+            --secondary: #00d2ff;
+            --dark: #1e293b;
+            --light: #f1f5f9;
+            --white: #ffffff;
+            --gray: #64748b;
+            --accent: #ff007a;
+            
+            /* Background Hero Utama */
+            --default-hero: linear-gradient(135deg, #0066ff 0%, #00d2ff 100%);
+            --bg-gradient: linear-gradient(180deg, #f8faff 0%, #f1f5f9 100%);
+            
+            /* Category Colors */
+            --cat-game: linear-gradient(135deg, #818cf8, #4f46e5);
+            --cat-pulsa: linear-gradient(135deg, #34d399, #059669);
+            --cat-data: linear-gradient(135deg, #f472b6, #db2777);
+            --cat-pln: linear-gradient(135deg, #fbbf24, #d97706);
+            --cat-ewallet: linear-gradient(135deg, #38bdf8, #0284c7);
+            --cat-project: linear-gradient(135deg, #8b5cf6, #d946ef);
+            
+            /* Gradient Animasi Pemanis */
+            --grad-fancy: linear-gradient(-45deg, #0066ff, #8b5cf6, #d946ef, #00d2ff);
+        }
+
+        /* --- SIDEBAR STYLES --- */
+        #sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            z-index: 5000; display: none; opacity: 0; transition: 0.3s;
+        }
+        #sidebar {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+            background: var(--white); z-index: 5001;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+            padding: 30px 20px;
+        }
+        #sidebar.active { left: 0; }
+        .sidebar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+        .side-menu-item {
+            display: flex; align-items: center; gap: 15px; padding: 14px 18px;
+            text-decoration: none; color: var(--dark); font-weight: 700;
+            border-radius: 14px; margin-bottom: 8px; transition: 0.3s; cursor: pointer;
+        }
+        .side-menu-item:hover { background: var(--primary-light); color: var(--primary); }
+
+        /* Style Spesial Untuk Creator Menu */
+        .side-menu-item.creator-special {
+            background: var(--grad-fancy);
+            background-size: 300% 300%;
+            color: white !important;
+            animation: gradientMove 4s ease infinite;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            border: none;
+        }
+        .side-menu-item.creator-special:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+        }
+
+        .menu-label { font-size: 11px; text-transform: uppercase; color: var(--gray); font-weight: 800; margin: 25px 0 10px 18px; letter-spacing: 1px; }
+
+        /* --- SPLASH SCREEN --- */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: all 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        
+        .advanced-logo {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+            animation: logoScale 1.8s ease-in-out infinite alternate;
+        }
+        
+        .logo-shape {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0066ff, #00d2ff);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            position: absolute;
+            animation: shapeMorph 6s linear infinite;
+            box-shadow: 0 15px 35px rgba(0, 102, 255, 0.4);
+        }
+
+        .logo-inner {
+            position: relative;
+            z-index: 10;
+            color: white;
+            font-size: 55px;
+            font-weight: 800;
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+            font-style: italic;
+        }
+
+        @keyframes shapeMorph {
+            0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: rotate(0deg); }
+            33% { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; }
+            66% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; transform: rotate(180deg); }
+        }
+
+        @keyframes logoScale { from { transform: scale(0.9); } to { transform: scale(1.1); } }
+
+        .splash-text {
+            margin-top: 35px; font-weight: 800; font-size: 24px;
+            background: linear-gradient(to right, #1e293b, #0066ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 4px; opacity: 0;
+            animation: textReveal 1s ease forwards 0.8s;
+        }
+
+        /* NEW STYLE: Splash Tagline at Bottom */
+        .splash-footer-text {
+            position: absolute;
+            bottom: 40px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--gray);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: textReveal 1s ease forwards 1.2s;
+        }
+
+        @keyframes textReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- HEADER & NAVBAR --- */
+        #main-wrapper { opacity: 0; transition: all 1s; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        
+        body { 
+            background: var(--bg-gradient); 
+            min-height: 100vh;
+            color: var(--dark); 
+            overflow-x: hidden; 
+        }
+
+        .container { padding: 0 16px; width: 100%; max-width: 500px; margin: 0 auto; position: relative; }
+
+        header { 
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 14px 0; 
+            border-bottom: 1px solid rgba(0,0,0,0.03); 
+            position: sticky; top: 0; z-index: 1000; 
+        }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; }
+        
+        .logo-nav { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .logo-box {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #0066ff 0%, #00d2ff 100%);
+            border-radius: 9px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 18px;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+        }
+        .logo-text-nav { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text-nav span:last-child { color: var(--primary); margin-left: 1px; }
+
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .menu-link { text-decoration: none; color: var(--dark); font-size: 13px; font-weight: 700; transition: 0.3s; opacity: 0.8; cursor: pointer; }
+        .menu-link:hover { color: var(--primary); opacity: 1; }
+
+        /* --- HERO --- */
+        .hero { 
+            position: relative; 
+            background: var(--default-hero);
+            color: white; padding: 50px 0; border-radius: 0 0 35px 35px; 
+            text-align: left; overflow: hidden; margin-bottom: 10px;
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.2);
+            transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero::before {
+            content: ''; position: absolute; top: -20px; left: -20px;
+            width: 150px; height: 150px; border-radius: 40px;
+            background: rgba(255,255,255,0.1); transform: rotate(15deg);
+        }
+
+        .hero-shapes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+
+        .hero-content { position: relative; z-index: 10; } 
+        .hero h2 { font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; transition: 0.3s; }
+        .hero p { font-size: 14px; opacity: 0.9; width: 65%; transition: 0.3s; }
+
+        .hero-decor-icon { position: absolute; right: -10px; bottom: -10px; font-size: 110px; opacity: 0.1; transform: rotate(-15deg); z-index: 1; transition: 0.5s; }
+
+        .hero-character {
+            position: absolute; right: -10px; bottom: -15px; width: 185px; z-index: 5; pointer-events: none;
+            transform: translateY(150%);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s;
+        }
+        
+        .hero-character.animate { transform: translateY(0); }
+        .hero-character img {
+            width: 100%; height: auto; display: block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); 
+            animation: floating 3.5s ease-in-out infinite;
+        }
+
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* --- PRODUK --- */
+        .section-header { margin: 25px 0 15px; }
+        .section-header h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--dark); }
+        .section-header h2::before { content: ''; width: 5px; height: 16px; background: var(--primary); border-radius: 10px; }
+
+        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .category-card { 
+            background: var(--white); padding: 16px; border-radius: 24px; display: flex; 
+            align-items: center; gap: 14px; cursor: pointer; border: 2px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .category-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
+        .category-card.active { border-color: var(--primary); background: var(--white); box-shadow: 0 10px 20px rgba(0,102,255,0.12); }
+        .category-card .icon-box { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 22px; position: relative; transition: 0.3s; flex-shrink: 0; color: white; }
+        .category-card span { font-weight: 700; font-size: 14px; color: var(--dark); }
+
+        .icon-game { background: var(--cat-game); }
+        .icon-pulsa { background: var(--cat-pulsa); }
+        .icon-data { background: var(--cat-data); }
+        .icon-pln { background: var(--cat-pln); }
+        .icon-ewallet { background: var(--cat-ewallet); }
+        .icon-project { background: var(--cat-project); }
+
+        .nominal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .nominal-item label { background: rgba(255, 255, 255, 0.8); border: 1.5px solid transparent; padding: 16px 12px; border-radius: 18px; display: block; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .nominal-item input { display: none; }
+        .nominal-item input:checked + label { border-color: var(--primary); background: var(--white); box-shadow: 0 5px 15px rgba(0,102,255,0.08); }
+
+        .order-form { background: rgba(255, 255, 255, 0.6); padding: 22px; border-radius: 24px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.5); }
+        .form-group input { width: 100%; padding: 14px; background: var(--white); border: 1.5px solid #eef2f6; border-radius: 12px; outline: none; transition: 0.3s; }
+        .btn-order { width: 100%; background: var(--primary); color: white; padding: 16px; border: none; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2); margin-top: 15px; }
+
+        /* --- PAYMENT METHOD STYLES --- */
+        .payment-method-container {
+            background: #ffffff;
+            border: 1.5px solid var(--primary);
+            border-radius: 18px;
+            padding: 16px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.1);
+        }
+        .payment-info { display: flex; align-items: center; gap: 12px; }
+        .payment-icon { font-size: 24px; }
+        .payment-text h4 { font-size: 14px; font-weight: 800; color: var(--dark); }
+        .payment-text p { font-size: 11px; color: var(--gray); font-weight: 600; }
+        .payment-badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* --- STYLES PEMANIS --- */
+        .pemanis-section { margin: 45px 0 20px; text-align: center; }
+        
+        .title-gradient-animated {
+            font-size: 18px;
+            font-weight: 800;
+            display: inline-block;
+            margin-bottom: 25px;
+            background: var(--grad-fancy);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 4s ease infinite;
+        }
+
+        .pemanis-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .pemanis-card {
+            background: var(--white);
+            padding: 25px 20px;
+            border-radius: 28px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+        }
+        .pemanis-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 8px; color: var(--dark); }
+        .pemanis-card p { font-size: 12px; color: var(--gray); line-height: 1.6; max-width: 90%; }
+        
+        .grad-line { height: 4px; width: 60px; background: var(--grad-fancy); background-size: 300% 300%; animation: gradientMove 5s ease infinite; border-radius: 10px; margin-top: 18px; }
+
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .benefit-tag { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--primary-light); color: var(--primary); padding: 6px 14px; border-radius: 100px; font-size: 10px; font-weight: 800; margin-bottom: 12px; }
+
+        /* --- MODAL & MISC --- */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); }
+        .modal-content { background: white; width: 85%; max-width: 380px; margin: 25% auto; padding: 25px; border-radius: 25px; animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes modalIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .fade-in { animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        footer { text-align: center; padding: 40px 0; color: var(--gray); font-size: 11px; font-weight: 600; }
+        .hidden { display: none; }
+
+        /* Step Order Styles */
+        .step-order { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px; }
+        .step-num { width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
+        .step-text { font-size: 13px; color: var(--dark); line-height: 1.5; }
+
+        /* Creator Form Extras */
+        .creator-form-field { margin-bottom: 15px; text-align: left; }
+        .creator-form-field label { display: block; font-size: 12px; font-weight: 700; color: var(--gray); margin-bottom: 6px; }
+        .creator-form-field input { width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #eef2f6; outline: none; }
+        .terms-box { background: #f8fafc; padding: 15px; border-radius: 12px; font-size: 11px; color: var(--gray); height: 160px; overflow-y: auto; margin-bottom: 10px; border: 1px solid #eee; text-align: left; line-height: 1.6; }
+        .check-group { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--dark); cursor: pointer; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">N</div>
+            <div class="logo-text-nav"><span>Nox</span><span>Pay</span></div>
+        </div>
+        <div class="menu-label">Navigasi</div>
+        <div class="side-menu-item" onclick="toggleSidebar(); handleHome()"><span>🏠</span> Beranda</div>
+        <div class="side-menu-item" onclick="toggleSidebar(); openCaraOrder()"><span>📖</span> Cara Order</div>
+        <div class="side-menu-item creator-special" onclick="toggleSidebar(); openCreatorModal()"><span>✨</span> Daftar Jadi Creator</div>
+        <div class="side-menu-item" onclick="window.location.href='projects.html'"><span>🎹</span> Project Musik</div>
+        <div class="menu-label">Bantuan</div>
+        <a href="https://wa.me/6283129555763" target="_blank" class="side-menu-item" style="text-decoration:none"><span>💬</span> CS NoxPay</a>
+    </div>
+
+    <div id="splash-screen">
+        <div class="advanced-logo"><div class="logo-shape"></div><div class="logo-inner">N</div></div>
+        <div class="splash-text">NOXPAY</div>
+        <div class="splash-footer-text">Secure & Fast Transaction</div>
+    </div>
+
+    <div id="main-wrapper">
+        <header>
+            <div class="container header-flex">
+                <div class="logo-nav" onclick="toggleSidebar()">
+                    <div class="logo-box">N</div>
+                    <div class="logo-text-nav"><span>Nox</span><span>Pay</span></div>
+                </div>
+                <nav class="nav-right">
+                    <span class="menu-link" onclick="handleHome()">Home</span>
+                    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
+                </nav>
+            </div>
+        </header>
+
+        <section class="hero" id="hero-section">
+            <div class="hero-shapes"></div>
+            <div class="hero-decor-icon" id="hero-icon">📱</div>
+            <div class="container hero-content">
+                <h2 id="hero-title">NoxPay -<br>Digital Payment Terpercaya</h2>
+                <p id="hero-desc">Proses kilat 1-5 menit aktif 24 jam.</p>
+            </div>
+            <div class="hero-character" id="main-character">
+                <img src="HERO/home1.png" id="char-img" alt="Payment Illustration">
+            </div>
+        </section>
+
+        <main class="container" id="main-content">
+            <div class="section-header" id="kategori-section"><h2>Layanan Top Up</h2></div>
+            <div class="category-grid">
+                <div class="category-card" data-cat="game"><div class="icon-box icon-game">🎮</div><span>Game</span></div>
+                <div class="category-card" data-cat="pulsa"><div class="icon-box icon-pulsa">📱</div><span>Pulsa</span></div>
+                <div class="category-card" data-cat="data"><div class="icon-box icon-data">📶</div><span>Paket Data</span></div>
+                <div class="category-card" data-cat="pln"><div class="icon-box icon-pln">⚡</div><span>PLN</span></div>
+                <div class="category-card" data-cat="ewallet" style="grid-column: span 2;"><div class="icon-box icon-ewallet">👛</div><span>E-Wallet</span></div>
+            </div>
+
+            <div id="sub-items-container" class="hidden fade-in">
+                <div class="section-header"><h2>Pilih Produk</h2></div>
+                <div class="category-grid" id="items-list"></div>
+            </div>
+
+            <div id="digital-product-section">
+                <div class="section-header"><h2>Tersedia Juga Produk Digital</h2></div>
+                <div class="category-grid">
+                    <div class="category-card" onclick="window.location.href='projects.html'" style="grid-column: span 2;">
+                        <div class="icon-box icon-project">🎹</div>
+                        <span>Project FL Studio Mobile</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="order-form-container" class="hidden fade-in">
+                <div class="order-form">
+                    <div class="form-group">
+                        <label id="label-id" style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Tujuan</label>
+                        <input type="text" id="target-id" placeholder="Masukkan Nomor/ID" inputmode="numeric">
+                    </div>
+                    <div class="form-group hidden" id="input-server-group" style="margin-top:15px">
+                        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Server ID</label>
+                        <input type="text" id="server-id" placeholder="Contoh: 2024" inputmode="numeric">
+                    </div>
+                    
+                    <div class="section-header" style="margin-top:20px"><h2>Pilih Nominal</h2></div>
+                    <div class="nominal-grid" id="nominal-list"></div>
+
+                    <div id="payment-method-section">
+                        <div class="section-header" style="margin-top:25px"><h2>Metode Pembayaran</h2></div>
+                        <div class="payment-method-container">
+                            <div class="payment-info">
+                                <span class="payment-icon">💵</span>
+                                <div class="payment-text">
+                                    <h4>Bayar Tunai / Cas</h4>
+                                    <p>Serahkan uang langsung ke admin</p>
+                                </div>
+                            </div>
+                            <div class="payment-badge">TERPILIH</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 25px;">
+                        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Nama Anda (Opsional)</label>
+                        <input type="text" id="customer-name" placeholder="Nama Anda">
+                    </div>
+                    <button class="btn-order" id="btn-review">Beli Sekarang</button>
+                </div>
+            </div>
+
+            <div class="pemanis-section" id="pemanis-noxpay">
+                <h2 class="title-gradient-animated">Kenapa Memilih NoxPay?</h2>
+                <div class="pemanis-grid">
+                    <div class="pemanis-card fade-in">
+                        <div class="benefit-tag">⚡ Fast Response</div>
+                        <h3>Proses Kilat Otomatis</h3>
+                        <p>Pesanan kamu diproses dalam hitungan menit tanpa harus menunggu lama. Sistem kami bekerja 24 jam nonstop.</p>
+                    </div>
+                    <div class="pemanis-card fade-in">
+                        <div class="benefit-tag">💎 Terpercaya</div>
+                        <h3>Layanan Aman & Legal</h3>
+                        <p>NoxPay menjamin keamanan data dan legalitas produk digital yang kami sediakan untuk kenyamanan kamu.</p>
+                    </div>
+                    <div class="pemanis-card fade-in">
+                        <div class="benefit-tag">🎨 Creative Hub</div>
+                        <h3>Eksklusif Project Musik</h3>
+                        <p>Selain top up, kami menyediakan aset musik berkualitas tinggi untuk konten kreator dan produser musik.</p>
+                        <div class="grad-line"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="orderModal" class="modal">
+            <div class="modal-content">
+                <h3 style="margin-bottom:15px; font-size:16px; font-weight:800;">Konfirmasi Pesanan</h3>
+                <div id="modal-details" style="font-size: 13px; line-height: 1.8;"></div>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button style="flex:1; padding:12px; border-radius:12px; border:none; background:#f1f5f9; font-weight:700; cursor:pointer" onclick="closeModal()">Batal</button>
+                    <button id="btn-send-wa" style="flex:1; padding:12px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:700; cursor:pointer">Bayar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="caraOrderModal" class="modal">
+            <div class="modal-content" style="max-width: 420px;">
+                <h3 style="margin-bottom:20px; font-size:18px; font-weight:800; text-align:center;">Cara Belanja di NoxPay</h3>
+                
+                <div class="step-order">
+                    <div class="step-num">1</div>
+                    <div class="step-text">Pilih kategori layanan (Game, Pulsa, atau E-Wallet).</div>
+                </div>
+                <div class="step-order">
+                    <div class="step-num">2</div>
+                    <div class="step-text">Masukkan <b>Nomor HP</b> atau <b>ID Akun</b> tujuan dengan benar.</div>
+                </div>
+                <div class="step-order">
+                    <div class="step-num">3</div>
+                    <div class="step-text">Pilih <b>Nominal</b> produk yang ingin kamu beli.</div>
+                </div>
+                <div class="step-order">
+                    <div class="step-num">4</div>
+                    <div class="step-text">Klik <b>Beli Sekarang</b>, cek detailnya, lalu klik <b>Bayar</b>.</div>
+                </div>
+                <div class="step-order">
+                    <div class="step-num">5</div>
+                    <div class="step-text">Kamu akan diarahkan ke WhatsApp untuk menyelesaikan pembayaran secara tunai (COD).</div>
+                </div>
+
+                <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:10px;" onclick="closeCaraOrder()">Mengerti</button>
+            </div>
+        </div>
+
+        <div id="creatorModal" class="modal">
+            <div class="modal-content" style="max-width: 420px; margin: 10% auto;">
+                
+                <div id="creator-step-1">
+                    <h3 style="margin-bottom:20px; font-size:18px; font-weight:800; text-align:center;">Pilih Kategori Digital</h3>
+                    <div class="category-grid">
+                        <div class="category-card" onclick="goToCreatorTerms('Music Project (FL Studio)')" style="grid-column: span 2;">
+                            <div class="icon-box icon-project">🎹</div>
+                            <span>Music Project</span>
+                        </div>
+                    </div>
+                    <button style="width:100%; padding:10px; border:none; background:none; color:var(--gray); font-weight:700; cursor:pointer; margin-top:20px;" onclick="closeCreatorModal()">Batal</button>
+                </div>
+
+                <div id="creator-step-terms" class="hidden">
+                    <h3 style="margin-bottom:15px; font-size:18px; font-weight:800; text-align:center;">Syarat & Ketentuan</h3>
+                    <div class="terms-box">
+                        <b>1. Kepemilikan Karya:</b> Produk yang dijual harus karya asli bukan hasil comot.<br>
+                        <b>2. PENTING:</b> Setiap project yang terjual akan di potong Atmin 5rb ya!.<br>
+                        <b>3. UPLOAD Produk:</b> Untuk upload produk tanpa biaya/gratis!,tapi 1hari limit upload 5 produk!.<br>
+                        <b>4. DAFTAR JADI CREATOR:</b> Untuk daftar jadi creator itu Gratiss!.
+                    </div>
+                    <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:10px;" onclick="goToCreatorForm()">Saya Setuju & Lanjut</button>
+                    <button style="width:100%; padding:10px; border:none; background:none; color:var(--gray); font-weight:700; cursor:pointer; margin-top:10px;" onclick="backToCreatorCategories()">Batal</button>
+                </div>
+
+                <div id="creator-step-2" class="hidden">
+                    <h3 style="margin-bottom:15px; font-size:18px; font-weight:800; text-align:center;">Formulir Pendaftaran</h3>
+                    <p style="font-size: 11px; text-align:center; color: var(--primary); font-weight: 700; margin-bottom: 15px;" id="selected-cat-label"></p>
+                    
+                    <div style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                        <div class="creator-form-field">
+                            <label>Nama Artist / Creator</label>
+                            <input type="text" id="creator-name" placeholder="Contoh: Nox Music">
+                        </div>
+                        
+                        <div class="creator-form-field">
+                            <label>Nomor WhatsApp</label>
+                            <input type="number" id="creator-wa" placeholder="Contoh: 08123456789">
+                        </div>
+
+                        <hr style="margin: 20px 0; opacity: 0.1;">
+                        <p style="font-size: 12px; font-weight: 800; color: var(--dark); margin-bottom: 12px;">Data Login (Untuk Dashboard Creator)</p>
+
+                        <div class="creator-form-field">
+                            <label>Username</label>
+                            <input type="text" id="creator-user" placeholder="Buat username login">
+                        </div>
+
+                        <div class="creator-form-field">
+                            <label>Password</label>
+                            <input type="password" id="creator-pass" placeholder="Buat password login">
+                        </div>
+                    </div>
+
+                    <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:15px;" onclick="submitCreatorForm()">Kirim Pendaftaran</button>
+                    <button style="width:100%; padding:10px; border:none; background:none; color:var(--gray); font-weight:700; cursor:pointer; margin-top:10px;" onclick="backToTerms()">Kembali</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>&copy; 2025 NoxPay Digital Payment.</footer>
+    </div>
+
+    <script>
+        const WHATSAPP_NUMBER = "6283129555763";
+        let selectedCreatorCategory = "";
+
+        const heroThemes = {
+            default: { bg: 'linear-gradient(135deg, #0066ff 0%, #00d2ff 100%)', icon: '📱', title: 'NoxPay -<br>Digital Payment Terpercaya', desc: 'Proses kilat 1-5 menit aktif 24 jam.', char: 'HERO/home1.png' },
+            game: { bg: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)', icon: '🎮', title: 'Top Up Game<br>Favoritmu', desc: 'Diamond & Point murah setiap hari.', char: 'HERO/home1.png' },
+            pulsa: { bg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', icon: '📲', title: 'Isi Pulsa<br>Semua Operator', desc: 'Pulsa murah tanpa antri.', char: 'HERO/home1.png' },
+            data: { bg: 'linear-gradient(135deg, #f472b6 0%, #db2777 100%)', icon: '📶', title: 'Paket Data<br>Internet Murah', desc: 'Browsing makin lancar tanpa kendala.', char: 'HERO/home1.png' },
+            pln: { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', icon: '⚡', title: 'Token Listrik<br>PLN Prabayar', desc: 'Token terkirim otomatis.', char: 'HERO/home1.png' },
+            ewallet: { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', icon: '👛', title: 'Top Up<br>E-Wallet', desc: 'Saldo Dana.', char: 'HERO/home1.png' },
+            ml: { bg: 'linear-gradient(135deg, #003366 0%, #0066cc 100%)', icon: '⚔️', title: 'Mobile Legends<br>Bang Bang', desc: 'Top up Diamond MLBB aman & legal via ID.', char: 'HERO/mlbb.png' },
+            ff: { bg: 'linear-gradient(135deg, #ff4e00 0%, #ec9f05 100%)', icon: '🔥', title: 'Garena<br>Free Fire', desc: 'Diamond FF murah untuk Booyah lebih maksimal!', char: 'HERO/game.png' }
+        };
+
+        // Helper function to generate pulsa prices (Kelipatan 5.000, Harga +2.000)
+        function generatePulsaPrices() {
+            const prices = [];
+            for (let val = 5000; val <= 100000; val += 5000) {
+                prices.push({
+                    a: val.toLocaleString('id-ID'),
+                    p: (val + 2000).toLocaleString('id-ID')
+                });
+            }
+            return prices;
+        }
+        
+        const database = {
+            game: [
+                { 
+                    id: 'ml', 
+                    name: 'MLBB', 
+                    img: 'GAME/mlbb.jpg', 
+                    heroImg: 'HERO/mlbb.png', 
+                    needsServer: true, 
+                    prices: [
+                        {a: '5 Diamond', p: '1.500'},
+                        {a: '11 Diamond', p: '3.500'},
+                        {a: '12 Diamond', p: '4.000'},
+                        {a: '15 Diamond', p: '5.000'},
+                        {a: '19 Diamond', p: '6.000'},
+                        {a: '20 Diamond', p: '6.500'},
+                        {a: '28 Diamond', p: '9.000'},
+                        {a: '30 Diamond', p: '9.500'},
+                        {a: '33 Diamond', p: '10.000'},
+                        {a: '36 Diamond', p: '10.500'},
+                        {a: '40 Diamond', p: '11.500'},
+                        {a: '46 Diamond', p: '13.500'},
+                        {a: '54 Diamond', p: '16.000'},
+                        {a: '65 Diamond', p: '18.000'},
+                        {a: '70 Diamond', p: '20.000'},
+                        {a: '75 Diamond', p: '22.000'},
+                        {a: '81 Diamond', p: '24.000'},
+                        {a: '92 Diamond', p: '26.000'},
+                        {a: '102 Diamond', p: '30.000'},
+                        {a: '110 Diamond', p: '31.000'},
+                        {a: '114 Diamond', p: '33.000'},
+                        {a: '140 Diamond', p: '38.000'},
+                        {a: '153 Diamond', p: '41.000'},
+                        {a: '168 Diamond', p: '46.000'},
+                        {a: '170 Diamond', p: '48.000'}
+                    ] 
+                },
+                { 
+                    id: 'ff', 
+                    name: 'Free Fire', 
+                    img: 'https://img.icons8.com/color/144/free-fire.png', 
+                    heroImg: 'HERO/game.png', 
+                    needsServer: false, 
+                    prices: [
+                        {a: '5 Diamond', p: '1.000'},
+                        {a: '10 Diamond', p: '2.000'},
+                        {a: '12 Diamond', p: '3.000'},
+                        {a: '15 Diamond', p: '3.500'},
+                        {a: '20 Diamond', p: '3.500'},
+                        {a: '25 Diamond', p: '4.000'},
+                        {a: '30 Diamond', p: '5.000'},
+                        {a: '40 Diamond', p: '7.000'},
+                        {a: '50 Diamond', p: '7.500'},
+                        {a: '55 Diamond', p: '8.000'},
+                        {a: '70 Diamond', p: '9.000'},
+                        {a: '80 Diamond', p: '11.000'},
+                        {a: '90 Diamond', p: '13.500'},
+                        {a: '120 Diamond', p: '16.000'},
+                        {a: '140 Diamond', p: '18.000'},
+                        {a: '150 Diamond', p: '19.000'},
+                        {a: '160 Diamond', p: '21.000'},
+                        {a: '190 Diamond', p: '25.000'},
+                        {a: 'Member Mingguan', p: '30.000'},
+                        {a: 'Member Bulanan', p: '150.000'}
+                    ] 
+                }
+            ],
+            pulsa: [
+                { id: 'tsel', name: 'Telkomsel', needsServer: false, prices: generatePulsaPrices() },
+                { id: 'xl', name: 'XL Axiata', needsServer: false, prices: generatePulsaPrices() },
+                { id: 'axis', name: 'Axis', needsServer: false, prices: generatePulsaPrices() }
+            ],
+            data: [
+                { 
+                    id: 'axis-data', 
+                    name: 'Axis AIGO', 
+                    needsServer: false, 
+                    prices: [
+                        {a: 'Kuota 500MB, 28 Hari', p: '6.179'},
+                        {a: 'Kuota 1GB, 28 Hari', p: '9.475'},
+                        {a: 'AIGO 2GB + Lokal, 28 Hari', p: '16.874'},
+                        {a: 'AIGO 3GB + Lokal, 28 Hari', p: '24.274'},
+                        {a: 'AIGO 5GB + Lokal, 28 Hari', p: '31.049'},
+                        {a: 'AIGO 6GB + Lokal, 28 Hari', p: '31.609'},
+                        {a: 'AIGO 8GB + Lokal, 28 Hari', p: '39.599'},
+                        {a: 'AIGO 14GB + Lokal, 28 Hari', p: '58.550'},
+                        {a: 'AIGO 20GB + Lokal, 28 Hari', p: '73.550'},
+                        {a: 'AIGO 30GB + Lokal, 28 Hari', p: '90.782'},
+                        {a: 'AIGO 100GB + Lokal, 28 Hari', p: '170.374'},
+                        {a: 'AIGO 150GB + Lokal, 28 Hari', p: '235.369'},
+                        {a: 'AIGO 250GB + Lokal, 28 Hari', p: '300.365'}
+                    ] 
+                }
+            ],
+            pln: [{ 
+                id: 'token', 
+                name: 'Token PLN', 
+                img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Logo_PLN.svg/1200px-Logo_PLN.svg.png', 
+                needsServer: false, 
+                prices: [
+                    {a: '5.000', p: '8.000'}, {a: '10.000', p: '13.000'}, {a: '15.000', p: '18.000'}, 
+                    {a: '20.000', p: '23.000'}, {a: '50.000', p: '53.000'}, {a: '100.000', p: '103.000'}, 
+                    {a: '200.000', p: '203.000'}, {a: '500.000', p: '503.000'}, {a: '1.000.000', p: '1.003.000'}
+                ] 
+            }],
+            ewallet: [
+                { 
+                    id: 'dana', 
+                    name: 'DANA', 
+                    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png', 
+                    needsServer: false, 
+                    prices: [
+                        {a: '5.000', p: '7.000'}, {a: '10.000', p: '12.000'}, {a: '15.000', p: '17.000'}, 
+                        {a: '20.000', p: '22.000'}, {a: '25.000', p: '27.000'}, {a: '30.000', p: '32.000'}, 
+                        {a: '35.000', p: '37.000'}, {a: '40.000', p: '42.000'}, {a: '45.000', p: '47.000'}, 
+                        {a: '50.000', p: '52.000'}, {a: '55.000', p: '57.000'}, {a: '60.000', p: '62.000'}, 
+                        {a: '65.000', p: '67.000'}, {a: '70.000', p: '72.000'}, {a: '75.000', p: '77.000'}, 
+                        {a: '80.000', p: '82.000'}, {a: '85.000', p: '87.000'}, {a: '90.000', p: '92.000'}, 
+                        {a: '95.000', p: '97.000'}, {a: '100.000', p: '102.000'}, {a: '200.000', p: '202.000'}, 
+                        {a: '300.000', p: '302.000'}, {a: '400.000', p: '402.000'}, {a: '500.000', p: '502.000'}, 
+                        {a: '600.000', p: '602.000'}, {a: '700.000', p: '702.000'}, {a: '800.000', p: '802.000'}, 
+                        {a: '900.000', p: '902.000'}, {a: '1.000.000', p: '1.002.000'}
+                    ] 
+                }
+            ]
+        };
+
+        let selectedCategory = '';
+        let selectedProduct = null;
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sb.classList.contains('active')) {
+                sb.classList.remove('active');
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.style.display = 'none', 300);
+            } else {
+                overlay.style.display = 'block';
+                setTimeout(() => { sb.classList.add('active'); overlay.style.opacity = '1'; }, 10);
+            }
+        }
+
+        function openCaraOrder() { document.getElementById('caraOrderModal').style.display = 'block'; }
+        function closeCaraOrder() { document.getElementById('caraOrderModal').style.display = 'none'; }
+        
+        function openCreatorModal() { 
+            document.getElementById('creatorModal').style.display = 'block'; 
+            backToCreatorCategories(); 
+        }
+        function closeCreatorModal() { document.getElementById('creatorModal').style.display = 'none'; }
+
+        function goToCreatorTerms(cat) {
+            selectedCreatorCategory = cat;
+            document.getElementById('creator-step-1').classList.add('hidden');
+            document.getElementById('creator-step-terms').classList.remove('hidden');
+        }
+
+        function goToCreatorForm() {
+            document.getElementById('creator-step-terms').classList.add('hidden');
+            document.getElementById('creator-step-2').classList.remove('hidden');
+            document.getElementById('selected-cat-label').innerText = "Mendaftar Sebagai Creator: " + selectedCreatorCategory;
+        }
+
+        function backToCreatorCategories() {
+            document.getElementById('creator-step-terms').classList.add('hidden');
+            document.getElementById('creator-step-2').classList.add('hidden');
+            document.getElementById('creator-step-1').classList.remove('hidden');
+            document.getElementById('creator-name').value = '';
+            document.getElementById('creator-wa').value = '';
+            document.getElementById('creator-user').value = '';
+            document.getElementById('creator-pass').value = '';
+        }
+
+        function backToTerms() {
+            document.getElementById('creator-step-2').classList.add('hidden');
+            document.getElementById('creator-step-terms').classList.remove('hidden');
+        }
+
+        function submitCreatorForm() {
+            const name = document.getElementById('creator-name').value;
+            const wa = document.getElementById('creator-wa').value;
+            const user = document.getElementById('creator-user').value;
+            const pass = document.getElementById('creator-pass').value;
+
+            if(!name || !wa || !user || !pass) {
+                alert('Mohon lengkapi seluruh data formulir dan data login.');
+                return;
+            }
+
+            const msg = `Halo Admin NoxPay,\n\nSaya ingin mendaftar menjadi *CREATOR*.\n\n*--- DATA PENDAFTAR ---*\nNama Artist: ${name}\nWhatsApp: ${wa}\nKategori: ${selectedCreatorCategory}\n\n*--- DATA LOGIN ---*\nUsername: ${user}\nPassword: ${pass}\n\nSaya telah menyetujui Syarat & Ketentuan. Mohon segera divalidasi akun saya!`;
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+            closeCreatorModal();
+        }
+
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('fromProject') === 'true') {
+                document.getElementById('splash-screen').style.display = 'none';
+                document.getElementById('main-wrapper').style.opacity = '1';
+                document.getElementById('main-character').classList.add('animate');
+            } else {
+                setTimeout(() => {
+                    document.getElementById('splash-screen').style.display = 'none';
+                    document.getElementById('main-wrapper').style.opacity = '1';
+                    setTimeout(() => { document.getElementById('main-character').classList.add('animate'); }, 100);
+                }, 2500);
+            }
+        });
+
+        function applyTheme(themeKey) {
+            const theme = heroThemes[themeKey] || heroThemes.default;
+            const hero = document.getElementById('hero-section');
+            const hIcon = document.getElementById('hero-icon');
+            const hTitle = document.getElementById('hero-title');
+            const hDesc = document.getElementById('hero-desc');
+            const charImg = document.getElementById('char-img');
+            hero.style.background = theme.bg;
+            hIcon.innerText = theme.icon;
+            hTitle.innerHTML = theme.title;
+            hDesc.innerText = theme.desc;
+            charImg.src = theme.char;
+        }
+
+        function resetInputs() {
+            document.getElementById('target-id').value = '';
+            document.getElementById('server-id').value = '';
+            document.getElementById('customer-name').value = '';
+        }
+
+        function handleHome() {
+            selectedCategory = ''; selectedProduct = null;
+            applyTheme('default');
+            resetInputs(); 
+            document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('sub-items-container').classList.add('hidden');
+            document.getElementById('order-form-container').classList.add('hidden');
+            document.getElementById('pemanis-noxpay').classList.remove('hidden');
+            document.getElementById('digital-product-section').classList.remove('hidden');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        document.querySelectorAll('.category-card[data-cat]').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                selectedCategory = card.dataset.cat;
+                resetInputs(); 
+                applyTheme(selectedCategory);
+                showProducts(selectedCategory);
+                document.getElementById('order-form-container').classList.add('hidden');
+                document.getElementById('pemanis-noxpay').classList.add('hidden');
+                document.getElementById('digital-product-section').classList.add('hidden');
+            });
+        });
+
+        function showProducts(cat) {
+            const container = document.getElementById('sub-items-container');
+            const list = document.getElementById('items-list');
+            list.innerHTML = '';
+            database[cat].forEach(prod => {
+                const item = document.createElement('div');
+                item.className = 'category-card fade-in';
+                if(cat === 'pulsa' || cat === 'data') {
+                    item.innerHTML = `<span>${prod.name}</span>`;
+                } else {
+                    item.innerHTML = `<div class="icon-box" style="background:var(--primary-light)"><img src="${prod.img}" style="width:70%; height:70%; object-fit:contain;"></div><span>${prod.name}</span>`;
+                }
+                item.onclick = () => selectProduct(prod, item);
+                list.appendChild(item);
+            });
+            container.classList.remove('hidden');
+            const yOffset = -80; 
+            const y = container.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({top: y, behavior: 'smooth'});
+        }
+
+        function selectProduct(prod, element) {
+            document.querySelectorAll('#items-list .category-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            selectedProduct = prod;
+            resetInputs(); 
+            if (heroThemes[prod.id]) applyTheme(prod.id);
+            const labelId = document.getElementById('label-id');
+            const inputId = document.getElementById('target-id');
+            if(selectedCategory === 'pln') {
+                labelId.innerText = "Nomor Meter / ID Pelanggan";
+                inputId.placeholder = "Contoh: 12345678901";
+            } else if(selectedCategory === 'pulsa' || selectedCategory === 'data') {
+                labelId.innerText = "Masukkan Nomor HP";
+                inputId.placeholder = "Contoh: 08123456789";
+            } else if(selectedCategory === 'ewallet') {
+                labelId.innerText = "Nomor Terdaftar di " + prod.name;
+                inputId.placeholder = "Contoh: 08123456789";
+            } else {
+                labelId.innerText = "User ID";
+                inputId.placeholder = "Masukkan ID Akun";
+            }
+            document.getElementById('input-server-group').className = prod.needsServer ? 'form-group' : 'hidden';
+            const nominalList = document.getElementById('nominal-list');
+            nominalList.innerHTML = '';
+            prod.prices.forEach((p, i) => {
+                nominalList.innerHTML += `<div class="nominal-item fade-in"><input type="radio" name="nominal" id="n-${i}" value="${p.a}" data-price="${p.p}"><label for="n-${i}"><b>${p.a}</b><br><span style="font-size:11px; color:var(--primary)">Rp ${p.p}</span></label></div>`;
+            });
+            const orderForm = document.getElementById('order-form-container');
+            orderForm.classList.remove('hidden');
+            const yOffset = -80;
+            const y = orderForm.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({top: y, behavior: 'smooth'});
+        }
+
+        document.getElementById('btn-review').onclick = () => {
+            const id = document.getElementById('target-id').value;
+            const nominal = document.querySelector('input[name="nominal"]:checked');
+            if(!id || !nominal) return alert('Lengkapi data pesanan!');
+            document.getElementById('modal-details').innerHTML = `
+                <div style="background:#f8fafc; padding:15px; border-radius:15px;">
+                    <p>Produk: <b>${selectedProduct.name}</b></p>
+                    <p>Nominal: <b>${nominal.value}</b></p>
+                    <p>Tujuan: <b>${id}</b></p>
+                    <p>Pembayaran: <b>Tunai / Cash (COD)</b></p>
+                    <hr style="margin:8px 0; opacity:0.1">
+                    <p>Total: <b>Rp ${nominal.dataset.price}</b></p>
+                </div>`;
+            document.getElementById('orderModal').style.display = 'block';
+        };
+
+        document.getElementById('btn-send-wa').onclick = () => {
+            const id = document.getElementById('target-id').value;
+            const serverId = document.getElementById('server-id').value;
+            const nominal = document.querySelector('input[name="nominal"]:checked');
+            const custName = document.getElementById('customer-name').value;
+            let destination = serverId ? `${id} (${serverId})` : id;
+            let buyerName = custName ? custName : 'Pelanggan';
+            let msg = `Halo *NoxPay*, saya ingin order.\n\n` +
+                      `*--- DETAIL PESANAN ---*\n` +
+                      `*Nama:* ${buyerName}\n` +
+                      `*Produk:* ${selectedProduct.name}\n` +
+                      `*Nominal:* ${nominal.value}\n` +
+                      `*ID/No:* ${destination}\n` +
+                      `*Total Harga:* Rp ${nominal.dataset.price}\n\n` +
+                      `Mohon segera diproses ya, terima kasih!`;
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
+    </script>
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoxPay - Music Preview Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-light: #f5f3ff;
+            --secondary: #d946ef;
+            --dark: #1e293b;
+            --light: #f1f5f9;
+            --white: #ffffff;
+            --gray: #64748b;
+            --hero-music: linear-gradient(135deg, #6d28d9 0%, #d946ef 100%);
+            --bg-gradient: linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%);
+            --avatar-gradient: linear-gradient(45deg, #8b5cf6, #d946ef, #00d2ff);
+            --btn-home-bg: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+            --btn-buy-bg: #1e293b; 
+            --btn-change-bg: #ffffff; 
+            --accent-new: #ff3e3e;
+            --whatsapp-green: #25d366;
+        }
+
+        /* Base Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        
+        body { 
+            background: var(--bg-gradient); 
+            min-height: 100vh; 
+            color: var(--dark); 
+            overflow-x: hidden;
+            animation: pageFadeIn 0.8s ease-out;
+        }
+
+        @keyframes pageFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .container { padding: 0 16px; width: 100%; max-width: 500px; margin: 0 auto; position: relative; }
+
+        /* --- HEADER & SIDEBAR --- */
+        header { 
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(15px); 
+            padding: 12px 0; 
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1); 
+            position: sticky; top: 0; z-index: 1000; 
+        }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; }
+        .logo-nav { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .logo-box { width: 32px; height: 32px; background: var(--hero-music); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 14px; }
+
+        #creator-sidebar {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+            background: var(--white); z-index: 5001;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+            padding: 30px 20px;
+        }
+        #creator-sidebar.active { left: 0; }
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            z-index: 5000; display: none; opacity: 0; transition: 0.3s;
+        }
+
+        /* Styling Tombol Upload Baru */
+        .btn-upload-prominent {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 18px;
+            margin-top: 20px;
+            cursor: pointer;
+            background: var(--hero-music);
+            color: white !important;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.2px;
+            box-shadow: 0 8px 15px rgba(139, 92, 246, 0.25);
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-upload-prominent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(139, 92, 246, 0.35);
+        }
+
+        .btn-upload-prominent .icon-bg {
+            background: rgba(255, 255, 255, 0.2);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .side-menu-item {
+            display: flex; align-items: center; gap: 12px; padding: 14px;
+            border-radius: 12px; margin-bottom: 8px; cursor: pointer;
+            font-weight: 700; color: var(--dark); transition: 0.2s;
+        }
+        .side-menu-item:hover { background: var(--primary-light); color: var(--primary); }
+
+        .btn-home-header {
+            background: var(--btn-home-bg); color: white; text-decoration: none;
+            padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 800;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
+        }
+
+        /* Fitur Baru: Tombol Cara Upload */
+        .btn-guide-header {
+            background: white; color: var(--primary); border: 1.5px solid var(--primary); 
+            text-decoration: none; padding: 5px 10px; border-radius: 10px; font-size: 11px; 
+            font-weight: 800; margin-right: 6px; cursor: pointer;
+        }
+
+        /* --- HERO --- */
+        .hero { 
+            position: relative; background: var(--hero-music); color: white; 
+            padding: 40px 0 70px; border-radius: 0 0 40px 40px; 
+            overflow: hidden; margin-bottom: 10px; 
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.2); 
+        }
+        .music-float-1 { position: absolute; top: 12%; right: 10%; width: 40px; opacity: 0.3; animation: floating 4s infinite ease-in-out; }
+        .music-float-2 { position: absolute; bottom: 20%; right: 45%; width: 30px; opacity: 0.2; animation: floating 3s infinite ease-in-out reverse; }
+        .hero-character { position: absolute; right: -10px; bottom: -5px; width: 170px; z-index: 5; pointer-events: none; }
+        .hero-character img { width: 100%; height: auto; animation: floating 3.5s ease-in-out infinite; }
+        @keyframes floating { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+
+        /* --- PROJECT LIST & CARDS --- */
+        .section-header { margin: 20px 0 12px; display: flex; justify-content: space-between; align-items: center; }
+        .section-header h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--dark); }
+        .section-header h2::before { content: ''; width: 5px; height: 15px; background: var(--primary); border-radius: 10px; }
+        
+        .project-card { 
+            background: var(--white); padding: 12px; border-radius: 24px; display: flex; 
+            flex-direction: column; gap: 8px; margin-bottom: 16px; 
+            border: 1px solid rgba(139, 92, 246, 0.05); box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            position: relative; overflow: hidden;
+        }
+
+        .card-main-info { display: flex; align-items: center; gap: 12px; width: 100%; }
+
+        .new-badge { position: absolute; top: 0; right: 0; background: var(--accent-new); color: white; font-size: 8px; font-weight: 900; padding: 4px 10px; border-radius: 0 0 0 15px; z-index: 2; }
+        .project-img-container { position: relative; width: 65px; height: 65px; flex-shrink: 0; cursor: pointer; }
+        .project-img-box { width: 100%; height: 100%; border-radius: 16px; background: #e2e8f0; overflow: hidden; }
+        .project-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .play-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.25); border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .play-icon { width: 32px; height: 32px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .play-icon svg { width: 14px; height: 14px; fill: var(--primary); transition: 0.2s; }
+
+        .project-info { flex: 1; }
+        .project-info b { font-size: 13px; display: block; margin-bottom: 2px; color: var(--dark); padding-right: 20px; line-height: 1.2; }
+        .project-info span { font-size: 14px; color: var(--primary); font-weight: 800; }
+        .btn-buy { background: var(--btn-buy-bg); color: white; border: none; padding: 10px 16px; border-radius: 14px; font-weight: 700; font-size: 10px; cursor: pointer; align-self: center; }
+
+        /* --- PLAYER BAR --- */
+        .player-controls { 
+            background: #f8fafc; padding: 8px 12px; border-radius: 12px; 
+            display: flex; align-items: center; gap: 10px; margin-top: 4px;
+            opacity: 0.5; transition: 0.3s; pointer-events: none;
+        }
+        .player-controls.active { opacity: 1; pointer-events: all; }
+        
+        .progress-container { flex: 1; position: relative; display: flex; align-items: center; }
+        .progress-bar { 
+            width: 100%; height: 4px; background: #e2e8f0; border-radius: 10px; 
+            cursor: pointer; appearance: none; outline: none;
+        }
+        .progress-bar::-webkit-slider-thumb {
+            appearance: none; width: 12px; height: 12px; background: var(--primary); 
+            border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .time-display { font-size: 9px; font-weight: 800; color: var(--gray); min-width: 30px; }
+
+        /* --- CATEGORY / CREATOR GRID --- */
+        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 5px; }
+        .creator-card { background: white; padding: 20px 10px; border-radius: 24px; text-align: center; border: 1px solid rgba(139, 92, 246, 0.08); cursor: pointer; }
+        .avatar-wrapper { width: 70px; height: 70px; margin: 0 auto 10px; background: var(--avatar-gradient); padding: 2px; border-radius: 50%; }
+        .creator-card img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid white; object-fit: cover; }
+
+        /* --- MODAL SYSTEM --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: none; align-items: flex-end; z-index: 2000; }
+        .modal-content { background: white; width: 100%; max-width: 500px; margin: 0 auto; border-radius: 30px 30px 0 0; padding: 24px; max-height: 90vh; overflow-y: auto; }
+        .modal-drag { width: 40px; height: 4px; background: #e2e8f0; border-radius: 10px; margin: -10px auto 20px; }
+        .form-label { display: block; font-size: 11px; font-weight: 800; color: var(--gray); margin-bottom: 6px; text-transform: uppercase; }
+        .form-control { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9; background: #f8fafc; font-size: 13px; font-weight: 700; margin-bottom: 15px; outline: none; }
+        
+        /* Guide Styles */
+        .guide-step { display: flex; gap: 12px; margin-bottom: 15px; }
+        .step-num { width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+        .step-text { font-size: 12px; font-weight: 600; color: var(--dark); line-height: 1.5; }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2;
+        }
+        .custom-file-btn {
+            display: block; width: 100%; padding: 14px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; text-align: center; color: var(--gray); font-size: 12px; font-weight: 700;
+        }
+
+        .hidden { display: none !important; }
+        footer { text-align: center; padding: 30px; font-size: 10px; color: var(--gray); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-overlay-creator" class="sidebar-overlay" onclick="toggleSidebarCreator()"></div>
+    <div id="creator-sidebar">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="logo-box">N</div>
+            <b style="font-size: 16px;">Creator Hub</b>
+        </div>
+
+        <div class="btn-upload-prominent" onclick="handleMenuUpload()">
+            <div class="icon-bg">📤</div>
+            <span>UPLOAD PROJECT</span>
+        </div>
+
+        <div style="margin-top: 25px;">
+        </div>
+    </div>
+
+    <header>
+        <div class="container header-flex">
+            <div class="logo-nav" onclick="toggleSidebarCreator()">
+                <div class="logo-box">N</div>
+                <div style="font-weight: 800; font-size: 16px; letter-spacing: -0.5px;">Nox<span style="color:var(--primary)">Pay Music</span></div>
+            </div>
+            <div>
+                <button class="btn-guide-header" onclick="document.getElementById('modal-guide').style.display='flex'">Cara Upload</button>
+                <a href="index.html?fromProject=true" class="btn-home-header">Beranda</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <img src="https://img.icons8.com/fluency/96/headphone.png" class="music-float-1">
+        <img src="https://img.icons8.com/fluency/96/musical-notes.png" class="music-float-2">
+        <div class="container hero-content">
+            <div style="background: rgba(255, 255, 255, 0.15); padding: 5px 12px; border-radius: 100px; font-size: 9px; font-weight: 800; display: inline-flex; margin-bottom: 12px;">✨ Music Marketplace</div>
+            <h2 style="font-size:28px; font-weight:800; line-height:1.1; letter-spacing: -1px;">Project Fl Studio Mobile<br>& Asset Music</h2>
+            <p style="font-size:12px; opacity:0.85; width:65%; margin-top:10px;">Dapatkan project terbaik dari artis pilihan.</p>
+        </div>
+        <div class="hero-character">
+            <img src="https://img.icons8.com/illustrations/external-faticon-flat-faticon/256/external-music-producer-recording-studio-faticon-flat-faticon.png">
+        </div>
+    </section>
+
+    <main class="container">
+        <div id="creator-section">
+            <div class="section-header"><h2>Pilih Kreator</h2></div>
+            <div class="category-grid">
+                <div class="creator-card" onclick="showProjects('Dyon Yete', 'https://api.dicebear.com/7.x/notionists/svg?seed=Dyon&backgroundColor=b6e3f4')">
+                    <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Dyon&backgroundColor=b6e3f4"></div>
+                    <b>Dyon Yete</b>
+                </div>
+                <div class="creator-card" onclick="showProjects('Artist', 'https://api.dicebear.com/7.x/notionists/svg?seed=Budi&backgroundColor=ffdfbf')">
+                    <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Budi&backgroundColor=ffdfbf"></div>
+                    <b>Artist</b>
+                </div>
+            </div>
+        </div>
+
+        <div id="project-section" class="hidden">
+            <div class="section-header">
+                <h2>Karya <span id="creator-name-display" style="color:var(--primary)"></span></h2>
+                <button onclick="showCreators()" style="background:white; border:1px solid var(--primary); color:var(--primary); padding:6px 12px; border-radius:10px; font-size:10px; font-weight:800;">Ganti</button>
+            </div>
+            <div id="project-render"></div>
+        </div>
+    </main>
+
+    <div id="modal-guide" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-drag"></div>
+            <h3 style="margin-bottom:20px; font-weight:800;">Panduan Upload Project</h3>
+            
+            <div class="guide-step">
+                <div class="step-num">1</div>
+                <div class="step-text">Klik <b>Logo N (Kiri Atas)</b> untuk membuka Sidebar Creator.</div>
+            </div>
+            <div class="guide-step">
+                <div class="step-num">2</div>
+                <div class="step-text">Klik tombol ungu <b>UPLOAD PROJECT</b>.</div>
+            </div>
+            <div class="guide-step">
+                <div class="step-num">3</div>
+                <div class="step-text">Masukkan <b>Username & Password</b> Creator Anda.</div>
+            </div>
+            <div class="guide-step">
+                <div class="step-num">4</div>
+                <div class="step-text">Isi data project, upload <b>Audio Preview (.mp3)</b>, dan masukkan <b>Link Download Zip</b>.</div>
+            </div>
+            <div class="guide-step">
+                <div class="step-num">5</div>
+                <div class="step-text">Klik <b>Kirim ke Admin</b>, data akan diverifikasi via WhatsApp sebelum dipublish.</div>
+            </div>
+
+            <button onclick="closeModalGeneric('modal-guide')" style="background:var(--primary); color:white; width:100%; border:none; padding:16px; border-radius:15px; font-weight:800; margin-top:10px;">Saya Mengerti</button>
+        </div>
+    </div>
+
+    <div id="modal-login-creator" class="modal-overlay">
+        <div class="modal-content" style="border-radius: 30px; margin-bottom: auto; margin-top: 30%;">
+            <h3 style="text-align:center; margin-bottom:20px; font-weight:800;">Login Creator</h3>
+            <label class="form-label">Username</label>
+            <input type="text" id="login-user" class="form-control" placeholder="Username">
+            <label class="form-label">Password</label>
+            <input type="password" id="login-pass" class="form-control" placeholder="Password">
+            <button onclick="checkLoginCreator()" style="background:var(--primary); color:white; width:100%; border:none; padding:16px; border-radius:15px; font-weight:800;">Masuk</button>
+            <button onclick="closeModalGeneric('modal-login-creator')" style="width:100%; border:none; background:none; margin-top:10px; color:var(--gray); font-size:12px;">Batal</button>
+        </div>
+    </div>
+
+    <div id="modal-upload-project" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-drag"></div>
+            <h3 style="margin-bottom:20px; font-weight:800;">Upload Project Baru</h3>
+            <label class="form-label">Judul Project</label>
+            <input type="text" id="up-title" class="form-control" placeholder="Judul">
+            <label class="form-label">Genre</label>
+            <input type="text" id="up-genre" class="form-control" placeholder="Genre">
+            <label class="form-label">Harga (Rp)</label>
+            <input type="number" id="up-price" class="form-control" placeholder="Contoh: 50000">
+            
+            <label class="form-label">Audio Preview (.mp3)</label>
+            <div class="file-input-wrapper">
+                <input type="file" id="up-audio-file" accept=".mp3,audio/*" onchange="updateFileNameDisplay(this)">
+                <div class="custom-file-btn" id="file-display-name">Klik untuk Pilih MP3</div>
+            </div>
+            
+            <label class="form-label">Link File Project (.zip)</label>
+            <input type="text" id="up-file" class="form-control" placeholder="Link Download">
+            
+            <button onclick="submitToAdmin()" style="background:var(--whatsapp-green); color:white; width:100%; border:none; padding:16px; border-radius:15px; font-weight:800;">Kirim ke Admin</button>
+            <button onclick="closeModalGeneric('modal-upload-project')" style="width:100%; border:none; background:none; margin-top:10px; color:var(--gray);">Batal</button>
+        </div>
+    </div>
+
+    <div onclick="openClaimModal()" style="position: fixed; bottom: 25px; right: 20px; background: #000; color: white; padding: 12px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; z-index: 1500;">
+        🔑 Klaim Download
+    </div>
+
+    <div id="modal-claim" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-drag"></div>
+            <h3 style="margin-bottom:15px; font-weight:800;">Klaim Project</h3>
+            <input type="text" id="license-key" class="form-control" placeholder="MASUKKAN KODE LISENSI">
+            <div id="download-area" class="hidden" style="background:#f0fdf4; padding:15px; border-radius:20px; text-align:center; border: 1px solid #dcfce7; margin-bottom: 10px;">
+                <p style="font-size: 10px; color: #16a34a; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;">Project Siap Diunduh:</p>
+                <h4 id="claim-project-name" style="font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 15px; line-height: 1.2;"></h4>
+                <a id="download-link" href="#" target="_blank" style="display:block; background:#22c55e; color:white; padding:14px; border-radius:12px; text-decoration:none; font-weight: 800; font-size: 13px;">📥 Download File Project</a>
+            </div>
+            <button onclick="verifyCode()" id="btn-verify" style="background:var(--primary); color:white; width:100%; border:none; padding:15px; border-radius:12px; font-weight:800;">Verifikasi Kode</button>
+            <button onclick="closeModalGeneric('modal-claim')" style="width:100%; background:none; border:none; color:var(--gray); margin-top:10px;">Tutup</button>
+        </div>
+    </div>
+
+    <div id="modal-detail" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-drag"></div>
+            <h3 style="margin-bottom:18px; font-weight:800;">Detail Project</h3>
+            <div id="modal-body-content" style="background:#f9f7ff; padding:15px; border-radius:20px;">
+                <p style="font-size:12px; margin-bottom:5px;">Pembuat: <b id="d-creator"></b></p>
+                <p style="font-size:12px; margin-bottom:5px;">Judul: <b id="d-title"></b></p>
+                <p style="font-size:14px; color:var(--primary);">Harga: <b id="d-price"></b></p>
+            </div>
+            <button onclick="confirmPurchase()" style="background:#000; color:white; width:100%; padding:16px; border-radius:18px; margin-top:20px; border:none; font-weight:800;">Beli via WhatsApp</button>
+            <button onclick="closeModalGeneric('modal-detail')" style="width:100%; background:none; border:none; color:var(--gray); margin-top:10px;">Kembali</button>
+        </div>
+    </div>
+
+    <footer>&copy; 2025 NoxPay Marketplace</footer>
+
+    <script>
+        const creatorDatabase = { "dyon_creator": "pass123", "feri": "sopan" };
+        const licenseDatabase = {
+            "NOX-KANE-2025": { title: "DJ MALAM TAHUN BARU STYLE VINKY", link: "#" },
+            "DEMO-FREE": { title: "Project Sample Free", link: "#" }
+        };
+
+        const projectData = {
+            "Dyon Yete": [
+                { name: "DJ MALAM TAHUN BARU STYLE VINKY", price: "70.000", audio: "DYONYETE/1.mp3", isNew: true }
+            ],
+            "Artist": []
+        };
+
+        let currentAudio = null;
+        let currentPlayBtn = null;
+        let currentProgress = null;
+        let currentTimeText = null;
+        let selectedProduct = null;
+
+        function toggleSidebarCreator() {
+            const sb = document.getElementById('creator-sidebar');
+            const overlay = document.getElementById('sidebar-overlay-creator');
+            if(sb.classList.contains('active')) {
+                sb.classList.remove('active');
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.style.display = 'none', 300);
+            } else {
+                overlay.style.display = 'block';
+                setTimeout(() => { sb.classList.add('active'); overlay.style.opacity = '1'; }, 10);
+            }
+        }
+
+        function handleMenuUpload() { toggleSidebarCreator(); document.getElementById('modal-login-creator').style.display = 'flex'; }
+        
+        function checkLoginCreator() {
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+            if(creatorDatabase[user] && creatorDatabase[user] === pass) {
+                closeModalGeneric('modal-login-creator');
+                document.getElementById('modal-upload-project').style.display = 'flex';
+            } else { alert("Creator Tidak Ditemukan!"); }
+        }
+
+        function verifyCode() {
+            const codeInput = document.getElementById('license-key').value.trim().toUpperCase();
+            const result = licenseDatabase[codeInput];
+            if(result) {
+                document.getElementById('claim-project-name').innerText = result.title;
+                document.getElementById('download-link').href = result.link;
+                document.getElementById('download-area').classList.remove('hidden');
+                document.getElementById('btn-verify').classList.add('hidden');
+            } else { alert("KODE LISENSI TIDAK VALID!"); }
+        }
+
+        function openClaimModal() { 
+            document.getElementById('license-key').value = "";
+            document.getElementById('download-area').classList.add('hidden');
+            document.getElementById('btn-verify').classList.remove('hidden');
+            document.getElementById('modal-claim').style.display = 'flex'; 
+        }
+
+        function showCreators() {
+            if(currentAudio) { currentAudio.pause(); }
+            document.getElementById('project-section').classList.add('hidden');
+            document.getElementById('creator-section').classList.remove('hidden');
+        }
+
+        function showProjects(name, avatarUrl) {
+            document.getElementById('creator-section').classList.add('hidden');
+            document.getElementById('project-section').classList.remove('hidden');
+            document.getElementById('creator-name-display').innerText = name;
+            const render = document.getElementById('project-render');
+            render.innerHTML = '';
+
+            if (projectData[name].length === 0) {
+                render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project tersedia.</p>';
+                return;
+            }
+
+            projectData[name].forEach((p, i) => {
+                render.innerHTML += `
+                <div class="project-card" id="card-${i}">
+                    ${p.isNew ? '<div class="new-badge">NEW</div>':''}
+                    <div class="card-main-info">
+                        <div class="project-img-container" onclick="playPreview(this, '${p.audio}', ${i})">
+                            <div class="project-img-box"><img src="${avatarUrl}"></div>
+                            <div class="play-overlay">
+                                <div class="play-icon" id="play-icon-${i}">
+                                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <b>${p.name}</b>
+                            <span>Rp ${p.price}</span>
+                        </div>
+                        <button class="btn-buy" onclick="openModalDetail('${name}', ${i})">Beli</button>
+                    </div>
+                    
+                    <div class="player-controls" id="controls-${i}">
+                        <div class="time-display" id="current-${i}">0:00</div>
+                        <div class="progress-container">
+                            <input type="range" class="progress-bar" id="progress-${i}" value="0" min="0" max="100" oninput="seekAudio(this)">
+                        </div>
+                        <div class="time-display" id="duration-${i}">0:00</div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function playPreview(el, src, index) {
+            const playIcon = document.getElementById(`play-icon-${index}`);
+            const controls = document.getElementById(`controls-${index}`);
+            const progress = document.getElementById(`progress-${index}`);
+            const currText = document.getElementById(`current-${index}`);
+            const durText = document.getElementById(`duration-${index}`);
+
+            if (currentAudio && currentAudio.src.includes(src)) {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    playIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                } else {
+                    currentAudio.pause();
+                    playIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                }
+                return;
+            }
+
+            if (currentAudio) {
+                currentAudio.pause();
+                if (currentPlayBtn) currentPlayBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                document.querySelectorAll('.player-controls').forEach(c => c.classList.remove('active'));
+            }
+
+            currentAudio = new Audio(src);
+            currentPlayBtn = playIcon;
+            currentProgress = progress;
+            currentTimeText = currText;
+            
+            controls.classList.add('active');
+            playIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+            currentAudio.addEventListener('timeupdate', () => {
+                const pos = (currentAudio.currentTime / currentAudio.duration) * 100;
+                currentProgress.value = pos || 0;
+                currentTimeText.innerText = formatTime(currentAudio.currentTime);
+                if(!isNaN(currentAudio.duration)) durText.innerText = formatTime(currentAudio.duration);
+            });
+
+            currentAudio.addEventListener('ended', () => {
+                playIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                currentProgress.value = 0;
+            });
+
+            currentAudio.play();
+        }
+
+        function seekAudio(el) {
+            if(!currentAudio) return;
+            const time = (el.value / 100) * currentAudio.duration;
+            currentAudio.currentTime = time;
+        }
+
+        function formatTime(secs) {
+            let min = Math.floor(secs / 60);
+            let sec = Math.floor(secs % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        function openModalDetail(creator, i) {
+            const p = projectData[creator][i];
+            selectedProduct = { ...p, creator };
+            document.getElementById('d-creator').innerText = creator;
+            document.getElementById('d-title').innerText = p.name;
+            document.getElementById('d-price').innerText = "Rp " + p.price;
+            document.getElementById('modal-detail').style.display = 'flex';
+        }
+
+        function closeModalGeneric(id) { document.getElementById(id).style.display = 'none'; }
+
+        function confirmPurchase() {
+            const msg = `Halo NoxPay, saya beli project: ${selectedProduct.name} dari ${selectedProduct.creator}`;
+            window.open(`https://wa.me/6283129555763?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function updateFileNameDisplay(input) {
+            const display = document.getElementById('file-display-name');
+            if(input.files && input.files[0]) {
+                display.innerText = "📁 " + input.files[0].name;
+                display.style.color = "var(--primary)";
+                display.style.borderColor = "var(--primary)";
+            } else {
+                display.innerText = "Klik untuk Pilih MP3";
+                display.style.color = "var(--gray)";
+            }
+        }
+
+        function submitToAdmin() {
+            const title = document.getElementById('up-title').value;
+            const genre = document.getElementById('up-genre').value;
+            const price = document.getElementById('up-price').value;
+            const fileLink = document.getElementById('up-file').value;
+            const audioInput = document.getElementById('up-audio-file');
+
+            if(!title || !fileLink || !price) return alert("Harap isi semua data!");
+
+            let audioName = "Tidak ada file";
+            if(audioInput.files.length > 0) {
+                audioName = audioInput.files[0].name;
+            } else {
+                return alert("Pilih file audio preview dulu!");
+            }
+
+            const msg = `🚀 *UPLOAD PROJECT NOXPAY*\n\n` +
+                        `👤 Project: ${title}\n` +
+                        `🎹 Genre: ${genre}\n` +
+                        `💰 Harga: Rp ${price}\n` +
+                        `🔗 Link: ${fileLink}\n` +
+                        `🎵 Preview: ${audioName}\n\n` +
+                        `_Admin, saya akan mengirimkan file audio preview setelah pesan ini._`;
+
+            window.open(`https://wa.me/6283129555763?text=${encodeURIComponent(msg)}`, '_blank');
+            closeModalGeneric('modal-upload-project');
+        }
+    </script>
+</body>
+</html>
