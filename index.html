@@ -249,8 +249,111 @@
         .nominal-item input:checked + label { border-color: var(--primary); background: var(--white); box-shadow: 0 5px 15px rgba(0,102,255,0.08); }
 
         .order-form { background: rgba(255, 255, 255, 0.6); padding: 22px; border-radius: 24px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.5); }
-        .form-group input { width: 100%; padding: 14px; background: var(--white); border: 1.5px solid #eef2f6; border-radius: 12px; outline: none; transition: 0.3s; }
+        
+        /* MODIFIKASI: Inputan Lebih Menonjol */
+        .form-group input { 
+            width: 100%; 
+            padding: 16px; 
+            background: #fdfdfd; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 16px; 
+            outline: none; 
+            transition: all 0.3s; 
+            font-weight: 600;
+            color: var(--dark);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .form-group input:focus {
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        .form-group input::placeholder {
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
         .btn-order { width: 100%; background: var(--primary); color: white; padding: 16px; border: none; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2); margin-top: 15px; }
+
+        /* --- DIGITAL PRODUCT (FL STUDIO) SPECIAL STYLES (MODIFIED) --- */
+        .project-card-special {
+            position: relative;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 245, 249, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15) !important;
+            z-index: 1;
+        }
+
+        /* Glare Effect */
+        .project-card-special::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            animation: rotateBg 10s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotateBg { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .project-card-special:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #8b5cf6;
+            box-shadow: 0 20px 45px rgba(139, 92, 246, 0.3) !important;
+        }
+
+        .project-card-special .icon-box {
+            background: var(--cat-project);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+            animation: pulse-purple 2s infinite;
+        }
+
+        .project-card-special span {
+            font-size: 16px !important;
+            font-weight: 800 !important;
+            background: linear-gradient(to right, #6366f1, #d946ef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .badge-premium {
+            position: absolute;
+            top: 12px;
+            right: -32px;
+            background: linear-gradient(to right, #ff007a, #8b5cf6);
+            color: white;
+            padding: 5px 35px;
+            font-size: 10px;
+            font-weight: 900;
+            transform: rotate(45deg);
+            box-shadow: 0 4px 12px rgba(255, 0, 122, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .exclusive-label {
+            position: absolute;
+            bottom: 12px;
+            right: 18px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #8b5cf6;
+            letter-spacing: 0.5px;
+            animation: bounceRight 1s infinite alternate;
+        }
+
+        @keyframes bounceRight { from { transform: translateX(0); } to { transform: translateX(5px); } }
+        @keyframes pulse-purple {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
 
         /* --- PAYMENT METHOD STYLES --- */
         .payment-method-container {
@@ -358,6 +461,50 @@
         .creator-form-field input { width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #eef2f6; outline: none; }
         .terms-box { background: #f8fafc; padding: 15px; border-radius: 12px; font-size: 11px; color: var(--gray); height: 160px; overflow-y: auto; margin-bottom: 10px; border: 1px solid #eee; text-align: left; line-height: 1.6; }
         .check-group { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--dark); cursor: pointer; margin-bottom: 15px; }
+
+        /* MODIFIKASI JALUR ADMIN (Mencolok) */
+        .admin-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .admin-box {
+            position: relative;
+            background: #fff;
+            border: 2px solid #eef2f6;
+            padding: 15px 10px;
+            border-radius: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        .admin-box h5 { font-size: 13px; font-weight: 800; margin-bottom: 2px; position: relative; z-index: 2; }
+        .admin-box p { font-size: 10px; font-weight: 700; opacity: 0.8; position: relative; z-index: 2; }
+        
+        .admin-box.active {
+            border-color: transparent;
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+            background: var(--grad-fancy);
+            background-size: 200% 200%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        .admin-box.active::after {
+            content: '✓';
+            position: absolute;
+            top: 5px; right: 8px;
+            font-size: 10px;
+            background: white;
+            color: var(--primary);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900;
+        }
     </style>
 </head>
 <body>
@@ -427,15 +574,35 @@
             <div id="digital-product-section">
                 <div class="section-header"><h2>Tersedia Juga Produk Digital</h2></div>
                 <div class="category-grid">
-                    <div class="category-card" onclick="window.location.href='projects.html'" style="grid-column: span 2;">
-                        <div class="icon-box icon-project">🎹</div>
-                        <span>Project FL Studio Mobile</span>
+                    <div class="category-card project-card-special" onclick="window.location.href='projects.html'" style="grid-column: span 2; padding: 25px;">
+                        <div class="badge-premium">Exclusive</div>
+                        <div class="icon-box icon-project" style="width: 60px; height: 60px; font-size: 30px;">🎹</div>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <span>Project FL Studio Mobile</span>
+                            <small style="color: var(--gray); font-size: 11px; font-weight: 700;">Dapatkan FLM Project Original Disini</small>
+                        </div>
+                        <div class="exclusive-label">Lihat Semua →</div>
                     </div>
                 </div>
             </div>
 
             <div id="order-form-container" class="hidden fade-in">
                 <div class="order-form">
+                    
+                    <div id="admin-selection-group" class="hidden" style="margin-bottom: 20px;">
+                        <label style="display:block; font-size:12px; font-weight:800; margin-bottom:12px; color:var(--dark); text-align:center; letter-spacing:1px;">⚡ PILIH JALUR ADMIN ⚡</label>
+                        <div class="admin-selector">
+                            <div class="admin-box active" id="admin-box-1" onclick="selectAdmin(1)">
+                                <h5>Admin 1</h5>
+                                <p>Wall</p>
+                            </div>
+                            <div class="admin-box" id="admin-box-2" onclick="selectAdmin(2)">
+                                <h5>Admin 2</h5>
+                                <p>Rizz</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label id="label-id" style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Tujuan</label>
                         <input type="text" id="target-id" placeholder="Masukkan Nomor/ID" inputmode="numeric">
@@ -625,12 +792,17 @@
 
     <script>
         // --- KONFIGURASI ADMIN ---
-        const WHATSAPP_NUMBER = "6283129555763";
-        const WHATSAPP_GAME = "6283198721162"; 
-        const URL_QRIS_DANA = "HERO/qris.jpg"; // Ganti dengan link gambar QRIS Anda (bisa link internet atau file lokal)
+        const WHATSAPP_NUMBER = "6283129555763"; // Admin Utama & Selain Game
+        
+        // WhatsApp Admin Khusus Game
+        const ADMIN_GAME_1 = "6283198721162"; 
+        const ADMIN_GAME_2 = "6283129555763"; 
+
+        const URL_QRIS_DANA = "QRIS/qris.jpg"; 
 
         let selectedCreatorCategory = "";
-        let currentPaymentMethod = "Cash"; // Default Payment
+        let currentPaymentMethod = "Cash"; 
+        let selectedAdminGame = 1; // Default Admin 1
 
         const heroThemes = {
             default: { bg: 'linear-gradient(135deg, #0066ff 0%, #00d2ff 100%)', icon: '📱', title: 'NoxPay -<br>Digital Payment Terpercaya', desc: 'Proses kilat 1-5 menit aktif 24 jam.', char: 'HERO/home1.png' },
@@ -643,7 +815,6 @@
             ff: { bg: 'linear-gradient(135deg, #ff4e00 0%, #ec9f05 100%)', icon: '🔥', title: 'Garena<br>Free Fire', desc: 'Diamond FF murah untuk Booyah lebih maksimal!', char: 'HERO/game.png' }
         };
 
-        // Helper function to generate pulsa prices (Kelipatan 5.000, Harga +2.000)
         function generatePulsaPrices() {
             const prices = [];
             for (let val = 5000; val <= 100000; val += 5000) {
@@ -882,8 +1053,8 @@
             document.getElementById('target-id').value = '';
             document.getElementById('server-id').value = '';
             document.getElementById('customer-name').value = '';
-            // Reset Payment to Cash
             selectPayment('Cash');
+            selectAdmin(1);
         }
 
         function handleHome() {
@@ -933,19 +1104,48 @@
             window.scrollTo({top: y, behavior: 'smooth'});
         }
 
+        // --- MODIFIKASI SELECT ADMIN & LOGIKA PAYMENT ---
+        function selectAdmin(num) {
+            selectedAdminGame = num;
+            document.getElementById('admin-box-1').classList.remove('active');
+            document.getElementById('admin-box-2').classList.remove('active');
+            document.getElementById('admin-box-' + num).classList.add('active');
+
+            const danaOption = document.getElementById('pay-dana');
+            
+            // Logika: Jika Admin 2, hilangkan opsi DANA dan set ke Cash
+            if (num === 2) {
+                danaOption.classList.add('hidden');
+                selectPayment('Cash'); // Reset ke cash
+            } else {
+                // Jika Admin 1, tampilkan DANA (khusus kategori game)
+                if (selectedCategory === 'game') {
+                    danaOption.classList.remove('hidden');
+                }
+            }
+        }
+
         function selectProduct(prod, element) {
             document.querySelectorAll('#items-list .category-card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
             selectedProduct = prod;
             resetInputs(); 
 
-            // Handle Payment Options Visibility
             const danaOption = document.getElementById('pay-dana');
+            const adminGroup = document.getElementById('admin-selection-group');
+
             if (selectedCategory === 'game') {
-                danaOption.classList.remove('hidden');
+                adminGroup.classList.remove('hidden'); 
+                // Di sini kita cek admin mana yang aktif saat produk dipilih
+                if (selectedAdminGame === 1) {
+                    danaOption.classList.remove('hidden');
+                } else {
+                    danaOption.classList.add('hidden');
+                }
             } else {
                 danaOption.classList.add('hidden');
-                selectPayment('Cash'); // Paksa Cash untuk non-game
+                adminGroup.classList.add('hidden'); 
+                selectPayment('Cash'); 
             }
 
             if (heroThemes[prod.id]) applyTheme(prod.id);
@@ -977,7 +1177,6 @@
             window.scrollTo({top: y, behavior: 'smooth'});
         }
 
-        // Fungsi Memilih Metode Pembayaran (DI-MODIFIKASI)
         function selectPayment(method) {
             currentPaymentMethod = method;
             const cardCash = document.getElementById('pay-cash');
@@ -992,14 +1191,13 @@
                 cardDana.classList.remove('selected');
                 badgeCash.innerText = "TERPILIH";
                 badgeDana.innerText = "PILIH";
-                payInstruction.classList.add('hidden'); // Sembunyikan QRIS
+                payInstruction.classList.add('hidden'); 
             } else {
                 cardCash.classList.remove('selected');
                 cardDana.classList.add('selected');
                 badgeCash.innerText = "PILIH";
                 badgeDana.innerText = "TERPILIH";
                 
-                // Jika game, tampilkan QRIS
                 if(selectedCategory === 'game') {
                     qrisImgEl.src = URL_QRIS_DANA;
                     payInstruction.classList.remove('hidden');
@@ -1015,6 +1213,7 @@
             if(!id || !nominal) return alert('Lengkapi data pesanan!');
             
             let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA (Transfer)';
+            let adminLabel = (selectedCategory === 'game') ? `<p>Jalur Admin: <b>Admin ${selectedAdminGame}</b></p>` : '';
 
             document.getElementById('modal-details').innerHTML = `
                 <div style="background:#f8fafc; padding:15px; border-radius:15px;">
@@ -1022,12 +1221,14 @@
                     <p>Nominal: <b>${nominal.value}</b></p>
                     <p>Tujuan: <b>${id}</b></p>
                     <p>Pembayaran: <b>${paymentLabel}</b></p>
+                    ${adminLabel}
                     <hr style="margin:8px 0; opacity:0.1">
                     <p>Total: <b>Rp ${nominal.dataset.price}</b></p>
                 </div>`;
             document.getElementById('orderModal').style.display = 'block';
         };
 
+        // --- MODIFIKASI: Pesan Bukti Transfer Hanya Untuk DANA ---
         document.getElementById('btn-send-wa').onclick = () => {
             const id = document.getElementById('target-id').value;
             const serverId = document.getElementById('server-id').value;
@@ -1037,8 +1238,18 @@
             let buyerName = custName ? custName : 'Pelanggan';
             let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA';
             
-            // Tentukan nomor tujuan (khusus game pakai nomor berbeda jika diinginkan)
-            let targetWA = (selectedCategory === 'game') ? WHATSAPP_GAME : WHATSAPP_NUMBER;
+            let targetWA = WHATSAPP_NUMBER;
+            if (selectedCategory === 'game') {
+                targetWA = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
+            }
+
+            // Logika Pesan Penutup Sesuai Request
+            let closingMsg = "";
+            if (currentPaymentMethod === 'DANA') {
+                closingMsg = `Saya akan segera mengirimkan Bukti Transfer. Mohon segera diproses ya, terima kasih!`;
+            } else {
+                closingMsg = `Mohon segera diproses ya, terima kasih!`;
+            }
 
             let msg = `Halo *NoxPay*, saya ingin order.\n\n` +
                       `*--- DETAIL PESANAN ---*\n` +
@@ -1048,7 +1259,7 @@
                       `*ID/No:* ${destination}\n` +
                       `*Metode Bayar:* ${paymentLabel}\n` +
                       `*Total Harga:* Rp ${nominal.dataset.price}\n\n` +
-                      `Saya akan segera mengirimkan Bukti Transfer (jika transfer). Mohon segera diproses ya, terima kasih!`;
+                      closingMsg;
             window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
