@@ -255,27 +255,51 @@
         /* --- PAYMENT METHOD STYLES --- */
         .payment-method-container {
             background: #ffffff;
-            border: 1.5px solid var(--primary);
+            border: 1.5px solid #eef2f6;
             border-radius: 18px;
             padding: 16px;
-            margin-top: 20px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .payment-method-container.selected {
+            border-color: var(--primary);
             box-shadow: 0 4px 12px rgba(0, 102, 255, 0.1);
         }
         .payment-info { display: flex; align-items: center; gap: 12px; }
-        .payment-icon { font-size: 24px; }
-        .payment-text h4 { font-size: 14px; font-weight: 800; color: var(--dark); }
-        .payment-text p { font-size: 11px; color: var(--gray); font-weight: 600; }
+        .payment-icon { font-size: 24px; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; }
+        .payment-icon img { width: 100%; height: auto; object-fit: contain; }
+        .payment-text h4 { font-size: 13px; font-weight: 800; color: var(--dark); }
+        .payment-text p { font-size: 10px; color: var(--gray); font-weight: 600; }
         .payment-badge {
-            background: var(--primary);
-            color: white;
+            background: #f1f5f9;
+            color: var(--gray);
             padding: 4px 10px;
             border-radius: 8px;
             font-size: 10px;
             font-weight: 800;
         }
+        .payment-method-container.selected .payment-badge {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* --- PAYMENT INSTRUCTION (NEW) --- */
+        #payment-instructions {
+            background: #fff;
+            border-radius: 18px;
+            padding: 20px;
+            margin-top: 10px;
+            text-align: center;
+            border: 1.5px dashed var(--primary);
+        }
+        .qris-img { width: 100%; max-width: 200px; margin: 10px auto; border-radius: 10px; display: block; }
+        .instruction-text { font-size: 11px; color: var(--gray); font-weight: 700; margin-top: 10px; line-height: 1.4; }
+        .instruction-text span { color: var(--accent); }
 
         /* --- STYLES PEMANIS --- */
         .pemanis-section { margin: 45px 0 20px; text-align: center; }
@@ -426,16 +450,42 @@
 
                     <div id="payment-method-section">
                         <div class="section-header" style="margin-top:25px"><h2>Metode Pembayaran</h2></div>
-                        <div class="payment-method-container">
-                            <div class="payment-info">
-                                <span class="payment-icon">💵</span>
-                                <div class="payment-text">
-                                    <h4>Bayar Tunai / Cas</h4>
-                                    <p>Serahkan uang langsung ke admin</p>
+                        
+                        <div id="payment-options-list">
+                            <div class="payment-method-container selected" id="pay-cash" onclick="selectPayment('Cash')">
+                                <div class="payment-info">
+                                    <span class="payment-icon">💵</span>
+                                    <div class="payment-text">
+                                        <h4>Bayar Tunai / Cas</h4>
+                                        <p>Serahkan uang langsung ke admin</p>
+                                    </div>
                                 </div>
+                                <div class="payment-badge" id="badge-cash">TERPILIH</div>
                             </div>
-                            <div class="payment-badge">TERPILIH</div>
+
+                            <div class="payment-method-container hidden" id="pay-dana" onclick="selectPayment('DANA')">
+                                <div class="payment-info">
+                                    <span class="payment-icon">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png" alt="DANA Logo">
+                                    </span>
+                                    <div class="payment-text">
+                                        <h4>DANA</h4>
+                                        <p>Transfer ke nomor DANA Admin</p>
+                                    </div>
+                                </div>
+                                <div class="payment-badge" id="badge-dana">PILIH</div>
+                            </div>
                         </div>
+
+                        <div id="payment-instructions" class="hidden fade-in">
+                            <h4 style="font-size:12px; font-weight:800;">Scan QRIS Dana Admin</h4>
+                            <img src="" id="qris-image-el" class="qris-img" alt="QRIS DANA">
+                            <div class="instruction-text">
+                                Silahkan selesaikan pembayaran. <br>
+                                <span>WAJIB:</span> Screenshoot bukti transfer dan kirimkan ke WhatsApp Admin setelah klik beli!
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="form-group" style="margin-top: 25px;">
@@ -502,7 +552,7 @@
                 </div>
                 <div class="step-order">
                     <div class="step-num">5</div>
-                    <div class="step-text">Kamu akan diarahkan ke WhatsApp untuk menyelesaikan pembayaran secara tunai (COD).</div>
+                    <div class="step-text">Kamu akan diarahkan ke WhatsApp untuk menyelesaikan pembayaran.</div>
                 </div>
 
                 <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:10px;" onclick="closeCaraOrder()">Mengerti</button>
@@ -574,8 +624,13 @@
     </div>
 
     <script>
+        // --- KONFIGURASI ADMIN ---
         const WHATSAPP_NUMBER = "6283129555763";
+        const WHATSAPP_GAME = "6283198721162"; 
+        const URL_QRIS_DANA = "QRIS/qris.jpg"; // Ganti dengan link gambar QRIS Anda (bisa link internet atau file lokal)
+
         let selectedCreatorCategory = "";
+        let currentPaymentMethod = "Cash"; // Default Payment
 
         const heroThemes = {
             default: { bg: 'linear-gradient(135deg, #0066ff 0%, #00d2ff 100%)', icon: '📱', title: 'NoxPay -<br>Digital Payment Terpercaya', desc: 'Proses kilat 1-5 menit aktif 24 jam.', char: 'HERO/home1.png' },
@@ -827,6 +882,8 @@
             document.getElementById('target-id').value = '';
             document.getElementById('server-id').value = '';
             document.getElementById('customer-name').value = '';
+            // Reset Payment to Cash
+            selectPayment('Cash');
         }
 
         function handleHome() {
@@ -881,6 +938,16 @@
             element.classList.add('active');
             selectedProduct = prod;
             resetInputs(); 
+
+            // Handle Payment Options Visibility
+            const danaOption = document.getElementById('pay-dana');
+            if (selectedCategory === 'game') {
+                danaOption.classList.remove('hidden');
+            } else {
+                danaOption.classList.add('hidden');
+                selectPayment('Cash'); // Paksa Cash untuk non-game
+            }
+
             if (heroThemes[prod.id]) applyTheme(prod.id);
             const labelId = document.getElementById('label-id');
             const inputId = document.getElementById('target-id');
@@ -910,16 +977,51 @@
             window.scrollTo({top: y, behavior: 'smooth'});
         }
 
+        // Fungsi Memilih Metode Pembayaran (DI-MODIFIKASI)
+        function selectPayment(method) {
+            currentPaymentMethod = method;
+            const cardCash = document.getElementById('pay-cash');
+            const cardDana = document.getElementById('pay-dana');
+            const badgeCash = document.getElementById('badge-cash');
+            const badgeDana = document.getElementById('badge-dana');
+            const payInstruction = document.getElementById('payment-instructions');
+            const qrisImgEl = document.getElementById('qris-image-el');
+
+            if (method === 'Cash') {
+                cardCash.classList.add('selected');
+                cardDana.classList.remove('selected');
+                badgeCash.innerText = "TERPILIH";
+                badgeDana.innerText = "PILIH";
+                payInstruction.classList.add('hidden'); // Sembunyikan QRIS
+            } else {
+                cardCash.classList.remove('selected');
+                cardDana.classList.add('selected');
+                badgeCash.innerText = "PILIH";
+                badgeDana.innerText = "TERPILIH";
+                
+                // Jika game, tampilkan QRIS
+                if(selectedCategory === 'game') {
+                    qrisImgEl.src = URL_QRIS_DANA;
+                    payInstruction.classList.remove('hidden');
+                } else {
+                    payInstruction.classList.add('hidden');
+                }
+            }
+        }
+
         document.getElementById('btn-review').onclick = () => {
             const id = document.getElementById('target-id').value;
             const nominal = document.querySelector('input[name="nominal"]:checked');
             if(!id || !nominal) return alert('Lengkapi data pesanan!');
+            
+            let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA (Transfer)';
+
             document.getElementById('modal-details').innerHTML = `
                 <div style="background:#f8fafc; padding:15px; border-radius:15px;">
                     <p>Produk: <b>${selectedProduct.name}</b></p>
                     <p>Nominal: <b>${nominal.value}</b></p>
                     <p>Tujuan: <b>${id}</b></p>
-                    <p>Pembayaran: <b>Tunai / Cash (COD)</b></p>
+                    <p>Pembayaran: <b>${paymentLabel}</b></p>
                     <hr style="margin:8px 0; opacity:0.1">
                     <p>Total: <b>Rp ${nominal.dataset.price}</b></p>
                 </div>`;
@@ -933,18 +1035,25 @@
             const custName = document.getElementById('customer-name').value;
             let destination = serverId ? `${id} (${serverId})` : id;
             let buyerName = custName ? custName : 'Pelanggan';
+            let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA';
+            
+            // Tentukan nomor tujuan (khusus game pakai nomor berbeda jika diinginkan)
+            let targetWA = (selectedCategory === 'game') ? WHATSAPP_GAME : WHATSAPP_NUMBER;
+
             let msg = `Halo *NoxPay*, saya ingin order.\n\n` +
                       `*--- DETAIL PESANAN ---*\n` +
                       `*Nama:* ${buyerName}\n` +
                       `*Produk:* ${selectedProduct.name}\n` +
                       `*Nominal:* ${nominal.value}\n` +
                       `*ID/No:* ${destination}\n` +
+                      `*Metode Bayar:* ${paymentLabel}\n` +
                       `*Total Harga:* Rp ${nominal.dataset.price}\n\n` +
-                      `Mohon segera diproses ya, terima kasih!`;
-            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+                      `Saya akan segera mengirimkan Bukti Transfer (jika transfer). Mohon segera diproses ya, terima kasih!`;
+            window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
     </script>
 </body>
 </html>
+
