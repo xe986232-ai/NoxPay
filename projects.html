@@ -292,6 +292,10 @@
                     <b>AriMarshello
                     FromJapanese</b>
                 </div>
+                <div class="creator-card" onclick="showProjects('Artist', 'https://api.dicebear.com/7.x/notionists/svg?seed=Artist&backgroundColor=c0aede')">
+                    <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Artist&backgroundColor=c0aede"></div>
+                    <b>Artist</b>
+                </div>
             </div>
         </div>
 
@@ -414,7 +418,8 @@
     <script>
         const creatorDatabase = { 
             "DyonYte": { pass: "DIONYETE234", wa: "6281211413521", name: "Dyon Yete" },
-            "arimarshello": { pass: "28052001", wa: "6281234567890", name: "AriMarshelloFromJapanese" } 
+            "arimarshello": { pass: "28052001", wa: "6281234567890", name: "AriMarshelloFromJapanese" },
+            "artist": { pass: "artist123", wa: "6281234567891", name: "Artist" } 
         };
         
         const licenseDatabase = {
@@ -427,6 +432,7 @@
                 { name: "DJ MALAM TAHUN BARU STYLE VINKY", price: "70.000", audio: "DYONYETE/1.mp3", isNew: true },
                 { name: "DJ SLOW STYLE HUDA FVNKY", price: "50.000", audio: "DYONYETE/2.mp3", isNew: true }
             ],
+            "AriMarshelloFromJapanese": [],
             "Artist": []
         };
 
@@ -493,7 +499,7 @@
             const render = document.getElementById('project-render');
             render.innerHTML = '';
 
-            if (projectData[name].length === 0) {
+            if (!projectData[name] || projectData[name].length === 0) {
                 render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project tersedia.</p>';
                 return;
             }
