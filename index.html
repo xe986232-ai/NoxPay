@@ -532,6 +532,51 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 900;
         }
+
+        /* NEW: History Item Style */
+        .history-card {
+            background: var(--white);
+            padding: 14px;
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #eef2f6;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        .delete-btn {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+        .delete-all-btn {
+            width: 100%;
+            padding: 10px;
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
@@ -690,6 +735,13 @@
                 </div>
             </div>
 
+            <div id="history-section" style="margin-top: 40px;">
+                <div class="section-header"><h2>Riwayat Terakhir</h2></div>
+                <div id="history-list">
+                    <p style="text-align: center; font-size: 11px; color: var(--gray); padding: 20px;">Belum ada riwayat pesanan.</p>
+                </div>
+            </div>
+
             <div class="pemanis-section" id="pemanis-noxpay">
                 <h2 class="title-gradient-animated">Kenapa Memilih NoxPay?</h2>
                 <div class="pemanis-grid">
@@ -720,6 +772,26 @@
                 <div style="display:flex; gap:10px; margin-top:20px;">
                     <button style="flex:1; padding:12px; border-radius:12px; border:none; background:#f1f5f9; font-weight:700; cursor:pointer" onclick="closeModal()">Batal</button>
                     <button id="btn-send-wa" style="flex:1; padding:12px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:700; cursor:pointer">Bayar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="invoiceModal" class="modal">
+            <div class="modal-content" style="max-width: 350px; padding: 0; overflow: hidden; border-radius: 20px;">
+                <div style="background: var(--primary); color: white; padding: 20px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: 800;">NoxPay</div>
+                    <p style="font-size: 10px; opacity: 0.8; letter-spacing: 1px;">INVOICE DIGITAL</p>
+                </div>
+                <div style="padding: 20px; background: white; font-family: 'Courier New', Courier, monospace;">
+                    <div id="invoice-details" style="font-size: 13px; color: #333;"></div>
+                    <hr style="border: none; border-top: 1px dashed #ccc; margin: 15px 0;">
+                    <div style="text-align: center; font-size: 11px; color: var(--gray);">
+                        Terima kasih telah memilih NoxPay!<br>Simpan struk ini sebagai bukti.
+                    </div>
+                </div>
+                <div style="padding: 15px; background: #f8fafc; display: flex; gap: 10px;">
+                    <button onclick="closeInvoice()" style="flex:1; padding:12px; border:none; border-radius:10px; font-weight:700; cursor:pointer;">Tutup</button>
+                    <button id="final-wa-btn" style="flex:1; padding:12px; border:none; border-radius:10px; background:#25D366; color:white; font-weight:700; cursor:pointer;">Kirim WA</button>
                 </div>
             </div>
         </div>
@@ -861,32 +933,15 @@
                     heroImg: 'HERO/mlbb.png', 
                     needsServer: true, 
                     prices: [
-                        {a: '5 Diamond', p: '1.500'},
-                        {a: '11 Diamond', p: '3.500'},
-                        {a: '12 Diamond', p: '4.000'},
-                        {a: '15 Diamond', p: '5.000'},
-                        {a: '19 Diamond', p: '6.000'},
-                        {a: '20 Diamond', p: '6.500'},
-                        {a: '28 Diamond', p: '9.000'},
-                        {a: '30 Diamond', p: '9.500'},
-                        {a: '33 Diamond', p: '10.000'},
-                        {a: '36 Diamond', p: '10.500'},
-                        {a: '40 Diamond', p: '11.500'},
-                        {a: '46 Diamond', p: '13.500'},
-                        {a: '54 Diamond', p: '16.000'},
-                        {a: '65 Diamond', p: '18.000'},
-                        {a: '70 Diamond', p: '20.000'},
-                        {a: '75 Diamond', p: '22.000'},
-                        {a: '81 Diamond', p: '24.000'},
-                        {a: '92 Diamond', p: '26.000'},
-                        {a: '102 Diamond', p: '30.000'},
-                        {a: '110 Diamond', p: '31.000'},
-                        {a: '114 Diamond', p: '33.000'},
-                        {a: '140 Diamond', p: '38.000'},
-                        {a: '153 Diamond', p: '41.000'},
-                        {a: '168 Diamond', p: '46.000'},
-                        {a: 'WDP', p: '28.000'},
-                        {a: '170 Diamond', p: '48.000'}
+                        {a: '5 Diamond', p: '1.500'}, {a: '11 Diamond', p: '3.500'}, {a: '12 Diamond', p: '4.000'},
+                        {a: '15 Diamond', p: '5.000'}, {a: '19 Diamond', p: '6.000'}, {a: '20 Diamond', p: '6.500'},
+                        {a: '28 Diamond', p: '9.000'}, {a: '30 Diamond', p: '9.500'}, {a: '33 Diamond', p: '10.000'},
+                        {a: '36 Diamond', p: '10.500'}, {a: '40 Diamond', p: '11.500'}, {a: '46 Diamond', p: '13.500'},
+                        {a: '54 Diamond', p: '16.000'}, {a: '65 Diamond', p: '18.000'}, {a: '70 Diamond', p: '20.000'},
+                        {a: '75 Diamond', p: '22.000'}, {a: '81 Diamond', p: '24.000'}, {a: '92 Diamond', p: '26.000'},
+                        {a: '102 Diamond', p: '30.000'}, {a: '110 Diamond', p: '31.000'}, {a: '114 Diamond', p: '33.000'},
+                        {a: '140 Diamond', p: '38.000'}, {a: '153 Diamond', p: '41.000'}, {a: '168 Diamond', p: '46.000'},
+                        {a: 'WDP', p: '28.000'}, {a: '170 Diamond', p: '48.000'}
                     ] 
                 },
                 { 
@@ -896,24 +951,12 @@
                     heroImg: 'HERO/game.png', 
                     needsServer: false, 
                     prices: [
-                        {a: '5 Diamond', p: '1.000'},
-                        {a: '10 Diamond', p: '2.000'},
-                        {a: '12 Diamond', p: '3.000'},
-                        {a: '15 Diamond', p: '3.500'},
-                        {a: '20 Diamond', p: '3.500'},
-                        {a: '25 Diamond', p: '4.000'},
-                        {a: '30 Diamond', p: '5.000'},
-                        {a: '40 Diamond', p: '7.000'},
-                        {a: '50 Diamond', p: '7.500'},
-                        {a: '55 Diamond', p: '8.000'},
-                        {a: '70 Diamond', p: '9.000'},
-                        {a: '80 Diamond', p: '11.000'},
-                        {a: '90 Diamond', p: '13.500'},
-                        {a: '120 Diamond', p: '16.000'},
-                        {a: '140 Diamond', p: '18.000'},
-                        {a: '150 Diamond', p: '20.000'},
-                        {a: '160 Diamond', p: '22.000'},
-                        {a: '190 Diamond', p: '26.000'}
+                        {a: '5 Diamond', p: '1.000'}, {a: '10 Diamond', p: '2.000'}, {a: '12 Diamond', p: '3.000'},
+                        {a: '15 Diamond', p: '3.500'}, {a: '20 Diamond', p: '3.500'}, {a: '25 Diamond', p: '4.000'},
+                        {a: '30 Diamond', p: '5.000'}, {a: '40 Diamond', p: '7.000'}, {a: '50 Diamond', p: '7.500'},
+                        {a: '55 Diamond', p: '8.000'}, {a: '70 Diamond', p: '9.000'}, {a: '80 Diamond', p: '11.000'},
+                        {a: '90 Diamond', p: '13.500'}, {a: '120 Diamond', p: '16.000'}, {a: '140 Diamond', p: '18.000'},
+                        {a: '150 Diamond', p: '20.000'}, {a: '160 Diamond', p: '22.000'}, {a: '190 Diamond', p: '26.000'}
                     ] 
                 }
             ],
@@ -928,18 +971,12 @@
                     name: 'Axis AIGO', 
                     needsServer: false, 
                     prices: [
-                        {a: 'Kuota 500MB, 28 Hari', p: '6.179'},
-                        {a: 'Kuota 1GB, 28 Hari', p: '9.475'},
-                        {a: 'AIGO 2GB + Lokal, 28 Hari', p: '16.874'},
-                        {a: 'AIGO 3GB + Lokal, 28 Hari', p: '24.274'},
-                        {a: 'AIGO 5GB + Lokal, 28 Hari', p: '31.049'},
-                        {a: 'AIGO 6GB + Lokal, 28 Hari', p: '31.609'},
-                        {a: 'AIGO 8GB + Lokal, 28 Hari', p: '39.599'},
-                        {a: 'AIGO 14GB + Lokal, 28 Hari', p: '58.550'},
-                        {a: 'AIGO 20GB + Lokal, 28 Hari', p: '73.550'},
-                        {a: 'AIGO 30GB + Lokal, 28 Hari', p: '90.782'},
-                        {a: 'AIGO 100GB + Lokal, 28 Hari', p: '170.374'},
-                        {a: 'AIGO 150GB + Lokal, 28 Hari', p: '235.369'},
+                        {a: 'Kuota 500MB, 28 Hari', p: '6.179'}, {a: 'Kuota 1GB, 28 Hari', p: '9.475'},
+                        {a: 'AIGO 2GB + Lokal, 28 Hari', p: '16.874'}, {a: 'AIGO 3GB + Lokal, 28 Hari', p: '24.274'},
+                        {a: 'AIGO 5GB + Lokal, 28 Hari', p: '31.049'}, {a: 'AIGO 6GB + Lokal, 28 Hari', p: '31.609'},
+                        {a: 'AIGO 8GB + Lokal, 28 Hari', p: '39.599'}, {a: 'AIGO 14GB + Lokal, 28 Hari', p: '58.550'},
+                        {a: 'AIGO 20GB + Lokal, 28 Hari', p: '73.550'}, {a: 'AIGO 30GB + Lokal, 28 Hari', p: '90.782'},
+                        {a: 'AIGO 100GB + Lokal, 28 Hari', p: '170.374'}, {a: 'AIGO 150GB + Lokal, 28 Hari', p: '235.369'},
                         {a: 'AIGO 250GB + Lokal, 28 Hari', p: '300.365'}
                     ] 
                 }
@@ -980,6 +1017,117 @@
         let selectedCategory = '';
         let selectedProduct = null;
 
+        // --- NEW FUNCTIONS FOR HISTORY & INVOICE ---
+        function saveToHistory(orderData) {
+            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+            
+            // CEK JIKA RIWAYAT SUDAH MENCAPAI 5 - JIKA YA HAPUS SEMUA SEBELUM SIMPAN YANG BARU
+            if (history.length >= 5) {
+                localStorage.removeItem('noxpay_history');
+                history = [];
+            }
+            
+            history.unshift(orderData);
+            localStorage.setItem('noxpay_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        // FUNGSI HAPUS SATUAN
+        function deleteHistoryItem(index) {
+            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+            history.splice(index, 1);
+            localStorage.setItem('noxpay_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        // FUNGSI HAPUS SEMUA
+        function deleteAllHistory() {
+            if (confirm("Hapus semua riwayat transaksi?")) {
+                localStorage.removeItem('noxpay_history');
+                renderHistory();
+            }
+        }
+
+        function renderHistory() {
+            const historyList = document.getElementById('history-list');
+            const history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; font-size: 11px; color: var(--gray); padding: 20px;">Belum ada riwayat pesanan.</p>';
+                return;
+            }
+
+            let html = `
+                <button class="delete-all-btn" onclick="deleteAllHistory()">
+                    🗑️ Hapus Semua Riwayat
+                </button>
+            `;
+
+            history.forEach((item, index) => {
+                html += `
+                    <div class="history-card fade-in">
+                        <div style="flex:1">
+                            <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
+                            <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
+                            <div style="font-size: 9px; color: var(--gray);">${item.date}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>
+                    </div>
+                `;
+            });
+            
+            historyList.innerHTML = html;
+        }
+
+        function showInvoice(data) {
+            const invoiceDetails = document.getElementById('invoice-details');
+            const orderID = "NPX-" + Math.floor(100000 + Math.random() * 900000);
+            const now = new Date().toLocaleString('id-ID');
+            invoiceDetails.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>ID Trx:</span> <b>${orderID}</b></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Waktu:</span> <b>${now}</b></div>
+                <hr style="border: none; border-top: 1px dashed #ccc; margin: 10px 0;">
+                <div style="margin-bottom:5px;">Item: <br><b>${data.product} - ${data.nominal}</b></div>
+                <div style="margin-bottom:5px;">Tujuan: <br><b>${data.target}</b></div>
+                <div style="margin-bottom:5px;">Metode: <b>${data.payment}</b></div>
+                <hr style="border: none; border-top: 1px dashed #ccc; margin: 10px 0;">
+                <div style="display:flex; justify-content:space-between; font-size: 16px;"><span>TOTAL:</span> <b>Rp ${data.price}</b></div>
+            `;
+            document.getElementById('invoiceModal').style.display = 'block';
+            document.getElementById('final-wa-btn').onclick = () => {
+                saveToHistory({ product: data.product, nominal: data.nominal, target: data.target, price: data.price, date: now });
+                sendWhatsApp(data, orderID);
+            };
+        }
+
+        function closeInvoice() { document.getElementById('invoiceModal').style.display = 'none'; }
+
+        function sendWhatsApp(data, orderID) {
+            let targetWA = WHATSAPP_NUMBER;
+            if (selectedCategory === 'game') {
+                targetWA = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
+            }
+            let closingMsg = (currentPaymentMethod === 'DANA') ? 
+                `Saya akan segera mengirimkan Bukti Transfer. Mohon segera diproses ya, terima kasih!` : 
+                `Mohon segera diproses ya, terima kasih!`;
+
+            let msg = `Halo *NoxPay*, saya ingin order.\n\n` +
+                      `*--- DETAIL PESANAN ---*\n` +
+                      `*ID TRX:* ${orderID}\n` +
+                      `*Nama:* ${data.buyerName}\n` +
+                      `*Produk:* ${data.product}\n` +
+                      `*Nominal:* ${data.nominal}\n` +
+                      `*ID/No:* ${data.target}\n` +
+                      `*Metode Bayar:* ${data.payment}\n` +
+                      `*Total Harga:* Rp ${data.price}\n\n` +
+                      closingMsg;
+            window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        // --- CORE FUNCTIONS ---
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -1018,10 +1166,6 @@
             document.getElementById('creator-step-terms').classList.add('hidden');
             document.getElementById('creator-step-2').classList.add('hidden');
             document.getElementById('creator-step-1').classList.remove('hidden');
-            document.getElementById('creator-name').value = '';
-            document.getElementById('creator-wa').value = '';
-            document.getElementById('creator-user').value = '';
-            document.getElementById('creator-pass').value = '';
         }
 
         function backToTerms() {
@@ -1034,18 +1178,14 @@
             const wa = document.getElementById('creator-wa').value;
             const user = document.getElementById('creator-user').value;
             const pass = document.getElementById('creator-pass').value;
-
-            if(!name || !wa || !user || !pass) {
-                alert('Mohon lengkapi seluruh data formulir dan data login.');
-                return;
-            }
-
+            if(!name || !wa || !user || !pass) return alert('Mohon lengkapi seluruh data!');
             const msg = `Halo Admin NoxPay,\n\nSaya ingin mendaftar menjadi *CREATOR*.\n\n*--- DATA PENDAFTAR ---*\nNama Artist: ${name}\nWhatsApp: ${wa}\nKategori: ${selectedCreatorCategory}\n\n*--- DATA LOGIN ---*\nUsername: ${user}\nPassword: ${pass}\n\nSaya telah menyetujui Syarat & Ketentuan. Mohon segera divalidasi akun saya!`;
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
             closeCreatorModal();
         }
 
         window.addEventListener('load', () => {
+            renderHistory();
             const params = new URLSearchParams(window.location.search);
             if (params.get('fromProject') === 'true') {
                 document.getElementById('splash-screen').style.display = 'none';
@@ -1124,29 +1264,21 @@
                 list.appendChild(item);
             });
             container.classList.remove('hidden');
-            const yOffset = -80; 
-            const y = container.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            const y = container.getBoundingClientRect().top + window.pageYOffset - 80;
             window.scrollTo({top: y, behavior: 'smooth'});
         }
 
-        // --- MODIFIKASI SELECT ADMIN & LOGIKA PAYMENT ---
         function selectAdmin(num) {
             selectedAdminGame = num;
             document.getElementById('admin-box-1').classList.remove('active');
             document.getElementById('admin-box-2').classList.remove('active');
             document.getElementById('admin-box-' + num).classList.add('active');
-
             const danaOption = document.getElementById('pay-dana');
-            
-            // Logika: Jika Admin 2, hilangkan opsi DANA dan set ke Cash
             if (num === 2) {
                 danaOption.classList.add('hidden');
-                selectPayment('Cash'); // Reset ke cash
-            } else {
-                // Jika Admin 1, tampilkan DANA (khusus kategori game)
-                if (selectedCategory === 'game') {
-                    danaOption.classList.remove('hidden');
-                }
+                selectPayment('Cash');
+            } else if (selectedCategory === 'game') {
+                danaOption.classList.remove('hidden');
             }
         }
 
@@ -1155,24 +1287,17 @@
             element.classList.add('active');
             selectedProduct = prod;
             resetInputs(); 
-
             const danaOption = document.getElementById('pay-dana');
             const adminGroup = document.getElementById('admin-selection-group');
-
             if (selectedCategory === 'game') {
                 adminGroup.classList.remove('hidden'); 
-                // Di sini kita cek admin mana yang aktif saat produk dipilih
-                if (selectedAdminGame === 1) {
-                    danaOption.classList.remove('hidden');
-                } else {
-                    danaOption.classList.add('hidden');
-                }
+                if (selectedAdminGame === 1) danaOption.classList.remove('hidden');
+                else danaOption.classList.add('hidden');
             } else {
                 danaOption.classList.add('hidden');
                 adminGroup.classList.add('hidden'); 
                 selectPayment('Cash'); 
             }
-
             if (heroThemes[prod.id]) applyTheme(prod.id);
             const labelId = document.getElementById('label-id');
             const inputId = document.getElementById('target-id');
@@ -1193,7 +1318,6 @@
             const nominalList = document.getElementById('nominal-list');
             nominalList.innerHTML = '';
             prod.prices.forEach((p, i) => {
-                // MODIFIKASI: Deteksi WDP untuk class khusus
                 const isWDP = p.a.toUpperCase().includes('WDP');
                 nominalList.innerHTML += `
                     <div class="nominal-item fade-in ${isWDP ? 'wdp-special' : ''}">
@@ -1206,8 +1330,7 @@
             });
             const orderForm = document.getElementById('order-form-container');
             orderForm.classList.remove('hidden');
-            const yOffset = -80;
-            const y = orderForm.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            const y = orderForm.getBoundingClientRect().top + window.pageYOffset - 80;
             window.scrollTo({top: y, behavior: 'smooth'});
         }
 
@@ -1219,7 +1342,6 @@
             const badgeDana = document.getElementById('badge-dana');
             const payInstruction = document.getElementById('payment-instructions');
             const qrisImgEl = document.getElementById('qris-image-el');
-
             if (method === 'Cash') {
                 cardCash.classList.add('selected');
                 cardDana.classList.remove('selected');
@@ -1231,7 +1353,6 @@
                 cardDana.classList.add('selected');
                 badgeCash.innerText = "PILIH";
                 badgeDana.innerText = "TERPILIH";
-                
                 if(selectedCategory === 'game') {
                     qrisImgEl.src = URL_QRIS_DANA;
                     payInstruction.classList.remove('hidden');
@@ -1245,10 +1366,8 @@
             const id = document.getElementById('target-id').value;
             const nominal = document.querySelector('input[name="nominal"]:checked');
             if(!id || !nominal) return alert('Lengkapi data pesanan!');
-            
             let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA (Transfer)';
             let adminLabel = (selectedCategory === 'game') ? `<p>Jalur Admin: <b>Admin ${selectedAdminGame}</b></p>` : '';
-
             document.getElementById('modal-details').innerHTML = `
                 <div style="background:#f8fafc; padding:15px; border-radius:15px;">
                     <p>Produk: <b>${selectedProduct.name}</b></p>
@@ -1262,39 +1381,21 @@
             document.getElementById('orderModal').style.display = 'block';
         };
 
-        // --- MODIFIKASI: Pesan Bukti Transfer Hanya Untuk DANA ---
         document.getElementById('btn-send-wa').onclick = () => {
+            closeModal();
             const id = document.getElementById('target-id').value;
             const serverId = document.getElementById('server-id').value;
             const nominal = document.querySelector('input[name="nominal"]:checked');
             const custName = document.getElementById('customer-name').value;
-            let destination = serverId ? `${id} (${serverId})` : id;
-            let buyerName = custName ? custName : 'Pelanggan';
-            let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA';
-            
-            let targetWA = WHATSAPP_NUMBER;
-            if (selectedCategory === 'game') {
-                targetWA = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
-            }
-
-            // Logika Pesan Penutup Sesuai Request
-            let closingMsg = "";
-            if (currentPaymentMethod === 'DANA') {
-                closingMsg = `Saya akan segera mengirimkan Bukti Transfer. Mohon segera diproses ya, terima kasih!`;
-            } else {
-                closingMsg = `Mohon segera diproses ya, terima kasih!`;
-            }
-
-            let msg = `Halo *NoxPay*, saya ingin order.\n\n` +
-                      `*--- DETAIL PESANAN ---*\n` +
-                      `*Nama:* ${buyerName}\n` +
-                      `*Produk:* ${selectedProduct.name}\n` +
-                      `*Nominal:* ${nominal.value}\n` +
-                      `*ID/No:* ${destination}\n` +
-                      `*Metode Bayar:* ${paymentLabel}\n` +
-                      `*Total Harga:* Rp ${nominal.dataset.price}\n\n` +
-                      closingMsg;
-            window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
+            const data = {
+                product: selectedProduct.name,
+                nominal: nominal.value,
+                target: serverId ? `${id} (${serverId})` : id,
+                price: nominal.dataset.price,
+                payment: currentPaymentMethod === 'Cash' ? 'Tunai' : 'DANA',
+                buyerName: custName ? custName : 'Pelanggan'
+            };
+            showInvoice(data);
         };
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
