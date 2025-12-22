@@ -248,6 +248,33 @@
         .nominal-item input { display: none; }
         .nominal-item input:checked + label { border-color: var(--primary); background: var(--white); box-shadow: 0 5px 15px rgba(0,102,255,0.08); }
 
+        /* MODIFIKASI: Style Khusus WDP */
+        .nominal-item.wdp-special label {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+            border: 2px solid rgba(0, 102, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nominal-item.wdp-special b {
+            background: linear-gradient(to right, #0066ff, #d946ef, #0066ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shineText 3s linear infinite;
+            font-size: 16px;
+        }
+
+        .nominal-item.wdp-special input:checked + label {
+            border-color: #d946ef;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(217, 70, 239, 0.15);
+        }
+
+        @keyframes shineText {
+            to { background-position: 200% center; }
+        }
+
         .order-form { background: rgba(255, 255, 255, 0.6); padding: 22px; border-radius: 24px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.5); }
         
         /* MODIFIKASI: Inputan Lebih Menonjol */
@@ -1168,7 +1195,16 @@
             const nominalList = document.getElementById('nominal-list');
             nominalList.innerHTML = '';
             prod.prices.forEach((p, i) => {
-                nominalList.innerHTML += `<div class="nominal-item fade-in"><input type="radio" name="nominal" id="n-${i}" value="${p.a}" data-price="${p.p}"><label for="n-${i}"><b>${p.a}</b><br><span style="font-size:11px; color:var(--primary)">Rp ${p.p}</span></label></div>`;
+                // MODIFIKASI: Deteksi WDP untuk class khusus
+                const isWDP = p.a.toUpperCase().includes('WDP');
+                nominalList.innerHTML += `
+                    <div class="nominal-item fade-in ${isWDP ? 'wdp-special' : ''}">
+                        <input type="radio" name="nominal" id="n-${i}" value="${p.a}" data-price="${p.p}">
+                        <label for="n-${i}">
+                            <b>${p.a}</b><br>
+                            <span style="font-size:11px; color:var(--primary)">Rp ${p.p}</span>
+                        </label>
+                    </div>`;
             });
             const orderForm = document.getElementById('order-form-container');
             orderForm.classList.remove('hidden');
