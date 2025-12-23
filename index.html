@@ -1072,43 +1072,30 @@
     historyList.innerHTML = `<button class="delete-all-btn" onclick="deleteAllHistory()">🗑️ Bersihkan Riwayat</button>`;
 
     history.forEach((item, index) => {
-        // ID unik untuk elemen status agar bisa diubah real-time
-        const statusBoxId = `status-box-${item.id_order}`;
-        
-        const card = document.createElement('div');
-        card.className = 'history-card fade-in';
-        card.innerHTML = `
-            <div class="history-main">
-                <div style="flex:1">
-                    <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
-                    <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
-                    <div id="${statusBoxId}" style="font-size: 10px; font-weight: 800; margin-top:5px; color: #ffc107;">
-                        ⌛ Menunggu Pembayaran
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
-                    <div style="font-size: 9px; color: var(--gray);">${item.date}</div>
-                </div>
-                <button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>
-            </div>
-        `;
-        historyList.appendChild(card);
+    // --- PASANG DI SINI ---
+    const statusText = item.status === "Success" ? "✅ Pembayaran Berhasil" : "⌛ Menunggu Pembayaran";
+    const statusClass = item.status === "Success" ? "status-success" : "status-pending";
+    const statusColor = item.status === "Success" ? "#00e676" : "#ffc107";
+    // ----------------------
+
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    
+    // Gunakan variabel statusColor dan statusText di bawah ini
+    card.style.borderLeft = `4px solid ${statusColor}`;
+    card.innerHTML = `
+        <div class="history-info">
+            <h4>${item.product}</h4>
+            <p style="color: ${statusColor}; font-weight: bold;">${statusText}</p>
+        </div>
+    `;
+    historyList.appendChild(card);
+});
+
 
         // --- REAL-TIME LISTENER ---
         // Menghubungkan kartu riwayat ini langsung ke database Firebase
-        db.ref('orders/' + item.id_order + '/status').on('value', (snapshot) => {
-            const currentStatus = snapshot.val();
-            const statusElement = document.getElementById(statusBoxId);
-            
-            if (statusElement && currentStatus === "Success") {
-                statusElement.innerHTML = "✅ Pembayaran Berhasil";
-                statusElement.style.color = "#00e676"; // Warna hijau sukses
-                // Tambahkan efek border hijau pada kartu agar lebih jelas
-                statusElement.closest('.history-card').style.borderLeft = "4px solid #00e676";
-            }
-        });
-    });
+        
 }
 
 
@@ -1486,30 +1473,44 @@
       console.error("Gagal simpan ke Firebase: ", error);
     });
     // Memantau perubahan status secara Real-Time dari Firebase
-// Antena Global: Pantau semua perubahan di folder 'orders'
+// ANTENA SUPER UPDATE - PASTI JALAN
 db.ref('orders/').on('value', (snapshot) => {
-    console.log("Ada perubahan data di Firebase!");
-    
-    // 1. Ambil data terbaru dari Firebase
     const firebaseData = snapshot.val();
-    
-    // 2. Ambil riwayat yang tersimpan di HP (Local Storage)
+    if (!firebaseData) return;
+
+    console.log("Data Firebase Diterima:", firebaseData);
+
+    // Ambil semua ID Order yang ada di riwayat lokal user
     let localHistory = JSON.parse(localStorage.getItem('purchaseHistory') || '[]');
 
-    // 3. Update status di Local Storage berdasarkan data terbaru Firebase
-    localHistory = localHistory.map(item => {
-        if (firebaseData && firebaseData[item.id_order]) {
-            item.status = firebaseData[item.id_order].status;
+    if (localHistory.length > 0) {
+        // PAKSA update status dari Firebase ke riwayat lokal
+        let adaPerubahan = false;
+        localHistory.forEach((item, index) => {
+            if (firebaseData[item.id_order]) {
+                const statusBaru = firebaseData[item.id_order].status;
+                if (localHistory[index].status !== statusBaru) {
+                    localHistory[index].status = statusBaru;
+                    adaPerubahan = true;
+                }
+            }
+        });
+
+        // Jika ada perubahan, simpan dan gambar ulang
+        if (adaPerubahan) {
+            localStorage.setItem('purchaseHistory', JSON.stringify(localHistory));
+            console.log("Status diperbarui ke Lokal! Menggambar ulang...");
+            
+            // Panggil fungsi renderHistory milikmu
+            if (typeof renderHistory === "function") {
+                renderHistory();
+            } else {
+                // Jika renderHistory tidak ketemu, paksa reload halaman
+                location.reload();
+            }
         }
-        return item;
-    });
-
-    // 4. Simpan kembali ke HP & Gambar ulang tampilannya
-    localStorage.setItem('purchaseHistory', JSON.stringify(localHistory));
-    renderHistory(); 
+    }
 });
-
-
   }
 </script>
 
