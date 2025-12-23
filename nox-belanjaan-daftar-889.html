@@ -3,33 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel Terkunci - NoxPay</title>
+    <title>Admin NoxPay - Mobile</title>
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; background: #2d2d2d; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #444; }
-        th { background: #007bff; color: white; }
-        .status-pending { color: #ffcc00; font-weight: bold; }
-        #loader { color: #007bff; font-weight: bold; margin-bottom: 10px; }
+        :root {
+            --primary: #007bff;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #333333;
+            --pending: #ff9800;
+        }
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 15px; 
+        }
+        .header {
+            padding: 10px 0 20px 0;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+        h2 { margin: 0; font-size: 1.5rem; color: var(--primary); }
+        #status-cloud { font-size: 0.8rem; color: #666; }
+
+        /* Desain Kartu untuk HP */
+        .order-container {
+            display: grid;
+            gap: 15px;
+        }
+        .order-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary);
+            position: relative;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            border-bottom: 1px split #eee;
+            padding-bottom: 5px;
+        }
+        .order-id { font-weight: bold; font-size: 0.9rem; color: #555; }
+        .order-time { font-size: 0.8rem; color: #888; }
+        
+        .order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .label { font-size: 0.75rem; color: #999; display: block; }
+        .value { font-size: 0.95rem; font-weight: 500; display: block; }
+        
+        .price-tag {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .badge {
+            background: var(--pending);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .total-price { color: var(--primary); font-weight: bold; font-size: 1.1rem; }
     </style>
 </head>
 <body>
-    <h2>Daftar Pesanan NoxPay (Secure Mode)</h2>
-    <div id="loader">Menghubungkan ke server aman...</div>
-    <table>
-        <thead>
-            <tr>
-                <th>Waktu</th>
-                <th>Nama</th>
-                <th>Produk</th>
-                <th>Target</th>
-                <th>Metode</th>
-                <th>Harga</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="order-list"></tbody>
-    </table>
+    <div class="header">
+        <h2>Pesanan Masuk 📦</h2>
+        <div id="status-cloud">Mengecek koneksi aman...</div>
+    </div>
+
+    <div id="order-list" class="order-container">
+        </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -50,30 +101,57 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // PROSES LOGIN RAHASIA (Anonymous)
         auth.signInAnonymously().then(() => {
-            document.getElementById('loader').innerText = "Koneksi Terenkripsi - Data Siap.";
+            document.getElementById('status-cloud').innerText = "✅ Terhubung ke Database (Aman)";
             loadOrders();
-        }).catch((error) => {
-            document.getElementById('loader').innerText = "Akses Ditolak! Aktifkan Anonymous Auth di Firebase.";
+        }).catch((err) => {
+            document.getElementById('status-cloud').innerText = "❌ Akses Ditolak!";
         });
 
         function loadOrders() {
             db.ref('orders').on('value', (snapshot) => {
-                const list = document.getElementById('order-list');
-                list.innerHTML = "";
-                snapshot.forEach((childSnapshot) => {
-                    const data = childSnapshot.val();
-                    const row = `<tr>
-                        <td>${data.waktu_masuk || '-'}</td>
-                        <td>${data.buyerName}</td>
-                        <td>${data.product} (${data.nominal})</td>
-                        <td>${data.target}</td>
-                        <td>${data.payment}</td>
-                        <td>Rp ${data.price}</td>
-                        <td class="status-pending">${data.status}</td>
-                    </tr>`;
-                    list.innerHTML += row;
+                const container = document.getElementById('order-list');
+                container.innerHTML = "";
+                
+                // Membalik urutan agar pesanan terbaru ada di paling ATAS
+                const orders = [];
+                snapshot.forEach(child => { orders.push(child.val()); });
+                orders.reverse(); 
+
+                orders.forEach((data) => {
+                    const card = `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">ID: ${data.waktu_masuk ? data.waktu_masuk.split(',')[1].trim() : 'Baru'}</span>
+                            <span class="order-time">${data.waktu_masuk || '-'}</span>
+                        </div>
+                        <div class="order-body">
+                            <div>
+                                <span class="label">Pelanggan</span>
+                                <span class="value">${data.buyerName}</span>
+                            </div>
+                            <div>
+                                <span class="label">Produk</span>
+                                <span class="value">${data.product}</span>
+                            </div>
+                            <div>
+                                <span class="label">Target</span>
+                                <span class="value" style="color:#e91e63">${data.target}</span>
+                            </div>
+                            <div>
+                                <span class="label">Nominal</span>
+                                <span class="value">${data.nominal}</span>
+                            </div>
+                        </div>
+                        <div class="price-tag">
+                            <div>
+                                <span class="label">Metode: ${data.payment}</span>
+                                <span class="total-price">Rp ${data.price}</span>
+                            </div>
+                            <span class="badge">${data.status}</span>
+                        </div>
+                    </div>`;
+                    container.innerHTML += card;
                 });
             });
         }
