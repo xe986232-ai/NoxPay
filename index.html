@@ -1481,7 +1481,7 @@ db.ref('orders/').on('value', (snapshot) => {
     console.log("Data Firebase Diterima:", firebaseData);
 
     // Ambil semua ID Order yang ada di riwayat lokal user
-    let localHistory = JSON.parse(localStorage.getItem('purchaseHistory') || '[]');
+    let localHistory = JSON.parse(localStorage.getItem('noxpay_history') || '[]');
 
     if (localHistory.length > 0) {
         // PAKSA update status dari Firebase ke riwayat lokal
