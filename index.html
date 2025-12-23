@@ -1481,10 +1481,54 @@
                 buyerName: custName ? custName : 'Pelanggan'
             };
             showInvoice(data);
+            kirimDataKeAdmin(data);
         };
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
     </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+  // Konfigurasi sesuai data terbaru Anda
+  const firebaseConfig = {
+    apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+    authDomain: "noxpay-admin.firebaseapp.com",
+    databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "noxpay-admin",
+    storageBucket: "noxpay-admin.firebasestorage.app",
+    messagingSenderId: "212794945472",
+    appId: "1:212794945472:web:bd803bb3e71b48ea99a225",
+    measurementId: "G-2PXC06145B"
+  };
+
+  // Inisialisasi Firebase
+  if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.database();
+
+  // Fungsi untuk mengirim data pesanan
+  function kirimDataKeAdmin(orderData) {
+    // Membuat ID pesanan unik berdasarkan waktu
+    const orderID = "NPX-" + Date.now();
+    
+    // Menyimpan ke path 'orders/' di database Anda
+    db.ref('orders/' + orderID).set({
+      ...orderData,
+      id_trx: orderID,
+      status: "Pending",
+      waktu_masuk: new Date().toLocaleString('id-ID')
+    })
+    .then(() => {
+      console.log("Pesanan tersimpan di Firebase!");
+    })
+    .catch((error) => {
+      console.error("Gagal simpan ke Firebase: ", error);
+    });
+  }
+</script>
+
 </body>
 </html>
 
