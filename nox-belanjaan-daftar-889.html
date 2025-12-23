@@ -3,80 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin NoxPay - Mobile</title>
+    <title>NoxPay Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #007bff;
-            --bg: #f0f2f5;
+            --primary: #4f46e5;
+            --bg: #f8fafc;
             --card: #ffffff;
-            --text: #333333;
-            --pending: #ff9800;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --success: #10b981;
+            --pending: #f59e0b;
         }
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 15px; 
-        }
-        .header {
-            padding: 10px 0 20px 0;
-            border-bottom: 2px solid #ddd;
-            margin-bottom: 20px;
-        }
-        h2 { margin: 0; font-size: 1.5rem; color: var(--primary); }
-        #status-cloud { font-size: 0.8rem; color: #666; }
 
-        /* Desain Kartu untuk HP */
+        * { box-sizing: border-box; }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .header {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        h2 { 
+            margin: 0; 
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            letter-spacing: -0.025em;
+        }
+
+        #status-cloud { 
+            font-size: 0.75rem; 
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* Container List */
         .order-container {
             display: grid;
-            gap: 15px;
+            gap: 12px;
+            max-width: 500px;
+            margin: 0 auto;
         }
+
+        /* Card Styling */
         .order-card {
             background: var(--card);
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--primary);
-            position: relative;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
+            border: 1px solid #eef2f6;
+            transition: transform 0.2s;
         }
+
+        .order-card:active { transform: scale(0.98); }
+
         .order-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            border-bottom: 1px split #eee;
-            padding-bottom: 5px;
+            align-items: center;
+            margin-bottom: 12px;
         }
-        .order-id { font-weight: bold; font-size: 0.9rem; color: #555; }
-        .order-time { font-size: 0.8rem; color: #888; }
+
+        .order-id { 
+            font-size: 0.7rem; 
+            font-weight: 700; 
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .order-time { font-size: 0.75rem; color: var(--text-sub); }
         
-        .order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .label { font-size: 0.75rem; color: #999; display: block; }
-        .value { font-size: 0.95rem; font-weight: 500; display: block; }
+        /* Grid Details */
+        .order-body { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .info-group { flex: 1 1 40%; }
         
+        .label { 
+            font-size: 0.65rem; 
+            font-weight: 600;
+            color: var(--text-sub); 
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .value { 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            color: var(--text-main);
+            display: block; 
+        }
+        
+        .target-val { color: #db2777; } /* Pink-600 untuk Target */
+
+        /* Footer Card */
         .price-tag {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed #ddd;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .badge {
-            background: var(--pending);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 20px;
+
+        .payment-method {
             font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+
+        .total-price { 
+            display: block;
+            color: var(--text-main); 
+            font-weight: 800; 
+            font-size: 1rem; 
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
             text-transform: uppercase;
         }
-        .total-price { color: var(--primary); font-weight: bold; font-size: 1.1rem; }
+
+        .badge-pending { background: #fffbeb; color: var(--pending); }
+        .badge-success { background: #ecfdf5; color: var(--success); }
+
+        /* Animasi masuk */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .order-card { animation: fadeIn 0.3s ease-out; }
     </style>
 </head>
 <body>
+
     <div class="header">
-        <h2>Pesanan Masuk 📦</h2>
-        <div id="status-cloud">Mengecek koneksi aman...</div>
+        <h2>Pesanan Masuk</h2>
+        <div id="status-cloud" style="color: var(--text-sub);">Menghubungkan...</div>
     </div>
 
     <div id="order-list" class="order-container">
@@ -99,13 +177,12 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const auth = firebase.auth();
-
-        auth.signInAnonymously().then(() => {
-            document.getElementById('status-cloud').innerText = "✅ Terhubung ke Database (Aman)";
+        
+        firebase.auth().signInAnonymously().then(() => {
+            document.getElementById('status-cloud').innerHTML = "<span style='color:var(--success)'>●</span> Terhubung";
             loadOrders();
-        }).catch((err) => {
-            document.getElementById('status-cloud').innerText = "❌ Akses Ditolak!";
+        }).catch(() => {
+            document.getElementById('status-cloud').innerHTML = "<span style='color:red'>●</span> Koneksi Terputus";
         });
 
         function loadOrders() {
@@ -113,42 +190,42 @@
                 const container = document.getElementById('order-list');
                 container.innerHTML = "";
                 
-                // Membalik urutan agar pesanan terbaru ada di paling ATAS
                 const orders = [];
                 snapshot.forEach(child => { orders.push(child.val()); });
                 orders.reverse(); 
 
                 orders.forEach((data) => {
+                    const statusClass = data.status === 'Pending' ? 'badge-pending' : 'badge-success';
                     const card = `
                     <div class="order-card">
                         <div class="order-header">
-                            <span class="order-id">ID: ${data.waktu_masuk ? data.waktu_masuk.split(',')[1].trim() : 'Baru'}</span>
+                            <span class="order-id">#${data.waktu_masuk ? data.waktu_masuk.split(',')[1].trim().replace(/\s/g, '') : 'REC'}</span>
                             <span class="order-time">${data.waktu_masuk || '-'}</span>
                         </div>
                         <div class="order-body">
-                            <div>
+                            <div class="info-group">
                                 <span class="label">Pelanggan</span>
                                 <span class="value">${data.buyerName}</span>
                             </div>
-                            <div>
+                            <div class="info-group">
                                 <span class="label">Produk</span>
                                 <span class="value">${data.product}</span>
                             </div>
-                            <div>
-                                <span class="label">Target</span>
-                                <span class="value" style="color:#e91e63">${data.target}</span>
+                            <div class="info-group">
+                                <span class="label">Target ID</span>
+                                <span class="value target-val">${data.target}</span>
                             </div>
-                            <div>
+                            <div class="info-group">
                                 <span class="label">Nominal</span>
                                 <span class="value">${data.nominal}</span>
                             </div>
                         </div>
                         <div class="price-tag">
                             <div>
-                                <span class="label">Metode: ${data.payment}</span>
+                                <span class="payment-method">${data.payment}</span>
                                 <span class="total-price">Rp ${data.price}</span>
                             </div>
-                            <span class="badge">${data.status}</span>
+                            <span class="badge ${statusClass}">${data.status}</span>
                         </div>
                     </div>`;
                     container.innerHTML += card;
