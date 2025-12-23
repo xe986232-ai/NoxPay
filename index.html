@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NoxPay - Digital Payment</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0066ff">
     <style>
         :root {
             --primary: #0066ff;
@@ -539,12 +541,17 @@
             padding: 14px;
             border-radius: 18px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 10px;
             border: 1px solid #eef2f6;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.02);
             position: relative;
+        }
+        .history-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .delete-btn {
             background: #fee2e2;
@@ -576,6 +583,34 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+        }
+        
+        /* New Status Badge Styles */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+            border-top: 1px dashed #eee;
+        }
+        .status-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #fff1f2; color: #e11d48; }
+        .status-paid { background: #f0fdf4; color: #16a34a; }
+        .btn-confirm-pay {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -897,6 +932,9 @@
         const ADMIN_GAME_2 = "6283129555763"; 
 
         const URL_QRIS_DANA = "HERO/qris.jpg"; 
+        
+        // FITUR BARU: KODE VERIFIKASI ADMIN (Silahkan ganti sesuai keinginan)
+        const ADMIN_VERIFICATION_CODE = "2025"; 
 
         let selectedCreatorCategory = "";
         let currentPaymentMethod = "Cash"; 
@@ -1017,33 +1055,68 @@
         let selectedCategory = '';
         let selectedProduct = null;
 
-        // --- NEW FUNCTIONS FOR HISTORY & INVOICE ---
+        // --- CORE FUNCTIONS (MODIFIED HISTORY PROTECTION) ---
         function saveToHistory(orderData) {
             let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
             
-            // CEK JIKA RIWAYAT SUDAH MENCAPAI 5 - JIKA YA HAPUS SEMUA SEBELUM SIMPAN YANG BARU
-            if (history.length >= 5) {
-                localStorage.removeItem('noxpay_history');
-                history = [];
-            }
+            // Tambahkan ID unik dan Status awal
+            orderData.id_order = "NPX-" + Date.now();
+            orderData.status = (orderData.payment === 'Tunai') ? 'pending' : 'paid';
+
+            if (history.length >= 10) { history.pop(); }
             
             history.unshift(orderData);
             localStorage.setItem('noxpay_history', JSON.stringify(history));
             renderHistory();
         }
 
-        // FUNGSI HAPUS SATUAN
+        function verifyPayment(id_order) {
+            const inputCode = prompt("MASUKKAN KODE VERIFIKASI ADMIN:");
+            if (inputCode === ADMIN_VERIFICATION_CODE) {
+                let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+                const index = history.findIndex(item => item.id_order === id_order);
+                if (index !== -1) {
+                    history[index].status = 'paid';
+                    localStorage.setItem('noxpay_history', JSON.stringify(history));
+                    alert("Pembayaran Berhasil Diverifikasi!");
+                    renderHistory();
+                }
+            } else if (inputCode !== null) {
+                alert("KODE SALAH!");
+            }
+        }
+
+        // FUNGSI PROTEKSI: Hapus item satuan
         function deleteHistoryItem(index) {
             let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+            const item = history[index];
+
+            // Proteksi: Jika pending, tidak bisa dihapus
+            if (item.status === 'pending') {
+                alert("❌ Transaksi belum dibayar! Silahkan bayar ke admin terlebih dahulu sebelum menghapus riwayat.");
+                return;
+            }
+
             history.splice(index, 1);
             localStorage.setItem('noxpay_history', JSON.stringify(history));
             renderHistory();
         }
 
-        // FUNGSI HAPUS SEMUA
+        // FUNGSI PROTEKSI: Hapus semua
         function deleteAllHistory() {
-            if (confirm("Hapus semua riwayat transaksi?")) {
-                localStorage.removeItem('noxpay_history');
+            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+            
+            // Filter: Hanya ambil yang statusnya 'pending' untuk tetap dipertahankan
+            const pendingItems = history.filter(item => item.status === 'pending');
+            const paidCount = history.length - pendingItems.length;
+
+            if (paidCount === 0) {
+                alert("Tidak ada transaksi selesai yang bisa dihapus.");
+                return;
+            }
+
+            if (confirm(`Hapus ${paidCount} riwayat transaksi yang sudah selesai? (Transaksi PENDING tidak akan terhapus)`)) {
+                localStorage.setItem('noxpay_history', JSON.stringify(pendingItems));
                 renderHistory();
             }
         }
@@ -1059,22 +1132,38 @@
 
             let html = `
                 <button class="delete-all-btn" onclick="deleteAllHistory()">
-                    🗑️ Hapus Semua Riwayat
+                    🗑️ Bersihkan Riwayat Selesai
                 </button>
             `;
 
             history.forEach((item, index) => {
+                const isPending = item.status === 'pending';
+                const isDana = item.payment === 'DANA'; // Cek apakah metode DANA
+
                 html += `
                     <div class="history-card fade-in">
-                        <div style="flex:1">
-                            <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
-                            <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
+                        <div class="history-main">
+                            <div style="flex:1">
+                                <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
+                                <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
+                                <div style="font-size: 9px; color: var(--gray);">${item.date}</div>
+                            </div>
+                            ${(!isPending || isDana) ? `<button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>` : ''}
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
-                            <div style="font-size: 9px; color: var(--gray);">${item.date}</div>
+                        
+                        ${!isDana ? `
+                        <div class="status-row">
+                            <div>
+                                <span class="status-badge ${isPending ? 'status-pending' : 'status-paid'}">
+                                    ${isPending ? '⏳ Menunggu Pembayaran' : '✅ Sudah Dibayar'}
+                                </span>
+                            </div>
+                            ${isPending ? `<button class="btn-confirm-pay" onclick="verifyPayment('${item.id_order}')">Konfirmasi Bayar</button>` : ''}
                         </div>
-                        <button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>
+                        ` : ''}
                     </div>
                 `;
             });
@@ -1098,7 +1187,7 @@
             `;
             document.getElementById('invoiceModal').style.display = 'block';
             document.getElementById('final-wa-btn').onclick = () => {
-                saveToHistory({ product: data.product, nominal: data.nominal, target: data.target, price: data.price, date: now });
+                saveToHistory({ product: data.product, nominal: data.nominal, target: data.target, price: data.price, payment: data.payment, date: now, buyerName: data.buyerName });
                 sendWhatsApp(data, orderID);
             };
         }
@@ -1110,7 +1199,7 @@
             if (selectedCategory === 'game') {
                 targetWA = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
             }
-            let closingMsg = (currentPaymentMethod === 'DANA') ? 
+            let closingMsg = (data.payment === 'DANA') ? 
                 `Saya akan segera mengirimkan Bukti Transfer. Mohon segera diproses ya, terima kasih!` : 
                 `Mohon segera diproses ya, terima kasih!`;
 
@@ -1127,7 +1216,6 @@
             window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // --- CORE FUNCTIONS ---
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -1144,10 +1232,7 @@
         function openCaraOrder() { document.getElementById('caraOrderModal').style.display = 'block'; }
         function closeCaraOrder() { document.getElementById('caraOrderModal').style.display = 'none'; }
         
-        function openCreatorModal() { 
-            document.getElementById('creatorModal').style.display = 'block'; 
-            backToCreatorCategories(); 
-        }
+        function openCreatorModal() { document.getElementById('creatorModal').style.display = 'block'; backToCreatorCategories(); }
         function closeCreatorModal() { document.getElementById('creatorModal').style.display = 'none'; }
 
         function goToCreatorTerms(cat) {
