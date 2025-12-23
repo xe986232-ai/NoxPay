@@ -1485,6 +1485,16 @@
     .catch((error) => {
       console.error("Gagal simpan ke Firebase: ", error);
     });
+    // Memantau perubahan status secara Real-Time dari Firebase
+db.ref('orders/').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        // Setiap ada perubahan di Firebase (misal Admin klik Konfirmasi), 
+        // kita jalankan ulang fungsi renderHistory agar tampilan berubah.
+        renderHistory(); 
+    }
+});
+
   }
 </script>
 
