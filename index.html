@@ -584,34 +584,6 @@
             justify-content: center;
             gap: 6px;
         }
-        
-        /* New Status Badge Styles */
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 8px;
-            border-top: 1px dashed #eee;
-        }
-        .status-badge {
-            font-size: 9px;
-            font-weight: 800;
-            padding: 4px 8px;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-        .status-pending { background: #fff1f2; color: #e11d48; }
-        .status-paid { background: #f0fdf4; color: #16a34a; }
-        .btn-confirm-pay {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 800;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -933,9 +905,6 @@
 
         const URL_QRIS_DANA = "HERO/qris.jpg"; 
         
-        // FITUR BARU: KODE VERIFIKASI ADMIN (Silahkan ganti sesuai keinginan)
-        const ADMIN_VERIFICATION_CODE = "2025"; 
-
         let selectedCreatorCategory = "";
         let currentPaymentMethod = "Cash"; 
         let selectedAdminGame = 1; // Default Admin 1
@@ -1055,121 +1024,93 @@
         let selectedCategory = '';
         let selectedProduct = null;
 
-        // --- CORE FUNCTIONS (MODIFIED HISTORY PROTECTION) ---
-        function saveToHistory(orderData) {
-            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            
-            // Tambahkan ID unik dan Status awal
-            orderData.id_order = "NPX-" + Date.now();
-            orderData.status = (orderData.payment === 'Tunai') ? 'pending' : 'paid';
+        // --- CORE FUNCTIONS (MODIFIED HISTORY) ---
+        function saveToHistory(data, orderID) {
+    let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+    
+    const newItem = {
+        product: data.product,
+        nominal: data.nominal,
+        price: data.price,
+        target: data.target,
+        id_order: orderID, // KUNCI: ID dari Firebase disimpan di sini
+        date: new Date().toLocaleString('id-ID')
+    };
 
-            if (history.length >= 10) { history.pop(); }
-            
-            history.unshift(orderData);
-            localStorage.setItem('noxpay_history', JSON.stringify(history));
-            renderHistory();
-        }
+    history.unshift(newItem);
+    if (history.length > 10) history.pop();
+    
+    localStorage.setItem('noxpay_history', JSON.stringify(history));
+    renderHistory(); // Supaya langsung muncul di daftar bawah
+}
 
-        function verifyPayment(id_order) {
-            const inputCode = prompt("MASUKKAN KODE VERIFIKASI ADMIN:");
-            if (inputCode === ADMIN_VERIFICATION_CODE) {
-                let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-                const index = history.findIndex(item => item.id_order === id_order);
-                if (index !== -1) {
-                    history[index].status = 'paid';
-                    localStorage.setItem('noxpay_history', JSON.stringify(history));
-                    alert("Pembayaran Berhasil Diverifikasi!");
-                    renderHistory();
-                }
-            } else if (inputCode !== null) {
-                alert("KODE SALAH!");
-            }
-        }
 
-        // FUNGSI PROTEKSI: Hapus item satuan
         function deleteHistoryItem(index) {
             let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            const item = history[index];
-
-            // Proteksi: Jika pending, tidak bisa dihapus
-            if (item.status === 'pending') {
-                alert("❌ Transaksi belum dibayar! Silahkan bayar ke admin terlebih dahulu sebelum menghapus riwayat.");
-                return;
-            }
-
             history.splice(index, 1);
             localStorage.setItem('noxpay_history', JSON.stringify(history));
             renderHistory();
         }
 
-        // FUNGSI PROTEKSI: Hapus semua
         function deleteAllHistory() {
-            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            
-            // Filter: Hanya ambil yang statusnya 'pending' untuk tetap dipertahankan
-            const pendingItems = history.filter(item => item.status === 'pending');
-            const paidCount = history.length - pendingItems.length;
-
-            if (paidCount === 0) {
-                alert("Tidak ada transaksi selesai yang bisa dihapus.");
-                return;
-            }
-
-            if (confirm(`Hapus ${paidCount} riwayat transaksi yang sudah selesai? (Transaksi PENDING tidak akan terhapus)`)) {
-                localStorage.setItem('noxpay_history', JSON.stringify(pendingItems));
+            if (confirm(`Hapus semua riwayat transaksi?`)) {
+                localStorage.setItem('noxpay_history', JSON.stringify([]));
                 renderHistory();
             }
         }
 
         function renderHistory() {
-            const historyList = document.getElementById('history-list');
-            const history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            
-            if (history.length === 0) {
-                historyList.innerHTML = '<p style="text-align: center; font-size: 11px; color: var(--gray); padding: 20px;">Belum ada riwayat pesanan.</p>';
-                return;
-            }
+    const historyList = document.getElementById('history-list');
+    const history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+    
+    if (history.length === 0) {
+        historyList.innerHTML = '<p style="text-align: center; font-size: 11px; color: var(--gray); padding: 20px;">Belum ada riwayat pesanan.</p>';
+        return;
+    }
 
-            let html = `
-                <button class="delete-all-btn" onclick="deleteAllHistory()">
-                    🗑️ Bersihkan Riwayat Selesai
-                </button>
-            `;
+    // Tombol Bersihkan
+    historyList.innerHTML = `<button class="delete-all-btn" onclick="deleteAllHistory()">🗑️ Bersihkan Riwayat</button>`;
 
-            history.forEach((item, index) => {
-                const isPending = item.status === 'pending';
-                const isDana = item.payment === 'DANA'; // Cek apakah metode DANA
-
-                html += `
-                    <div class="history-card fade-in">
-                        <div class="history-main">
-                            <div style="flex:1">
-                                <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
-                                <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
-                                <div style="font-size: 9px; color: var(--gray);">${item.date}</div>
-                            </div>
-                            ${(!isPending || isDana) ? `<button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>` : ''}
-                        </div>
-                        
-                        ${!isDana ? `
-                        <div class="status-row">
-                            <div>
-                                <span class="status-badge ${isPending ? 'status-pending' : 'status-paid'}">
-                                    ${isPending ? '⏳ Menunggu Pembayaran' : '✅ Sudah Dibayar'}
-                                </span>
-                            </div>
-                            ${isPending ? `<button class="btn-confirm-pay" onclick="verifyPayment('${item.id_order}')">Konfirmasi Bayar</button>` : ''}
-                        </div>
-                        ` : ''}
+    history.forEach((item, index) => {
+        // ID unik untuk elemen status agar bisa diubah real-time
+        const statusBoxId = `status-box-${item.id_order}`;
+        
+        const card = document.createElement('div');
+        card.className = 'history-card fade-in';
+        card.innerHTML = `
+            <div class="history-main">
+                <div style="flex:1">
+                    <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
+                    <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
+                    <div id="${statusBoxId}" style="font-size: 10px; font-weight: 800; margin-top:5px; color: #ffc107;">
+                        ⌛ Menunggu Pembayaran
                     </div>
-                `;
-            });
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
+                    <div style="font-size: 9px; color: var(--gray);">${item.date}</div>
+                </div>
+                <button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>
+            </div>
+        `;
+        historyList.appendChild(card);
+
+        // --- REAL-TIME LISTENER ---
+        // Menghubungkan kartu riwayat ini langsung ke database Firebase
+        db.ref('orders/' + item.id_order + '/status').on('value', (snapshot) => {
+            const currentStatus = snapshot.val();
+            const statusElement = document.getElementById(statusBoxId);
             
-            historyList.innerHTML = html;
-        }
+            if (statusElement && currentStatus === "Success") {
+                statusElement.innerHTML = "✅ Pembayaran Berhasil";
+                statusElement.style.color = "#00e676"; // Warna hijau sukses
+                // Tambahkan efek border hijau pada kartu agar lebih jelas
+                statusElement.closest('.history-card').style.borderLeft = "4px solid #00e676";
+            }
+        });
+    });
+}
+
 
         function showInvoice(data) {
             const invoiceDetails = document.getElementById('invoice-details');
@@ -1213,7 +1154,31 @@
                       `*Metode Bayar:* ${data.payment}\n` +
                       `*Total Harga:* Rp ${data.price}\n\n` +
                       closingMsg;
-            window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
+                              // 1. Simpan ke Firebase Database (Laporan Admin)
+                //         // 1. LANGKAH PERTAMA: Buka WhatsApp Langsung (Agar tidak diblokir browser)
+        // Ganti 628xxx dengan nomor kamu yang asli
+        window.open(`https://wa.me/6283129555763?text=${encodeURIComponent(msg)}`, '_blank');
+
+        // 2. LANGKAH KEDUA: Baru simpan ke Database & Riwayat
+        db.ref('orders/' + orderID).set({
+            id_order: orderID,
+            product: data.product,
+            nominal: data.nominal,
+            price: data.price,
+            target: data.target,
+            payment: data.payment,
+            status: "Pending",
+            waktu: now
+        });
+
+        // 3. Simpan ke Riwayat HP User
+        saveToHistory(data, orderID);
+
+        // 4. Tutup invoice otomatis
+        const invoiceModal = document.getElementById('invoice-modal');
+        if (invoiceModal) invoiceModal.style.display = 'none';
+
+
         }
 
         function toggleSidebar() {
@@ -1490,7 +1455,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
 <script>
-  // Konfigurasi sesuai data terbaru Anda
   const firebaseConfig = {
     apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
     authDomain: "noxpay-admin.firebaseapp.com",
@@ -1502,18 +1466,13 @@
     measurementId: "G-2PXC06145B"
   };
 
-  // Inisialisasi Firebase
   if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
   }
   const db = firebase.database();
 
-  // Fungsi untuk mengirim data pesanan
   function kirimDataKeAdmin(orderData) {
-    // Membuat ID pesanan unik berdasarkan waktu
     const orderID = "NPX-" + Date.now();
-    
-    // Menyimpan ke path 'orders/' di database Anda
     db.ref('orders/' + orderID).set({
       ...orderData,
       id_trx: orderID,
