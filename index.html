@@ -6,7 +6,7 @@
     <title>NoxPay - Digital Payment</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0066ff">
+    <meta name="theme-color" content="#0066ff">
     <style>
         :root {
             --primary: #0066ff;
@@ -17,227 +17,64 @@
             --white: #ffffff;
             --gray: #64748b;
             --accent: #ff007a;
-            
-            /* Background Hero Utama */
             --default-hero: linear-gradient(135deg, #0066ff 0%, #00d2ff 100%);
             --bg-gradient: linear-gradient(180deg, #f8faff 0%, #f1f5f9 100%);
-            
-            /* Category Colors */
             --cat-game: linear-gradient(135deg, #818cf8, #4f46e5);
             --cat-pulsa: linear-gradient(135deg, #34d399, #059669);
             --cat-data: linear-gradient(135deg, #f472b6, #db2777);
             --cat-pln: linear-gradient(135deg, #fbbf24, #d97706);
             --cat-ewallet: linear-gradient(135deg, #38bdf8, #0284c7);
             --cat-project: linear-gradient(135deg, #8b5cf6, #d946ef);
-            
-            /* Gradient Animasi Pemanis */
             --grad-fancy: linear-gradient(-45deg, #0066ff, #8b5cf6, #d946ef, #00d2ff);
         }
 
-        /* --- SIDEBAR STYLES --- */
-        #sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
-            z-index: 5000; display: none; opacity: 0; transition: 0.3s;
-        }
-        #sidebar {
-            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
-            background: var(--white); z-index: 5001;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
-            padding: 30px 20px;
-        }
+        #sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 5000; display: none; opacity: 0; transition: 0.3s; }
+        #sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: var(--white); z-index: 5001; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 30px rgba(0,0,0,0.1); padding: 30px 20px; }
         #sidebar.active { left: 0; }
         .sidebar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
-        .side-menu-item {
-            display: flex; align-items: center; gap: 15px; padding: 14px 18px;
-            text-decoration: none; color: var(--dark); font-weight: 700;
-            border-radius: 14px; margin-bottom: 8px; transition: 0.3s; cursor: pointer;
-        }
+        .side-menu-item { display: flex; align-items: center; gap: 15px; padding: 14px 18px; text-decoration: none; color: var(--dark); font-weight: 700; border-radius: 14px; margin-bottom: 8px; transition: 0.3s; cursor: pointer; }
         .side-menu-item:hover { background: var(--primary-light); color: var(--primary); }
-
-        /* Style Spesial Untuk Creator Menu */
-        .side-menu-item.creator-special {
-            background: var(--grad-fancy);
-            background-size: 300% 300%;
-            color: white !important;
-            animation: gradientMove 4s ease infinite;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-            border: none;
-        }
-        .side-menu-item.creator-special:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
-        }
-
+        .side-menu-item.creator-special { background: var(--grad-fancy); background-size: 300% 300%; color: white !important; animation: gradientMove 4s ease infinite; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); border: none; }
         .menu-label { font-size: 11px; text-transform: uppercase; color: var(--gray); font-weight: 800; margin: 25px 0 10px 18px; letter-spacing: 1px; }
 
-        /* --- SPLASH SCREEN --- */
-        #splash-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 9999;
-            transition: all 0.8s cubic-bezier(0.65, 0, 0.35, 1);
-        }
-        
-        .advanced-logo {
-            width: 120px;
-            height: 120px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            perspective: 1000px;
-            animation: logoScale 1.8s ease-in-out infinite alternate;
-        }
-        
-        .logo-shape {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0066ff, #00d2ff);
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            position: absolute;
-            animation: shapeMorph 6s linear infinite;
-            box-shadow: 0 15px 35px rgba(0, 102, 255, 0.4);
-        }
-
-        .logo-inner {
-            position: relative;
-            z-index: 10;
-            color: white;
-            font-size: 55px;
-            font-weight: 800;
-            text-shadow: 2px 4px 10px rgba(0,0,0,0.1);
-            font-style: italic;
-        }
-
-        @keyframes shapeMorph {
-            0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: rotate(0deg); }
-            33% { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; }
-            66% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; transform: rotate(180deg); }
-        }
-
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: all 0.8s; }
+        .advanced-logo { width: 120px; height: 120px; position: relative; display: flex; align-items: center; justify-content: center; perspective: 1000px; animation: logoScale 1.8s ease-in-out infinite alternate; }
+        .logo-shape { width: 100%; height: 100%; background: linear-gradient(135deg, #0066ff, #00d2ff); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; position: absolute; animation: shapeMorph 6s linear infinite; box-shadow: 0 15px 35px rgba(0, 102, 255, 0.4); }
+        .logo-inner { position: relative; z-index: 10; color: white; font-size: 55px; font-weight: 800; text-shadow: 2px 4px 10px rgba(0,0,0,0.1); font-style: italic; }
+        @keyframes shapeMorph { 0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: rotate(0deg); } 33% { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; } 66% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; transform: rotate(180deg); } }
         @keyframes logoScale { from { transform: scale(0.9); } to { transform: scale(1.1); } }
-
-        .splash-text {
-            margin-top: 35px; font-weight: 800; font-size: 24px;
-            background: linear-gradient(to right, #1e293b, #0066ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 4px; opacity: 0;
-            animation: textReveal 1s ease forwards 0.8s;
-        }
-
-        /* NEW STYLE: Splash Tagline at Bottom */
-        .splash-footer-text {
-            position: absolute;
-            bottom: 40px;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--gray);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            opacity: 0;
-            animation: textReveal 1s ease forwards 1.2s;
-        }
-
+        .splash-text { margin-top: 35px; font-weight: 800; font-size: 24px; background: linear-gradient(to right, #1e293b, #0066ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 4px; opacity: 0; animation: textReveal 1s ease forwards 0.8s; }
+        .splash-footer-text { position: absolute; bottom: 40px; font-size: 10px; font-weight: 700; color: var(--gray); letter-spacing: 2px; text-transform: uppercase; opacity: 0; animation: textReveal 1s ease forwards 1.2s; }
         @keyframes textReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- HEADER & NAVBAR --- */
         #main-wrapper { opacity: 0; transition: all 1s; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
-        
-        body { 
-            background: var(--bg-gradient); 
-            min-height: 100vh;
-            color: var(--dark); 
-            overflow-x: hidden; 
-        }
-
+        body { background: var(--bg-gradient); min-height: 100vh; color: var(--dark); overflow-x: hidden; }
         .container { padding: 0 16px; width: 100%; max-width: 500px; margin: 0 auto; position: relative; }
-
-        header { 
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(15px);
-            padding: 14px 0; 
-            border-bottom: 1px solid rgba(0,0,0,0.03); 
-            position: sticky; top: 0; z-index: 1000; 
-        }
+        header { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 1000; }
         .header-flex { display: flex; justify-content: space-between; align-items: center; }
-        
         .logo-nav { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .logo-box {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, #0066ff 0%, #00d2ff 100%);
-            border-radius: 9px; display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 800; font-size: 18px;
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
-        }
+        .logo-box { width: 36px; height: 36px; background: linear-gradient(135deg, #0066ff 0%, #00d2ff 100%); border-radius: 9px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px; box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2); }
         .logo-text-nav { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
         .logo-text-nav span:last-child { color: var(--primary); margin-left: 1px; }
-
         .nav-right { display: flex; align-items: center; gap: 15px; }
         .menu-link { text-decoration: none; color: var(--dark); font-size: 13px; font-weight: 700; transition: 0.3s; opacity: 0.8; cursor: pointer; }
-        .menu-link:hover { color: var(--primary); opacity: 1; }
-
-        /* --- HERO --- */
-        .hero { 
-            position: relative; 
-            background: var(--default-hero);
-            color: white; padding: 50px 0; border-radius: 0 0 35px 35px; 
-            text-align: left; overflow: hidden; margin-bottom: 10px;
-            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.2);
-            transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .hero::before {
-            content: ''; position: absolute; top: -20px; left: -20px;
-            width: 150px; height: 150px; border-radius: 40px;
-            background: rgba(255,255,255,0.1); transform: rotate(15deg);
-        }
-
-        .hero-shapes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-
+        .hero { position: relative; background: var(--default-hero); color: white; padding: 50px 0; border-radius: 0 0 35px 35px; text-align: left; overflow: hidden; margin-bottom: 10px; box-shadow: 0 10px 30px rgba(0, 102, 255, 0.2); transition: background 0.6s; }
         .hero-content { position: relative; z-index: 10; } 
-        .hero h2 { font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; transition: 0.3s; }
-        .hero p { font-size: 14px; opacity: 0.9; width: 65%; transition: 0.3s; }
-
-        .hero-decor-icon { position: absolute; right: -10px; bottom: -10px; font-size: 110px; opacity: 0.1; transform: rotate(-15deg); z-index: 1; transition: 0.5s; }
-
-        .hero-character {
-            position: absolute; right: -10px; bottom: -15px; width: 185px; z-index: 5; pointer-events: none;
-            transform: translateY(150%);
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s;
-        }
-        
+        .hero h2 { font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; }
+        .hero p { font-size: 14px; opacity: 0.9; width: 65%; }
+        .hero-character { position: absolute; right: -10px; bottom: -15px; width: 185px; z-index: 5; pointer-events: none; transform: translateY(150%); transition: transform 0.8s; }
         .hero-character.animate { transform: translateY(0); }
-        .hero-character img {
-            width: 100%; height: auto; display: block;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); 
-            animation: floating 3.5s ease-in-out infinite;
-        }
-
+        .hero-character img { width: 100%; height: auto; animation: floating 3.5s ease-in-out infinite; }
         @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* --- PRODUK --- */
         .section-header { margin: 25px 0 15px; }
         .section-header h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--dark); }
         .section-header h2::before { content: ''; width: 5px; height: 16px; background: var(--primary); border-radius: 10px; }
-
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .category-card { 
-            background: var(--white); padding: 16px; border-radius: 24px; display: flex; 
-            align-items: center; gap: 14px; cursor: pointer; border: 2px solid transparent; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-        .category-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
-        .category-card.active { border-color: var(--primary); background: var(--white); box-shadow: 0 10px 20px rgba(0,102,255,0.12); }
-        .category-card .icon-box { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 22px; position: relative; transition: 0.3s; flex-shrink: 0; color: white; }
-        .category-card span { font-weight: 700; font-size: 14px; color: var(--dark); }
-
+        .category-card { background: var(--white); padding: 16px; border-radius: 24px; display: flex; align-items: center; gap: 14px; cursor: pointer; border: 2px solid transparent; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .category-card.active { border-color: var(--primary); }
+        .category-card .icon-box { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; flex-shrink: 0; }
         .icon-game { background: var(--cat-game); }
         .icon-pulsa { background: var(--cat-pulsa); }
         .icon-data { background: var(--cat-data); }
@@ -246,388 +83,47 @@
         .icon-project { background: var(--cat-project); }
 
         .nominal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .nominal-item label { background: rgba(255, 255, 255, 0.8); border: 1.5px solid transparent; padding: 16px 12px; border-radius: 18px; display: block; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .nominal-item label { background: rgba(255, 255, 255, 0.8); border: 1.5px solid transparent; padding: 16px 12px; border-radius: 18px; display: block; cursor: pointer; transition: 0.2s; }
         .nominal-item input { display: none; }
-        .nominal-item input:checked + label { border-color: var(--primary); background: var(--white); box-shadow: 0 5px 15px rgba(0,102,255,0.08); }
-
-        /* MODIFIKASI: Style Khusus WDP */
-        .nominal-item.wdp-special label {
-            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
-            border: 2px solid rgba(0, 102, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nominal-item.wdp-special b {
-            background: linear-gradient(to right, #0066ff, #d946ef, #0066ff);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shineText 3s linear infinite;
-            font-size: 16px;
-        }
-
-        .nominal-item.wdp-special input:checked + label {
-            border-color: #d946ef;
-            background: #fff;
-            box-shadow: 0 8px 20px rgba(217, 70, 239, 0.15);
-        }
-
-        @keyframes shineText {
-            to { background-position: 200% center; }
-        }
-
+        .nominal-item input:checked + label { border-color: var(--primary); background: var(--white); }
         .order-form { background: rgba(255, 255, 255, 0.6); padding: 22px; border-radius: 24px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.5); }
-        
-        /* MODIFIKASI: Inputan Lebih Menonjol */
-        .form-group input { 
-            width: 100%; 
-            padding: 16px; 
-            background: #fdfdfd; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 16px; 
-            outline: none; 
-            transition: all 0.3s; 
-            font-weight: 600;
-            color: var(--dark);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .form-group input:focus {
-            border-color: var(--primary);
-            background: var(--white);
-            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1);
-            transform: translateY(-1px);
-        }
-        .form-group input::placeholder {
-            color: #cbd5e1;
-            font-weight: 500;
-        }
-
+        .form-group input { width: 100%; padding: 16px; background: #fdfdfd; border: 2px solid #e2e8f0; border-radius: 16px; outline: none; font-weight: 600; }
         .btn-order { width: 100%; background: var(--primary); color: white; padding: 16px; border: none; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2); margin-top: 15px; }
 
-        /* --- DIGITAL PRODUCT (FL STUDIO) SPECIAL STYLES (MODIFIED) --- */
-        .project-card-special {
-            position: relative;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 245, 249, 0.8) 100%);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(139, 92, 246, 0.2);
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15) !important;
-            z-index: 1;
-        }
-
-        /* Glare Effect */
-        .project-card-special::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
-            animation: rotateBg 10s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes rotateBg { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .project-card-special:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: #8b5cf6;
-            box-shadow: 0 20px 45px rgba(139, 92, 246, 0.3) !important;
-        }
-
-        .project-card-special .icon-box {
-            background: var(--cat-project);
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
-            animation: pulse-purple 2s infinite;
-        }
-
-        .project-card-special span {
-            font-size: 16px !important;
-            font-weight: 800 !important;
-            background: linear-gradient(to right, #6366f1, #d946ef);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
-
-        .badge-premium {
-            position: absolute;
-            top: 12px;
-            right: -32px;
-            background: linear-gradient(to right, #ff007a, #8b5cf6);
-            color: white;
-            padding: 5px 35px;
-            font-size: 10px;
-            font-weight: 900;
-            transform: rotate(45deg);
-            box-shadow: 0 4px 12px rgba(255, 0, 122, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .exclusive-label {
-            position: absolute;
-            bottom: 12px;
-            right: 18px;
-            font-size: 11px;
-            font-weight: 800;
-            color: #8b5cf6;
-            letter-spacing: 0.5px;
-            animation: bounceRight 1s infinite alternate;
-        }
-
-        @keyframes bounceRight { from { transform: translateX(0); } to { transform: translateX(5px); } }
-        @keyframes pulse-purple {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-        }
-
-        /* --- PAYMENT METHOD STYLES --- */
-        .payment-method-container {
-            background: #ffffff;
-            border: 1.5px solid #eef2f6;
-            border-radius: 18px;
-            padding: 16px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .payment-method-container.selected {
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.1);
-        }
-        .payment-info { display: flex; align-items: center; gap: 12px; }
-        .payment-icon { font-size: 24px; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; }
-        .payment-icon img { width: 100%; height: auto; object-fit: contain; }
-        .payment-text h4 { font-size: 13px; font-weight: 800; color: var(--dark); }
-        .payment-text p { font-size: 10px; color: var(--gray); font-weight: 600; }
-        .payment-badge {
-            background: #f1f5f9;
-            color: var(--gray);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 800;
-        }
-        .payment-method-container.selected .payment-badge {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* --- PAYMENT INSTRUCTION (NEW) --- */
-        #payment-instructions {
-            background: #fff;
-            border-radius: 18px;
-            padding: 20px;
-            margin-top: 10px;
-            text-align: center;
-            border: 1.5px dashed var(--primary);
-        }
-        .qris-img { width: 100%; max-width: 200px; margin: 10px auto; border-radius: 10px; display: block; }
-        .instruction-text { font-size: 11px; color: var(--gray); font-weight: 700; margin-top: 10px; line-height: 1.4; }
-        .instruction-text span { color: var(--accent); }
-
-        /* --- STYLES PEMANIS --- */
-        .pemanis-section { margin: 45px 0 20px; text-align: center; }
+        /* Status Badge Colors */
+        .history-card { background: var(--white); padding: 14px; border-radius: 18px; border: 1px solid #eef2f6; margin-bottom: 12px; }
+        .history-main { display: flex; justify-content: space-between; align-items: center; }
+        .status-row { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px dashed #eee; margin-top: 8px; }
+        .status-badge { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+        .status-pending { background: #fffbeb; color: #b45309; } /* Kuning */
+        .status-paid { background: #f0fdf4; color: #16a34a; } /* Hijau */
         
-        .title-gradient-animated {
-            font-size: 18px;
-            font-weight: 800;
-            display: inline-block;
-            margin-bottom: 25px;
-            background: var(--grad-fancy);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientMove 4s ease infinite;
-        }
-
-        .pemanis-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .pemanis-card {
-            background: var(--white);
-            padding: 25px 20px;
-            border-radius: 28px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.03);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
-            display: flex;
-            flex-direction: column;
-            align-items: center; 
-        }
-        .pemanis-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 8px; color: var(--dark); }
-        .pemanis-card p { font-size: 12px; color: var(--gray); line-height: 1.6; max-width: 90%; }
-        
-        .grad-line { height: 4px; width: 60px; background: var(--grad-fancy); background-size: 300% 300%; animation: gradientMove 5s ease infinite; border-radius: 10px; margin-top: 18px; }
-
-        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        .benefit-tag { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--primary-light); color: var(--primary); padding: 6px 14px; border-radius: 100px; font-size: 10px; font-weight: 800; margin-bottom: 12px; }
-
-        /* --- MODAL & MISC --- */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); }
-        .modal-content { background: white; width: 85%; max-width: 380px; margin: 25% auto; padding: 25px; border-radius: 25px; animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes modalIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-content { background: white; width: 85%; max-width: 380px; margin: 25% auto; padding: 25px; border-radius: 25px; }
         .fade-in { animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        footer { text-align: center; padding: 40px 0; color: var(--gray); font-size: 11px; font-weight: 600; }
         .hidden { display: none; }
+        footer { text-align: center; padding: 40px 0; color: var(--gray); font-size: 11px; }
 
-        /* Step Order Styles */
-        .step-order { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px; }
-        .step-num { width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
-        .step-text { font-size: 13px; color: var(--dark); line-height: 1.5; }
+        .admin-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .admin-box { background: #fff; border: 2px solid #eef2f6; padding: 15px 10px; border-radius: 18px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .admin-box.active { background: var(--grad-fancy); color: white; border-color: transparent; }
 
-        /* Creator Form Extras */
-        .creator-form-field { margin-bottom: 15px; text-align: left; }
-        .creator-form-field label { display: block; font-size: 12px; font-weight: 700; color: var(--gray); margin-bottom: 6px; }
-        .creator-form-field input { width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #eef2f6; outline: none; }
-        .terms-box { background: #f8fafc; padding: 15px; border-radius: 12px; font-size: 11px; color: var(--gray); height: 160px; overflow-y: auto; margin-bottom: 10px; border: 1px solid #eee; text-align: left; line-height: 1.6; }
-        .check-group { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--dark); cursor: pointer; margin-bottom: 15px; }
-
-        /* MODIFIKASI JALUR ADMIN (Mencolok) */
-        .admin-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-        .admin-box {
-            position: relative;
-            background: #fff;
-            border: 2px solid #eef2f6;
-            padding: 15px 10px;
-            border-radius: 18px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
-        }
-        .admin-box h5 { font-size: 13px; font-weight: 800; margin-bottom: 2px; position: relative; z-index: 2; }
-        .admin-box p { font-size: 10px; font-weight: 700; opacity: 0.8; position: relative; z-index: 2; }
-        
-        .admin-box.active {
-            border-color: transparent;
-            color: white;
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
-            background: var(--grad-fancy);
-            background-size: 200% 200%;
-            animation: gradientMove 3s ease infinite;
-        }
-
-        .admin-box.active::after {
-            content: '✓';
-            position: absolute;
-            top: 5px; right: 8px;
-            font-size: 10px;
-            background: white;
-            color: var(--primary);
-            width: 16px; height: 16px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900;
-        }
-
-        /* NEW: History Item Style */
-        .history-card {
-            background: var(--white);
-            padding: 14px;
-            border-radius: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border: 1px solid #eef2f6;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            position: relative;
-        }
-        .history-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .delete-btn {
-            background: #fee2e2;
-            color: #ef4444;
-            border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            cursor: pointer;
-            margin-left: 10px;
-            font-size: 14px;
-        }
-        .delete-all-btn {
-            width: 100%;
-            padding: 10px;
-            background: #fee2e2;
-            color: #ef4444;
-            border: none;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        
-        /* New Status Badge Styles */
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 8px;
-            border-top: 1px dashed #eee;
-        }
-        .status-badge {
-            font-size: 9px;
-            font-weight: 800;
-            padding: 4px 8px;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-        .status-pending { background: #fff1f2; color: #e11d48; }
-        .status-paid { background: #f0fdf4; color: #16a34a; }
-        .btn-confirm-pay {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 800;
-            cursor: pointer;
-        }
+        .payment-method-container { background: #ffffff; border: 1.5px solid #eef2f6; border-radius: 18px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .payment-method-container.selected { border-color: var(--primary); }
+        .payment-info { display: flex; align-items: center; gap: 12px; }
+        .payment-icon img { width: 24px; }
+        .payment-badge { background: #f1f5f9; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
     </style>
 </head>
 <body>
 
     <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
     <div id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo-box">N</div>
-            <div class="logo-text-nav"><span>Nox</span><span>Pay</span></div>
-        </div>
+        <div class="sidebar-header"><div class="logo-box">N</div><div class="logo-text-nav"><span>Nox</span><span>Pay</span></div></div>
         <div class="menu-label">Navigasi</div>
         <div class="side-menu-item" onclick="toggleSidebar(); handleHome()"><span>🏠</span> Beranda</div>
         <div class="side-menu-item" onclick="toggleSidebar(); openCaraOrder()"><span>📖</span> Cara Order</div>
-        <div class="side-menu-item creator-special" onclick="toggleSidebar(); openCreatorModal()"><span>✨</span> Daftar Jadi Creator</div>
-        <div class="side-menu-item" onclick="window.location.href='projects.html'"><span>🎹</span> Project Musik</div>
-        <div class="menu-label">Bantuan</div>
         <a href="https://wa.me/6283129555763" target="_blank" class="side-menu-item" style="text-decoration:none"><span>💬</span> CS NoxPay</a>
     </div>
 
@@ -640,31 +136,21 @@
     <div id="main-wrapper">
         <header>
             <div class="container header-flex">
-                <div class="logo-nav" onclick="toggleSidebar()">
-                    <div class="logo-box">N</div>
-                    <div class="logo-text-nav"><span>Nox</span><span>Pay</span></div>
-                </div>
-                <nav class="nav-right">
-                    <span class="menu-link" onclick="handleHome()">Home</span>
-                    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
-                </nav>
+                <div class="logo-nav" onclick="toggleSidebar()"><div class="logo-box">N</div><div class="logo-text-nav"><span>Nox</span><span>Pay</span></div></div>
+                <nav class="nav-right"><span class="menu-link" onclick="handleHome()">Home</span></nav>
             </div>
         </header>
 
         <section class="hero" id="hero-section">
-            <div class="hero-shapes"></div>
-            <div class="hero-decor-icon" id="hero-icon">📱</div>
             <div class="container hero-content">
                 <h2 id="hero-title">NoxPay -<br>Digital Payment Terpercaya</h2>
                 <p id="hero-desc">Proses kilat 1-5 menit aktif 24 jam.</p>
             </div>
-            <div class="hero-character" id="main-character">
-                <img src="HERO/home1.png" id="char-img" alt="Payment Illustration">
-            </div>
+            <div class="hero-character" id="main-character"><img src="HERO/home1.png" id="char-img"></div>
         </section>
 
-        <main class="container" id="main-content">
-            <div class="section-header" id="kategori-section"><h2>Layanan Top Up</h2></div>
+        <main class="container">
+            <div class="section-header"><h2>Layanan Top Up</h2></div>
             <div class="category-grid">
                 <div class="category-card" data-cat="game"><div class="icon-box icon-game">🎮</div><span>Game</span></div>
                 <div class="category-card" data-cat="pulsa"><div class="icon-box icon-pulsa">📱</div><span>Pulsa</span></div>
@@ -678,857 +164,225 @@
                 <div class="category-grid" id="items-list"></div>
             </div>
 
-            <div id="digital-product-section">
-                <div class="section-header"><h2>Tersedia Juga Produk Digital</h2></div>
-                <div class="category-grid">
-                    <div class="category-card project-card-special" onclick="window.location.href='projects.html'" style="grid-column: span 2; padding: 25px;">
-                        <div class="badge-premium">Exclusive</div>
-                        <div class="icon-box icon-project" style="width: 60px; height: 60px; font-size: 30px;">🎹</div>
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <span>Project FL Studio Mobile</span>
-                            <small style="color: var(--gray); font-size: 11px; font-weight: 700;">Dapatkan FLM Project Original Disini</small>
-                        </div>
-                        <div class="exclusive-label">Lihat Semua →</div>
-                    </div>
-                </div>
-            </div>
-
             <div id="order-form-container" class="hidden fade-in">
                 <div class="order-form">
-                    
-                    <div id="admin-selection-group" class="hidden" style="margin-bottom: 20px;">
-                        <label style="display:block; font-size:12px; font-weight:800; margin-bottom:12px; color:var(--dark); text-align:center; letter-spacing:1px;">⚡ PILIH JALUR ADMIN ⚡</label>
+                    <div id="admin-selection-group" class="hidden">
                         <div class="admin-selector">
-                            <div class="admin-box active" id="admin-box-1" onclick="selectAdmin(1)">
-                                <h5>Admin 1</h5>
-                                <p>Wall</p>
-                            </div>
-                            <div class="admin-box" id="admin-box-2" onclick="selectAdmin(2)">
-                                <h5>Admin 2</h5>
-                                <p>Rizz</p>
-                            </div>
+                            <div class="admin-box active" id="admin-box-1" onclick="selectAdmin(1)"><h5>Admin 1</h5></div>
+                            <div class="admin-box" id="admin-box-2" onclick="selectAdmin(2)"><h5>Admin 2</h5></div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label id="label-id" style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Tujuan</label>
-                        <input type="text" id="target-id" placeholder="Masukkan Nomor/ID" inputmode="numeric">
-                    </div>
-                    <div class="form-group hidden" id="input-server-group" style="margin-top:15px">
-                        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Server ID</label>
-                        <input type="text" id="server-id" placeholder="Contoh: 2024" inputmode="numeric">
-                    </div>
+                    <div class="form-group"><label id="label-id">Tujuan</label><input type="text" id="target-id" placeholder="Masukkan Nomor/ID"></div>
+                    <div class="form-group hidden" id="input-server-group" style="margin-top:10px"><label>Server ID</label><input type="text" id="server-id"></div>
                     
-                    <div class="section-header" style="margin-top:20px"><h2>Pilih Nominal</h2></div>
+                    <div class="section-header"><h2>Pilih Nominal</h2></div>
                     <div class="nominal-grid" id="nominal-list"></div>
 
-                    <div id="payment-method-section">
-                        <div class="section-header" style="margin-top:25px"><h2>Metode Pembayaran</h2></div>
-                        
-                        <div id="payment-options-list">
-                            <div class="payment-method-container selected" id="pay-cash" onclick="selectPayment('Cash')">
-                                <div class="payment-info">
-                                    <span class="payment-icon">💵</span>
-                                    <div class="payment-text">
-                                        <h4>Bayar Tunai / Cas</h4>
-                                        <p>Serahkan uang langsung ke admin</p>
-                                    </div>
-                                </div>
-                                <div class="payment-badge" id="badge-cash">TERPILIH</div>
-                            </div>
-
-                            <div class="payment-method-container hidden" id="pay-dana" onclick="selectPayment('DANA')">
-                                <div class="payment-info">
-                                    <span class="payment-icon">
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png" alt="DANA Logo">
-                                    </span>
-                                    <div class="payment-text">
-                                        <h4>DANA</h4>
-                                        <p>Transfer ke nomor DANA Admin</p>
-                                    </div>
-                                </div>
-                                <div class="payment-badge" id="badge-dana">PILIH</div>
-                            </div>
+                    <div id="payment-options-list" style="margin-top:20px">
+                        <div class="payment-method-container selected" id="pay-cash" onclick="selectPayment('Cash')">
+                            <div class="payment-info"><span>💵</span><h4>Bayar Tunai</h4></div>
+                            <div class="payment-badge" id="badge-cash">PILIH</div>
                         </div>
-
-                        <div id="payment-instructions" class="hidden fade-in">
-                            <h4 style="font-size:12px; font-weight:800;">Scan QRIS Dana Admin</h4>
-                            <img src="" id="qris-image-el" class="qris-img" alt="QRIS DANA">
-                            <div class="instruction-text">
-                                Silahkan selesaikan pembayaran. <br>
-                                <span>WAJIB:</span> Screenshoot bukti transfer dan kirimkan ke WhatsApp Admin setelah klik beli!
-                            </div>
+                        <div class="payment-method-container" id="pay-dana" onclick="selectPayment('DANA')">
+                            <div class="payment-info"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png"><h4>DANA</h4></div>
+                            <div class="payment-badge" id="badge-dana">PILIH</div>
                         </div>
-
                     </div>
 
-                    <div class="form-group" style="margin-top: 25px;">
-                        <label style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Nama Anda (Opsional)</label>
-                        <input type="text" id="customer-name" placeholder="Nama Anda">
-                    </div>
                     <button class="btn-order" id="btn-review">Beli Sekarang</button>
                 </div>
             </div>
 
             <div id="history-section" style="margin-top: 40px;">
-                <div class="section-header"><h2>Riwayat Terakhir</h2></div>
+                <div class="section-header"><h2>Riwayat Pesanan (Live)</h2></div>
                 <div id="history-list">
                     <p style="text-align: center; font-size: 11px; color: var(--gray); padding: 20px;">Belum ada riwayat pesanan.</p>
                 </div>
             </div>
-
-            <div class="pemanis-section" id="pemanis-noxpay">
-                <h2 class="title-gradient-animated">Kenapa Memilih NoxPay?</h2>
-                <div class="pemanis-grid">
-                    <div class="pemanis-card fade-in">
-                        <div class="benefit-tag">⚡ Fast Response</div>
-                        <h3>Proses Kilat Otomatis</h3>
-                        <p>Pesanan kamu diproses dalam hitungan menit tanpa harus menunggu lama. Sistem kami bekerja 24 jam nonstop.</p>
-                    </div>
-                    <div class="pemanis-card fade-in">
-                        <div class="benefit-tag">💎 Terpercaya</div>
-                        <h3>Layanan Aman & Legal</h3>
-                        <p>NoxPay menjamin keamanan data dan legalitas produk digital yang kami sediakan untuk kenyamanan kamu.</p>
-                    </div>
-                    <div class="pemanis-card fade-in">
-                        <div class="benefit-tag">🎨 Creative Hub</div>
-                        <h3>Eksklusif Project Musik</h3>
-                        <p>Selain top up, kami menyediakan aset musik berkualitas tinggi untuk konten kreator dan produser musik.</p>
-                        <div class="grad-line"></div>
-                    </div>
-                </div>
-            </div>
         </main>
 
-        <div id="orderModal" class="modal">
-            <div class="modal-content">
-                <h3 style="margin-bottom:15px; font-size:16px; font-weight:800;">Konfirmasi Pesanan</h3>
-                <div id="modal-details" style="font-size: 13px; line-height: 1.8;"></div>
-                <div style="display:flex; gap:10px; margin-top:20px;">
-                    <button style="flex:1; padding:12px; border-radius:12px; border:none; background:#f1f5f9; font-weight:700; cursor:pointer" onclick="closeModal()">Batal</button>
-                    <button id="btn-send-wa" style="flex:1; padding:12px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:700; cursor:pointer">Bayar</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="invoiceModal" class="modal">
-            <div class="modal-content" style="max-width: 350px; padding: 0; overflow: hidden; border-radius: 20px;">
-                <div style="background: var(--primary); color: white; padding: 20px; text-align: center;">
-                    <div style="font-size: 24px; font-weight: 800;">NoxPay</div>
-                    <p style="font-size: 10px; opacity: 0.8; letter-spacing: 1px;">INVOICE DIGITAL</p>
-                </div>
-                <div style="padding: 20px; background: white; font-family: 'Courier New', Courier, monospace;">
-                    <div id="invoice-details" style="font-size: 13px; color: #333;"></div>
-                    <hr style="border: none; border-top: 1px dashed #ccc; margin: 15px 0;">
-                    <div style="text-align: center; font-size: 11px; color: var(--gray);">
-                        Terima kasih telah memilih NoxPay!<br>Simpan struk ini sebagai bukti.
-                    </div>
-                </div>
-                <div style="padding: 15px; background: #f8fafc; display: flex; gap: 10px;">
-                    <button onclick="closeInvoice()" style="flex:1; padding:12px; border:none; border-radius:10px; font-weight:700; cursor:pointer;">Tutup</button>
-                    <button id="final-wa-btn" style="flex:1; padding:12px; border:none; border-radius:10px; background:#25D366; color:white; font-weight:700; cursor:pointer;">Beli</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="caraOrderModal" class="modal">
-            <div class="modal-content" style="max-width: 420px;">
-                <h3 style="margin-bottom:20px; font-size:18px; font-weight:800; text-align:center;">Cara Belanja di NoxPay</h3>
-                
-                <div class="step-order">
-                    <div class="step-num">1</div>
-                    <div class="step-text">Pilih kategori layanan (Game, Pulsa, atau E-Wallet).</div>
-                </div>
-                <div class="step-order">
-                    <div class="step-num">2</div>
-                    <div class="step-text">Masukkan <b>Nomor HP</b> atau <b>ID Akun</b> tujuan dengan benar.</div>
-                </div>
-                <div class="step-order">
-                    <div class="step-num">3</div>
-                    <div class="step-text">Pilih <b>Nominal</b> produk yang ingin kamu beli.</div>
-                </div>
-                <div class="step-order">
-                    <div class="step-num">4</div>
-                    <div class="step-text">Klik <b>Beli Sekarang</b>, cek detailnya, lalu klik <b>Bayar</b>.</div>
-                </div>
-                <div class="step-order">
-                    <div class="step-num">5</div>
-                    <div class="step-text">Kamu akan diarahkan ke WhatsApp untuk menyelesaikan pembayaran.</div>
-                </div>
-
-                <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:10px;" onclick="closeCaraOrder()">Mengerti</button>
-            </div>
-        </div>
-
-        <div id="creatorModal" class="modal">
-            <div class="modal-content" style="max-width: 420px; margin: 10% auto;">
-                
-                <div id="creator-step-1">
-                    <h3 style="margin-bottom:20px; font-size:18px; font-weight:800; text-align:center;">Pilih Kategori Digital</h3>
-                    <div class="category-grid">
-                        <div class="category-card" onclick="goToCreatorTerms('Music Project (FL Studio)')" style="grid-column: span 2;">
-                            <div class="icon-box icon-project">🎹</div>
-                            <span>Music Project</span>
-                        </div>
-                    </div>
-                    <button style="width:100%; padding:10px; border:none; background:none; color:var(--gray); font-weight:700; cursor:pointer; margin-top:20px;" onclick="closeCreatorModal()">Batal</button>
-                </div>
-
-                <div id="creator-step-terms" class="hidden">
-                    <h3 style="margin-bottom:15px; font-size:18px; font-weight:800; text-align:center;">Syarat & Ketentuan</h3>
-                    <div class="terms-box">
-                        <b>1. Kepemilikan Karya:</b> Produk yang dijual harus karya asli bukan hasil comot.<br>
-                        <b>2. PENTING:</b> Biaya Untuk UPLOAD Produk 5rb ya!.<br>
-                        <b>4. DAFTAR JADI CREATOR:</b> Untuk daftar jadi creator itu Gratiss!.
-                    </div>
-                    <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:10px;" onclick="goToCreatorForm()">Saya Setuju & Lanjut</button>
-                    <button style="width:100%; padding:10px; border:none; background:none; color:var(--gray); font-weight:700; cursor:pointer; margin-top:10px;" onclick="backToCreatorCategories()">Batal</button>
-                </div>
-
-                <div id="creator-step-2" class="hidden">
-                    <h3 style="margin-bottom:15px; font-size:18px; font-weight:800; text-align:center;">Formulir Pendaftaran</h3>
-                    <p style="font-size: 11px; text-align:center; color: var(--primary); font-weight: 700; margin-bottom: 15px;" id="selected-cat-label"></p>
-                    
-                    <div style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
-                        <div class="creator-form-field">
-                            <label>Nama Artist / Creator</label>
-                            <input type="text" id="creator-name" placeholder="Contoh: Nox Music">
-                        </div>
-                        
-                        <div class="creator-form-field">
-                            <label>Nomor WhatsApp</label>
-                            <input type="number" id="creator-wa" placeholder="Contoh: 08123456789">
-                        </div>
-
-                        <hr style="margin: 20px 0; opacity: 0.1;">
-                        <p style="font-size: 12px; font-weight: 800; color: var(--dark); margin-bottom: 12px;">Data Login (Untuk Dashboard Creator)</p>
-
-                        <div class="creator-form-field">
-                            <label>Username</label>
-                            <input type="text" id="creator-user" placeholder="Buat username login">
-                        </div>
-
-                        <div class="creator-form-field">
-                            <label>Password</label>
-                            <input type="password" id="creator-pass" placeholder="Buat password login">
-                        </div>
-                    </div>
-
-                    <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:15px;" onclick="submitCreatorForm()">Kirim Pendaftaran</button>
-                    <button style="width:100%; padding:10px; border:none; background:none; color:var(--gray); font-weight:700; cursor:pointer; margin-top:10px;" onclick="backToTerms()">Kembali</button>
-                </div>
-            </div>
-        </div>
-
+        <div id="orderModal" class="modal"><div class="modal-content"><h3 id="modal-title">Konfirmasi</h3><div id="modal-details"></div><div style="display:flex; gap:10px; margin-top:20px;"><button onclick="closeModal()">Batal</button><button id="btn-send-wa" style="background:var(--primary); color:white;">Bayar</button></div></div></div>
+        
         <footer>&copy; 2025 NoxPay Digital Payment.</footer>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
     <script>
-        // --- KONFIGURASI ADMIN ---
-        const WHATSAPP_NUMBER = "6283129555763"; // Admin Utama & Selain Game
-        
-        // WhatsApp Admin Khusus Game
-        const ADMIN_GAME_1 = "6283198721162"; 
-        const ADMIN_GAME_2 = "6283129555763"; 
-
-        const URL_QRIS_DANA = "HERO/qris.jpg"; 
-        
-        // FITUR BARU: KODE VERIFIKASI ADMIN (Silahkan ganti sesuai keinginan)
-        const ADMIN_VERIFICATION_CODE = "2025"; 
-
-        let selectedCreatorCategory = "";
-        let currentPaymentMethod = "Cash"; 
-        let selectedAdminGame = 1; // Default Admin 1
-
-        const heroThemes = {
-            default: { bg: 'linear-gradient(135deg, #0066ff 0%, #00d2ff 100%)', icon: '📱', title: 'NoxPay -<br>Digital Payment Terpercaya', desc: 'Proses kilat 1-5 menit aktif 24 jam.', char: 'HERO/home1.png' },
-            game: { bg: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)', icon: '🎮', title: 'Top Up Game<br>Favoritmu', desc: 'Diamond & Point murah setiap hari.', char: 'HERO/home1.png' },
-            pulsa: { bg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', icon: '📲', title: 'Isi Pulsa<br>Semua Operator', desc: 'Pulsa murah tanpa antri.', char: 'HERO/home1.png' },
-            data: { bg: 'linear-gradient(135deg, #f472b6 0%, #db2777 100%)', icon: '📶', title: 'Paket Data<br>Internet Murah', desc: 'Browsing makin lancar tanpa kendala.', char: 'HERO/home1.png' },
-            pln: { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', icon: '⚡', title: 'Token Listrik<br>PLN Prabayar', desc: 'Token terkirim otomatis.', char: 'HERO/home1.png' },
-            ewallet: { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', icon: '👛', title: 'Top Up<br>E-Wallet', desc: 'Saldo Dana.', char: 'HERO/home1.png' },
-            ml: { bg: 'linear-gradient(135deg, #003366 0%, #0066cc 100%)', icon: '⚔️', title: 'Mobile Legends<br>Bang Bang', desc: 'Top up Diamond MLBB aman & legal via ID.', char: 'HERO/mlbb.png' },
-            ff: { bg: 'linear-gradient(135deg, #ff4e00 0%, #ec9f05 100%)', icon: '🔥', title: 'Garena<br>Free Fire', desc: 'Diamond FF murah untuk Booyah lebih maksimal!', char: 'HERO/game.png' }
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin",
+            storageBucket: "noxpay-admin.firebasestorage.app",
+            messagingSenderId: "212794945472",
+            appId: "1:212794945472:web:bd803bb3e71b48ea99a225"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        function generatePulsaPrices() {
-            const prices = [];
-            for (let val = 5000; val <= 100000; val += 5000) {
-                prices.push({
-                    a: val.toLocaleString('id-ID'),
-                    p: (val + 2000).toLocaleString('id-ID')
-                });
-            }
-            return prices;
-        }
-        
-        const database = {
-            game: [
-                { 
-                    id: 'ml', 
-                    name: 'MLBB', 
-                    img: 'GAME/mlbb.jpg', 
-                    heroImg: 'HERO/mlbb.png', 
-                    needsServer: true, 
-                    prices: [
-                        {a: '5 Diamond', p: '1.500'}, {a: '11 Diamond', p: '3.500'}, {a: '12 Diamond', p: '4.000'},
-                        {a: '15 Diamond', p: '5.000'}, {a: '19 Diamond', p: '6.000'}, {a: '20 Diamond', p: '6.500'},
-                        {a: '28 Diamond', p: '9.000'}, {a: '30 Diamond', p: '9.500'}, {a: '33 Diamond', p: '10.000'},
-                        {a: '36 Diamond', p: '10.500'}, {a: '40 Diamond', p: '11.500'}, {a: '46 Diamond', p: '13.500'},
-                        {a: '54 Diamond', p: '16.000'}, {a: '65 Diamond', p: '18.000'}, {a: '70 Diamond', p: '20.000'},
-                        {a: '75 Diamond', p: '22.000'}, {a: '81 Diamond', p: '24.000'}, {a: '92 Diamond', p: '26.000'},
-                        {a: '102 Diamond', p: '30.000'}, {a: '110 Diamond', p: '31.000'}, {a: '114 Diamond', p: '33.000'},
-                        {a: '140 Diamond', p: '38.000'}, {a: '153 Diamond', p: '41.000'}, {a: '168 Diamond', p: '46.000'},
-                        {a: 'WDP', p: '28.000'}, {a: '170 Diamond', p: '48.000'}
-                    ] 
-                },
-                { 
-                    id: 'ff', 
-                    name: 'Free Fire', 
-                    img: 'https://img.icons8.com/color/144/free-fire.png', 
-                    heroImg: 'HERO/game.png', 
-                    needsServer: false, 
-                    prices: [
-                        {a: '5 Diamond', p: '1.000'}, {a: '10 Diamond', p: '2.000'}, {a: '12 Diamond', p: '3.000'},
-                        {a: '15 Diamond', p: '3.500'}, {a: '20 Diamond', p: '3.500'}, {a: '25 Diamond', p: '4.000'},
-                        {a: '30 Diamond', p: '5.000'}, {a: '40 Diamond', p: '7.000'}, {a: '50 Diamond', p: '7.500'},
-                        {a: '55 Diamond', p: '8.000'}, {a: '70 Diamond', p: '9.000'}, {a: '80 Diamond', p: '11.000'},
-                        {a: '90 Diamond', p: '13.500'}, {a: '120 Diamond', p: '16.000'}, {a: '140 Diamond', p: '18.000'},
-                        {a: '150 Diamond', p: '20.000'}, {a: '160 Diamond', p: '22.000'}, {a: '190 Diamond', p: '26.000'}
-                    ] 
-                }
-            ],
-            pulsa: [
-                { id: 'tsel', name: 'Telkomsel', needsServer: false, prices: generatePulsaPrices() },
-                { id: 'xl', name: 'XL Axiata', needsServer: false, prices: generatePulsaPrices() },
-                { id: 'axis', name: 'Axis', needsServer: false, prices: generatePulsaPrices() }
-            ],
-            data: [
-                { 
-                    id: 'axis-data', 
-                    name: 'Axis AIGO', 
-                    needsServer: false, 
-                    prices: [
-                        {a: 'Kuota 500MB, 28 Hari', p: '6.179'}, {a: 'Kuota 1GB, 28 Hari', p: '9.475'},
-                        {a: 'AIGO 2GB + Lokal, 28 Hari', p: '16.874'}, {a: 'AIGO 3GB + Lokal, 28 Hari', p: '24.274'},
-                        {a: 'AIGO 5GB + Lokal, 28 Hari', p: '31.049'}, {a: 'AIGO 6GB + Lokal, 28 Hari', p: '31.609'},
-                        {a: 'AIGO 8GB + Lokal, 28 Hari', p: '39.599'}, {a: 'AIGO 14GB + Lokal, 28 Hari', p: '58.550'},
-                        {a: 'AIGO 20GB + Lokal, 28 Hari', p: '73.550'}, {a: 'AIGO 30GB + Lokal, 28 Hari', p: '90.782'},
-                        {a: 'AIGO 100GB + Lokal, 28 Hari', p: '170.374'}, {a: 'AIGO 150GB + Lokal, 28 Hari', p: '235.369'},
-                        {a: 'AIGO 250GB + Lokal, 28 Hari', p: '300.365'}
-                    ] 
-                }
-            ],
-            pln: [{ 
-                id: 'token', 
-                name: 'Token PLN', 
-                img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Logo_PLN.svg/1200px-Logo_PLN.svg.png', 
-                needsServer: false, 
-                prices: [
-                    {a: '5.000', p: '8.000'}, {a: '10.000', p: '13.000'}, {a: '15.000', p: '18.000'}, 
-                    {a: '20.000', p: '23.000'}, {a: '50.000', p: '53.000'}, {a: '100.000', p: '103.000'}, 
-                    {a: '200.000', p: '203.000'}, {a: '500.000', p: '503.000'}, {a: '1.000.000', p: '1.003.000'}
-                ] 
-            }],
-            ewallet: [
-                { 
-                    id: 'dana', 
-                    name: 'DANA', 
-                    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png', 
-                    needsServer: false, 
-                    prices: [
-                        {a: '5.000', p: '7.000'}, {a: '10.000', p: '12.000'}, {a: '15.000', p: '17.000'}, 
-                        {a: '20.000', p: '22.000'}, {a: '25.000', p: '27.000'}, {a: '30.000', p: '32.000'}, 
-                        {a: '35.000', p: '37.000'}, {a: '40.000', p: '42.000'}, {a: '45.000', p: '47.000'}, 
-                        {a: '50.000', p: '52.000'}, {a: '55.000', p: '57.000'}, {a: '60.000', p: '62.000'}, 
-                        {a: '65.000', p: '67.000'}, {a: '70.000', p: '72.000'}, {a: '75.000', p: '77.000'}, 
-                        {a: '80.000', p: '82.000'}, {a: '85.000', p: '87.000'}, {a: '90.000', p: '92.000'}, 
-                        {a: '95.000', p: '97.000'}, {a: '100.000', p: '102.000'}, {a: '200.000', p: '202.000'}, 
-                        {a: '300.000', p: '302.000'}, {a: '400.000', p: '402.000'}, {a: '500.000', p: '502.000'}, 
-                        {a: '600.000', p: '602.000'}, {a: '700.000', p: '702.000'}, {a: '800.000', p: '802.000'}, 
-                        {a: '900.000', p: '902.000'}, {a: '1.000.000', p: '1.002.000'}
-                    ] 
-                }
-            ]
-        };
-
+        // Data & State
+        const WHATSAPP_NUMBER = "6283129555763";
+        const ADMIN_GAME_1 = "6283198721162";
+        const ADMIN_GAME_2 = "6283129555763";
         let selectedCategory = '';
         let selectedProduct = null;
+        let currentPaymentMethod = 'Cash';
+        let selectedAdminGame = 1;
 
-        // --- CORE FUNCTIONS (MODIFIED HISTORY PROTECTION) ---
-        function saveToHistory(orderData) {
-            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            
-            // Tambahkan ID unik dan Status awal
-            orderData.id_order = "NPX-" + Date.now();
-            orderData.status = (orderData.payment === 'Tunai') ? 'pending' : 'paid';
+        const database = {
+            game: [{ id: 'ml', name: 'MLBB', img: 'GAME/mlbb.jpg', needsServer: true, prices: [{a: '5 Diamond', p: '1.500'}, {a: 'WDP', p: '28.000'}] }],
+            pulsa: [{ id: 'tsel', name: 'Telkomsel', prices: [{a: '5.000', p: '7.000'}] }],
+            data: [{ id: 'axis-data', name: 'Axis AIGO', prices: [{a: '1GB', p: '9.000'}] }],
+            pln: [{ id: 'token', name: 'Token PLN', prices: [{a: '20.000', p: '23.000'}] }],
+            ewallet: [{ id: 'dana', name: 'DANA', prices: [{a: '10.000', p: '12.000'}] }]
+        };
 
-            if (history.length >= 10) { history.pop(); }
-            
-            history.unshift(orderData);
-            localStorage.setItem('noxpay_history', JSON.stringify(history));
-            renderHistory();
-        }
+        // --- CORE LIVE LOGIC ---
+        function kirimDataKeAdmin(orderData, orderID) {
+            // Simpan ID di HP pembeli
+            let myOrders = JSON.parse(localStorage.getItem('noxpay_orders_ids')) || [];
+            myOrders.push(orderID);
+            localStorage.setItem('noxpay_orders_ids', JSON.stringify(myOrders));
 
-        function verifyPayment(id_order) {
-            const inputCode = prompt("MASUKKAN KODE VERIFIKASI ADMIN:");
-            if (inputCode === ADMIN_VERIFICATION_CODE) {
-                let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-                const index = history.findIndex(item => item.id_order === id_order);
-                if (index !== -1) {
-                    history[index].status = 'paid';
-                    localStorage.setItem('noxpay_history', JSON.stringify(history));
-                    alert("Pembayaran Berhasil Diverifikasi!");
-                    renderHistory();
-                }
-            } else if (inputCode !== null) {
-                alert("KODE SALAH!");
-            }
-        }
-
-        // FUNGSI PROTEKSI: Hapus item satuan
-        function deleteHistoryItem(index) {
-            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            const item = history[index];
-
-            // Proteksi: Jika pending, tidak bisa dihapus
-            if (item.status === 'pending') {
-                alert("❌ Transaksi belum dibayar! Silahkan bayar ke admin terlebih dahulu sebelum menghapus riwayat.");
-                return;
-            }
-
-            history.splice(index, 1);
-            localStorage.setItem('noxpay_history', JSON.stringify(history));
-            renderHistory();
-        }
-
-        // FUNGSI PROTEKSI: Hapus semua
-        function deleteAllHistory() {
-            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            
-            // Filter: Hanya ambil yang statusnya 'pending' untuk tetap dipertahankan
-            const pendingItems = history.filter(item => item.status === 'pending');
-            const paidCount = history.length - pendingItems.length;
-
-            if (paidCount === 0) {
-                alert("Tidak ada transaksi selesai yang bisa dihapus.");
-                return;
-            }
-
-            if (confirm(`Hapus ${paidCount} riwayat transaksi yang sudah selesai? (Transaksi PENDING tidak akan terhapus)`)) {
-                localStorage.setItem('noxpay_history', JSON.stringify(pendingItems));
+            // Kirim ke Firebase
+            db.ref('orders/' + orderID).set({
+                ...orderData,
+                id_trx: orderID,
+                status: "Pending",
+                waktu_masuk: new Date().toLocaleString('id-ID')
+            }).then(() => {
                 renderHistory();
-            }
+            });
         }
 
         function renderHistory() {
             const historyList = document.getElementById('history-list');
-            const history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+            let myOrders = JSON.parse(localStorage.getItem('noxpay_orders_ids')) || [];
             
-            if (history.length === 0) {
-                historyList.innerHTML = '<p style="text-align: center; font-size: 11px; color: var(--gray); padding: 20px;">Belum ada riwayat pesanan.</p>';
-                return;
-            }
+            if (myOrders.length === 0) return;
+            historyList.innerHTML = '';
 
-            let html = `
-                <button class="delete-all-btn" onclick="deleteAllHistory()">
-                    🗑️ Bersihkan Riwayat Selesai
-                </button>
-            `;
+            myOrders.forEach((orderID) => {
+                // Listen perubahan status secara Real-time
+                db.ref('orders/' + orderID).on('value', (snapshot) => {
+                    const item = snapshot.val();
+                    if (!item) return;
 
-            history.forEach((item, index) => {
-                const isPending = item.status === 'pending';
-                const isDana = item.payment === 'DANA'; // Cek apakah metode DANA
+                    const oldCard = document.getElementById('card-' + orderID);
+                    if (oldCard) oldCard.remove();
 
-                html += `
-                    <div class="history-card fade-in">
-                        <div class="history-main">
-                            <div style="flex:1">
-                                <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
-                                <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
+                    const isPending = item.status.toLowerCase() === 'pending';
+                    
+                    const cardHtml = `
+                        <div class="history-card fade-in" id="card-${orderID}">
+                            <div class="history-main">
+                                <div style="flex:1">
+                                    <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
+                                    <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
+                                    <div style="font-size: 9px; color: var(--gray);">${item.waktu_masuk ? item.waktu_masuk.split(',')[1] : ''}</div>
+                                </div>
                             </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
-                                <div style="font-size: 9px; color: var(--gray);">${item.date}</div>
-                            </div>
-                            ${(!isPending || isDana) ? `<button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>` : ''}
-                        </div>
-                        
-                        ${!isDana ? `
-                        <div class="status-row">
-                            <div>
+                            <div class="status-row">
                                 <span class="status-badge ${isPending ? 'status-pending' : 'status-paid'}">
-                                    ${isPending ? '⏳ Menunggu Pembayaran' : '✅ Sudah Dibayar'}
+                                    ${isPending ? '⏳ Menunggu Konfirmasi' : '✅ Transaksi Selesai'}
                                 </span>
                             </div>
-                            ${isPending ? `<button class="btn-confirm-pay" onclick="verifyPayment('${item.id_order}')">Konfirmasi Bayar</button>` : ''}
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
+                        </div>`;
+                    historyList.insertAdjacentHTML('afterbegin', cardHtml);
+                });
             });
-            
-            historyList.innerHTML = html;
         }
 
-        function showInvoice(data) {
-            const invoiceDetails = document.getElementById('invoice-details');
-            const orderID = "NPX-" + Math.floor(100000 + Math.random() * 900000);
-            const now = new Date().toLocaleString('id-ID');
-            invoiceDetails.innerHTML = `
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>ID Trx:</span> <b>${orderID}</b></div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Waktu:</span> <b>${now}</b></div>
-                <hr style="border: none; border-top: 1px dashed #ccc; margin: 10px 0;">
-                <div style="margin-bottom:5px;">Item: <br><b>${data.product} - ${data.nominal}</b></div>
-                <div style="margin-bottom:5px;">Tujuan: <br><b>${data.target}</b></div>
-                <div style="margin-bottom:5px;">Metode: <b>${data.payment}</b></div>
-                <hr style="border: none; border-top: 1px dashed #ccc; margin: 10px 0;">
-                <div style="display:flex; justify-content:space-between; font-size: 16px;"><span>TOTAL:</span> <b>Rp ${data.price}</b></div>
-            `;
-            document.getElementById('invoiceModal').style.display = 'block';
-            document.getElementById('final-wa-btn').onclick = () => {
-                saveToHistory({ product: data.product, nominal: data.nominal, target: data.target, price: data.price, payment: data.payment, date: now, buyerName: data.buyerName });
-                sendWhatsApp(data, orderID);
-            };
-        }
-
-        function closeInvoice() { document.getElementById('invoiceModal').style.display = 'none'; }
-
-        function sendWhatsApp(data, orderID) {
-            let targetWA = WHATSAPP_NUMBER;
-            if (selectedCategory === 'game') {
-                targetWA = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
-            }
-            let closingMsg = (data.payment === 'DANA') ? 
-                `Saya akan segera mengirimkan Bukti Transfer. Mohon segera diproses ya, terima kasih!` : 
-                `Mohon segera diproses ya, terima kasih!`;
-
-            let msg = `Halo *NoxPay*, saya ingin order.\n\n` +
-                      `*--- DETAIL PESANAN ---*\n` +
-                      `*ID TRX:* ${orderID}\n` +
-                      `*Nama:* ${data.buyerName}\n` +
-                      `*Produk:* ${data.product}\n` +
-                      `*Nominal:* ${data.nominal}\n` +
-                      `*ID/No:* ${data.target}\n` +
-                      `*Metode Bayar:* ${data.payment}\n` +
-                      `*Total Harga:* Rp ${data.price}\n\n` +
-                      closingMsg;
-            window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            if(sb.classList.contains('active')) {
-                sb.classList.remove('active');
-                overlay.style.opacity = '0';
-                setTimeout(() => overlay.style.display = 'none', 300);
-            } else {
-                overlay.style.display = 'block';
-                setTimeout(() => { sb.classList.add('active'); overlay.style.opacity = '1'; }, 10);
-            }
-        }
-
-        function openCaraOrder() { document.getElementById('caraOrderModal').style.display = 'block'; }
-        function closeCaraOrder() { document.getElementById('caraOrderModal').style.display = 'none'; }
-        
-        function openCreatorModal() { document.getElementById('creatorModal').style.display = 'block'; backToCreatorCategories(); }
-        function closeCreatorModal() { document.getElementById('creatorModal').style.display = 'none'; }
-
-        function goToCreatorTerms(cat) {
-            selectedCreatorCategory = cat;
-            document.getElementById('creator-step-1').classList.add('hidden');
-            document.getElementById('creator-step-terms').classList.remove('hidden');
-        }
-
-        function goToCreatorForm() {
-            document.getElementById('creator-step-terms').classList.add('hidden');
-            document.getElementById('creator-step-2').classList.remove('hidden');
-            document.getElementById('selected-cat-label').innerText = "Mendaftar Sebagai Creator: " + selectedCreatorCategory;
-        }
-
-        function backToCreatorCategories() {
-            document.getElementById('creator-step-terms').classList.add('hidden');
-            document.getElementById('creator-step-2').classList.add('hidden');
-            document.getElementById('creator-step-1').classList.remove('hidden');
-        }
-
-        function backToTerms() {
-            document.getElementById('creator-step-2').classList.add('hidden');
-            document.getElementById('creator-step-terms').classList.remove('hidden');
-        }
-
-        function submitCreatorForm() {
-            const name = document.getElementById('creator-name').value;
-            const wa = document.getElementById('creator-wa').value;
-            const user = document.getElementById('creator-user').value;
-            const pass = document.getElementById('creator-pass').value;
-            if(!name || !wa || !user || !pass) return alert('Mohon lengkapi seluruh data!');
-            const msg = `Halo Admin NoxPay,\n\nSaya ingin mendaftar menjadi *CREATOR*.\n\n*--- DATA PENDAFTAR ---*\nNama Artist: ${name}\nWhatsApp: ${wa}\nKategori: ${selectedCreatorCategory}\n\n*--- DATA LOGIN ---*\nUsername: ${user}\nPassword: ${pass}\n\nSaya telah menyetujui Syarat & Ketentuan. Mohon segera divalidasi akun saya!`;
-            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-            closeCreatorModal();
-        }
-
-        window.addEventListener('load', () => {
-            renderHistory();
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('fromProject') === 'true') {
+        // UI Handlers
+        window.onload = () => {
+            setTimeout(() => {
                 document.getElementById('splash-screen').style.display = 'none';
                 document.getElementById('main-wrapper').style.opacity = '1';
                 document.getElementById('main-character').classList.add('animate');
-            } else {
-                setTimeout(() => {
-                    document.getElementById('splash-screen').style.display = 'none';
-                    document.getElementById('main-wrapper').style.opacity = '1';
-                    setTimeout(() => { document.getElementById('main-character').classList.add('animate'); }, 100);
-                }, 2500);
-            }
-        });
-
-        function applyTheme(themeKey) {
-            const theme = heroThemes[themeKey] || heroThemes.default;
-            const hero = document.getElementById('hero-section');
-            const hIcon = document.getElementById('hero-icon');
-            const hTitle = document.getElementById('hero-title');
-            const hDesc = document.getElementById('hero-desc');
-            const charImg = document.getElementById('char-img');
-            hero.style.background = theme.bg;
-            hIcon.innerText = theme.icon;
-            hTitle.innerHTML = theme.title;
-            hDesc.innerText = theme.desc;
-            charImg.src = theme.char;
-        }
-
-        function resetInputs() {
-            document.getElementById('target-id').value = '';
-            document.getElementById('server-id').value = '';
-            document.getElementById('customer-name').value = '';
-            selectPayment('Cash');
-            selectAdmin(1);
-        }
-
-        function handleHome() {
-            selectedCategory = ''; selectedProduct = null;
-            applyTheme('default');
-            resetInputs(); 
-            document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
-            document.getElementById('sub-items-container').classList.add('hidden');
-            document.getElementById('order-form-container').classList.add('hidden');
-            document.getElementById('pemanis-noxpay').classList.remove('hidden');
-            document.getElementById('digital-product-section').classList.remove('hidden');
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
+                renderHistory();
+            }, 2000);
+        };
 
         document.querySelectorAll('.category-card[data-cat]').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
+            card.onclick = () => {
                 selectedCategory = card.dataset.cat;
-                resetInputs(); 
-                applyTheme(selectedCategory);
                 showProducts(selectedCategory);
-                document.getElementById('order-form-container').classList.add('hidden');
-                document.getElementById('pemanis-noxpay').classList.add('hidden');
-                document.getElementById('digital-product-section').classList.add('hidden');
-            });
+            };
         });
 
         function showProducts(cat) {
-            const container = document.getElementById('sub-items-container');
             const list = document.getElementById('items-list');
             list.innerHTML = '';
             database[cat].forEach(prod => {
                 const item = document.createElement('div');
-                item.className = 'category-card fade-in';
-                if(cat === 'pulsa' || cat === 'data') {
-                    item.innerHTML = `<span>${prod.name}</span>`;
-                } else {
-                    item.innerHTML = `<div class="icon-box" style="background:var(--primary-light)"><img src="${prod.img}" style="width:70%; height:70%; object-fit:contain;"></div><span>${prod.name}</span>`;
-                }
-                item.onclick = () => selectProduct(prod, item);
+                item.className = 'category-card';
+                item.innerHTML = `<span>${prod.name}</span>`;
+                item.onclick = () => selectProduct(prod);
                 list.appendChild(item);
             });
-            container.classList.remove('hidden');
-            const y = container.getBoundingClientRect().top + window.pageYOffset - 80;
-            window.scrollTo({top: y, behavior: 'smooth'});
+            document.getElementById('sub-items-container').classList.remove('hidden');
         }
 
-        function selectAdmin(num) {
-            selectedAdminGame = num;
-            document.getElementById('admin-box-1').classList.remove('active');
-            document.getElementById('admin-box-2').classList.remove('active');
-            document.getElementById('admin-box-' + num).classList.add('active');
-            const danaOption = document.getElementById('pay-dana');
-            if (num === 2) {
-                danaOption.classList.add('hidden');
-                selectPayment('Cash');
-            } else if (selectedCategory === 'game') {
-                danaOption.classList.remove('hidden');
-            }
-        }
-
-        function selectProduct(prod, element) {
-            document.querySelectorAll('#items-list .category-card').forEach(c => c.classList.remove('active'));
-            element.classList.add('active');
+        function selectProduct(prod) {
             selectedProduct = prod;
-            resetInputs(); 
-            const danaOption = document.getElementById('pay-dana');
-            const adminGroup = document.getElementById('admin-selection-group');
-            if (selectedCategory === 'game') {
-                adminGroup.classList.remove('hidden'); 
-                if (selectedAdminGame === 1) danaOption.classList.remove('hidden');
-                else danaOption.classList.add('hidden');
-            } else {
-                danaOption.classList.add('hidden');
-                adminGroup.classList.add('hidden'); 
-                selectPayment('Cash'); 
-            }
-            if (heroThemes[prod.id]) applyTheme(prod.id);
-            const labelId = document.getElementById('label-id');
-            const inputId = document.getElementById('target-id');
-            if(selectedCategory === 'pln') {
-                labelId.innerText = "Nomor Meter / ID Pelanggan";
-                inputId.placeholder = "Contoh: 12345678901";
-            } else if(selectedCategory === 'pulsa' || selectedCategory === 'data') {
-                labelId.innerText = "Masukkan Nomor HP";
-                inputId.placeholder = "Contoh: 08123456789";
-            } else if(selectedCategory === 'ewallet') {
-                labelId.innerText = "Nomor Terdaftar di " + prod.name;
-                inputId.placeholder = "Contoh: 08123456789";
-            } else {
-                labelId.innerText = "User ID";
-                inputId.placeholder = "Masukkan ID Akun";
-            }
-            document.getElementById('input-server-group').className = prod.needsServer ? 'form-group' : 'hidden';
             const nominalList = document.getElementById('nominal-list');
             nominalList.innerHTML = '';
             prod.prices.forEach((p, i) => {
-                const isWDP = p.a.toUpperCase().includes('WDP');
                 nominalList.innerHTML += `
-                    <div class="nominal-item fade-in ${isWDP ? 'wdp-special' : ''}">
+                    <div class="nominal-item">
                         <input type="radio" name="nominal" id="n-${i}" value="${p.a}" data-price="${p.p}">
-                        <label for="n-${i}">
-                            <b>${p.a}</b><br>
-                            <span style="font-size:11px; color:var(--primary)">Rp ${p.p}</span>
-                        </label>
+                        <label for="n-${i}"><b>${p.a}</b><br><span>Rp ${p.p}</span></label>
                     </div>`;
             });
-            const orderForm = document.getElementById('order-form-container');
-            orderForm.classList.remove('hidden');
-            const y = orderForm.getBoundingClientRect().top + window.pageYOffset - 80;
-            window.scrollTo({top: y, behavior: 'smooth'});
+            document.getElementById('order-form-container').classList.remove('hidden');
+            if(prod.needsServer) document.getElementById('input-server-group').classList.remove('hidden');
+            if(selectedCategory === 'game') document.getElementById('admin-selection-group').classList.remove('hidden');
         }
 
-        function selectPayment(method) {
-            currentPaymentMethod = method;
-            const cardCash = document.getElementById('pay-cash');
-            const cardDana = document.getElementById('pay-dana');
-            const badgeCash = document.getElementById('badge-cash');
-            const badgeDana = document.getElementById('badge-dana');
-            const payInstruction = document.getElementById('payment-instructions');
-            const qrisImgEl = document.getElementById('qris-image-el');
-            if (method === 'Cash') {
-                cardCash.classList.add('selected');
-                cardDana.classList.remove('selected');
-                badgeCash.innerText = "TERPILIH";
-                badgeDana.innerText = "PILIH";
-                payInstruction.classList.add('hidden'); 
-            } else {
-                cardCash.classList.remove('selected');
-                cardDana.classList.add('selected');
-                badgeCash.innerText = "PILIH";
-                badgeDana.innerText = "TERPILIH";
-                if(selectedCategory === 'game') {
-                    qrisImgEl.src = URL_QRIS_DANA;
-                    payInstruction.classList.remove('hidden');
-                } else {
-                    payInstruction.classList.add('hidden');
-                }
-            }
+        function selectPayment(m) {
+            currentPaymentMethod = m;
+            document.getElementById('pay-cash').classList.toggle('selected', m === 'Cash');
+            document.getElementById('pay-dana').classList.toggle('selected', m === 'DANA');
+        }
+
+        function selectAdmin(n) {
+            selectedAdminGame = n;
+            document.getElementById('admin-box-1').classList.toggle('active', n === 1);
+            document.getElementById('admin-box-2').classList.toggle('active', n === 2);
         }
 
         document.getElementById('btn-review').onclick = () => {
-            const id = document.getElementById('target-id').value;
             const nominal = document.querySelector('input[name="nominal"]:checked');
-            if(!id || !nominal) return alert('Lengkapi data pesanan!');
-            let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA (Transfer)';
-            let adminLabel = (selectedCategory === 'game') ? `<p>Jalur Admin: <b>Admin ${selectedAdminGame}</b></p>` : '';
-            document.getElementById('modal-details').innerHTML = `
-                <div style="background:#f8fafc; padding:15px; border-radius:15px;">
-                    <p>Produk: <b>${selectedProduct.name}</b></p>
-                    <p>Nominal: <b>${nominal.value}</b></p>
-                    <p>Tujuan: <b>${id}</b></p>
-                    <p>Pembayaran: <b>${paymentLabel}</b></p>
-                    ${adminLabel}
-                    <hr style="margin:8px 0; opacity:0.1">
-                    <p>Total: <b>Rp ${nominal.dataset.price}</b></p>
-                </div>`;
+            if(!nominal) return alert('Pilih nominal!');
+            document.getElementById('modal-details').innerHTML = `Produk: ${selectedProduct.name}<br>Nominal: ${nominal.value}<br>Total: Rp ${nominal.dataset.price}`;
             document.getElementById('orderModal').style.display = 'block';
         };
 
         document.getElementById('btn-send-wa').onclick = () => {
-            closeModal();
-            const id = document.getElementById('target-id').value;
-            const serverId = document.getElementById('server-id').value;
+            const orderID = "NPX-" + Date.now();
             const nominal = document.querySelector('input[name="nominal"]:checked');
-            const custName = document.getElementById('customer-name').value;
             const data = {
                 product: selectedProduct.name,
                 nominal: nominal.value,
-                target: serverId ? `${id} (${serverId})` : id,
+                target: document.getElementById('target-id').value,
                 price: nominal.dataset.price,
-                payment: currentPaymentMethod === 'Cash' ? 'Tunai' : 'DANA',
-                buyerName: custName ? custName : 'Pelanggan'
+                payment: currentPaymentMethod
             };
-            showInvoice(data);
-            kirimDataKeAdmin(data);
+            kirimDataKeAdmin(data, orderID);
+            closeModal();
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=Halo NoxPay, saya order ${data.product} ${data.nominal}. ID: ${orderID}`);
         };
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('sidebar-overlay').style.display = 'block'; }
+        function handleHome() { location.reload(); }
     </script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
-<script>
-  // Konfigurasi sesuai data terbaru Anda
-  const firebaseConfig = {
-    apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
-    authDomain: "noxpay-admin.firebaseapp.com",
-    databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "noxpay-admin",
-    storageBucket: "noxpay-admin.firebasestorage.app",
-    messagingSenderId: "212794945472",
-    appId: "1:212794945472:web:bd803bb3e71b48ea99a225",
-    measurementId: "G-2PXC06145B"
-  };
-
-  // Inisialisasi Firebase
-  if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-  }
-  const db = firebase.database();
-
-  // Fungsi untuk mengirim data pesanan
-  function kirimDataKeAdmin(orderData) {
-    // Membuat ID pesanan unik berdasarkan waktu
-    const orderID = "NPX-" + Date.now();
-    
-    // Menyimpan ke path 'orders/' di database Anda
-    db.ref('orders/' + orderID).set({
-      ...orderData,
-      id_trx: orderID,
-      status: "Pending",
-      waktu_masuk: new Date().toLocaleString('id-ID')
-    })
-    .then(() => {
-      console.log("Pesanan tersimpan di Firebase!");
-    })
-    .catch((error) => {
-      console.error("Gagal simpan ke Firebase: ", error);
-    });
-  }
-</script>
-
 </body>
 </html>
 
