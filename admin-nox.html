@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel NoxPay</title>
+    <title>Admin Panel Terkunci - NoxPay</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #444; }
         th { background: #007bff; color: white; }
-        tr:hover { background: #f1f1f1; }
-        .status-pending { color: orange; font-weight: bold; }
+        .status-pending { color: #ffcc00; font-weight: bold; }
+        #loader { color: #007bff; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <h2>Daftar Pesanan NoxPay</h2>
+    <h2>Daftar Pesanan NoxPay (Secure Mode)</h2>
+    <div id="loader">Menghubungkan ke server aman...</div>
     <table>
         <thead>
             <tr>
@@ -27,15 +28,14 @@
                 <th>Status</th>
             </tr>
         </thead>
-        <tbody id="order-list">
-            </tbody>
+        <tbody id="order-list"></tbody>
     </table>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
     <script>
-        // Gunakan Config yang sama seperti di index.html
         const firebaseConfig = {
             apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
             authDomain: "noxpay-admin.firebaseapp.com",
@@ -48,26 +48,36 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const auth = firebase.auth();
 
-        // Mengambil data dari folder 'orders' secara realtime
-        db.ref('orders').on('value', (snapshot) => {
-            const list = document.getElementById('order-list');
-            list.innerHTML = ""; // Bersihkan tabel sebelum update
-            
-            snapshot.forEach((childSnapshot) => {
-                const data = childSnapshot.val();
-                const row = `<tr>
-                    <td>${data.waktu_masuk || '-'}</td>
-                    <td>${data.buyerName}</td>
-                    <td>${data.product} (${data.nominal})</td>
-                    <td>${data.target}</td>
-                    <td>${data.payment}</td>
-                    <td>Rp ${data.price}</td>
-                    <td class="status-pending">${data.status}</td>
-                </tr>`;
-                list.innerHTML += row;
-            });
+        // PROSES LOGIN RAHASIA (Anonymous)
+        auth.signInAnonymously().then(() => {
+            document.getElementById('loader').innerText = "Koneksi Terenkripsi - Data Siap.";
+            loadOrders();
+        }).catch((error) => {
+            document.getElementById('loader').innerText = "Akses Ditolak! Aktifkan Anonymous Auth di Firebase.";
         });
+
+        function loadOrders() {
+            db.ref('orders').on('value', (snapshot) => {
+                const list = document.getElementById('order-list');
+                list.innerHTML = "";
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    const row = `<tr>
+                        <td>${data.waktu_masuk || '-'}</td>
+                        <td>${data.buyerName}</td>
+                        <td>${data.product} (${data.nominal})</td>
+                        <td>${data.target}</td>
+                        <td>${data.payment}</td>
+                        <td>Rp ${data.price}</td>
+                        <td class="status-pending">${data.status}</td>
+                    </tr>`;
+                    list.innerHTML += row;
+                });
+            });
+        }
     </script>
 </body>
 </html>
+
