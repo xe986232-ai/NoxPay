@@ -1486,14 +1486,29 @@
       console.error("Gagal simpan ke Firebase: ", error);
     });
     // Memantau perubahan status secara Real-Time dari Firebase
+// Antena Global: Pantau semua perubahan di folder 'orders'
 db.ref('orders/').on('value', (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-        // Setiap ada perubahan di Firebase (misal Admin klik Konfirmasi), 
-        // kita jalankan ulang fungsi renderHistory agar tampilan berubah.
-        renderHistory(); 
-    }
+    console.log("Ada perubahan data di Firebase!");
+    
+    // 1. Ambil data terbaru dari Firebase
+    const firebaseData = snapshot.val();
+    
+    // 2. Ambil riwayat yang tersimpan di HP (Local Storage)
+    let localHistory = JSON.parse(localStorage.getItem('purchaseHistory') || '[]');
+
+    // 3. Update status di Local Storage berdasarkan data terbaru Firebase
+    localHistory = localHistory.map(item => {
+        if (firebaseData && firebaseData[item.id_order]) {
+            item.status = firebaseData[item.id_order].status;
+        }
+        return item;
+    });
+
+    // 4. Simpan kembali ke HP & Gambar ulang tampilannya
+    localStorage.setItem('purchaseHistory', JSON.stringify(localHistory));
+    renderHistory(); 
 });
+
 
   }
 </script>
