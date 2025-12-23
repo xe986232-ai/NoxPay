@@ -261,19 +261,23 @@
         }
 
         // FUNGSI KONFIRMASI (UPDATE STATUS)
-        function konfirmasiTransaksi(orderID) {
-            if (confirm("Konfirmasi bahwa pesanan " + orderID + " telah dibayar?")) {
-                db.ref('orders/' + orderID).update({
-                    status: "Success"
-                })
-                .then(() => {
-                    console.log("Status updated!");
-                })
-                .catch((err) => {
-                    alert("Gagal update: " + err.message);
-                });
-            }
-        }
+        // Gunakan fungsi ini di script panel admin kamu
+function konfirmasiTransaksi(orderID) {
+    if (confirm("Konfirmasi pembayaran untuk " + orderID + "?")) {
+        // Update status ke Firebase
+        db.ref('orders/' + orderID).update({
+            status: "Success", // Ini kunci utama agar status di user berubah
+            waktu_selesai: new Date().toLocaleString('id-ID')
+        })
+        .then(() => {
+            alert("Pembayaran Terkonfirmasi!");
+        })
+        .catch((err) => {
+            alert("Error: " + err.message);
+        });
+    }
+}
+
 
         function logout() {
             auth.signOut().then(() => location.reload());
