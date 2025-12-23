@@ -1478,23 +1478,30 @@ db.ref('orders/').on('value', (snapshot) => {
     const firebaseData = snapshot.val();
     if (!firebaseData) return;
 
-    console.log("Data Firebase Diterima:", firebaseData);
-
-    // Ambil semua ID Order yang ada di riwayat lokal user
     let localHistory = JSON.parse(localStorage.getItem('noxpay_history') || '[]');
 
     if (localHistory.length > 0) {
-        // PAKSA update status dari Firebase ke riwayat lokal
         let adaPerubahan = false;
         localHistory.forEach((item, index) => {
-            if (firebaseData[item.id_order]) {
-                const statusBaru = firebaseData[item.id_order].status;
+            // Kita coba cek semua kemungkinan nama ID (id_order atau id)
+            const orderID = item.id_order || item.id; 
+            
+            if (orderID && firebaseData[orderID]) {
+                const statusBaru = firebaseData[orderID].status;
                 if (localHistory[index].status !== statusBaru) {
                     localHistory[index].status = statusBaru;
                     adaPerubahan = true;
                 }
             }
         });
+
+        if (adaPerubahan) {
+            localStorage.setItem('noxpay_history', JSON.stringify(localHistory));
+            renderHistory(); // Gambar ulang layar
+        }
+    }
+});
+
 
         // Jika ada perubahan, simpan dan gambar ulang
         if (adaPerubahan) {
