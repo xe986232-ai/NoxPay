@@ -56,7 +56,6 @@
         }
         .side-menu-item:hover { background: var(--primary-light); color: var(--primary); }
 
-        /* Style Spesial Untuk Creator Menu */
         .side-menu-item.creator-special {
             background: var(--grad-fancy);
             background-size: 300% 300%;
@@ -131,7 +130,6 @@
             animation: textReveal 1s ease forwards 0.8s;
         }
 
-        /* NEW STYLE: Splash Tagline at Bottom */
         .splash-footer-text {
             position: absolute;
             bottom: 40px;
@@ -250,7 +248,6 @@
         .nominal-item input { display: none; }
         .nominal-item input:checked + label { border-color: var(--primary); background: var(--white); box-shadow: 0 5px 15px rgba(0,102,255,0.08); }
 
-        /* MODIFIKASI: Style Khusus WDP */
         .nominal-item.wdp-special label {
             background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
             border: 2px solid rgba(0, 102, 255, 0.2);
@@ -279,7 +276,6 @@
 
         .order-form { background: rgba(255, 255, 255, 0.6); padding: 22px; border-radius: 24px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.5); }
         
-        /* MODIFIKASI: Inputan Lebih Menonjol */
         .form-group input { 
             width: 100%; 
             padding: 16px; 
@@ -305,7 +301,6 @@
 
         .btn-order { width: 100%; background: var(--primary); color: white; padding: 16px; border: none; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2); margin-top: 15px; }
 
-        /* --- DIGITAL PRODUCT (FL STUDIO) SPECIAL STYLES (MODIFIED) --- */
         .project-card-special {
             position: relative;
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 245, 249, 0.8) 100%);
@@ -317,7 +312,6 @@
             z-index: 1;
         }
 
-        /* Glare Effect */
         .project-card-special::before {
             content: '';
             position: absolute;
@@ -420,7 +414,6 @@
             color: white;
         }
 
-        /* --- PAYMENT INSTRUCTION (NEW) --- */
         #payment-instructions {
             background: #fff;
             border-radius: 18px;
@@ -479,19 +472,16 @@
         footer { text-align: center; padding: 40px 0; color: var(--gray); font-size: 11px; font-weight: 600; }
         .hidden { display: none; }
 
-        /* Step Order Styles */
         .step-order { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px; }
         .step-num { width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
         .step-text { font-size: 13px; color: var(--dark); line-height: 1.5; }
 
-        /* Creator Form Extras */
         .creator-form-field { margin-bottom: 15px; text-align: left; }
         .creator-form-field label { display: block; font-size: 12px; font-weight: 700; color: var(--gray); margin-bottom: 6px; }
         .creator-form-field input { width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #eef2f6; outline: none; }
         .terms-box { background: #f8fafc; padding: 15px; border-radius: 12px; font-size: 11px; color: var(--gray); height: 160px; overflow-y: auto; margin-bottom: 10px; border: 1px solid #eee; text-align: left; line-height: 1.6; }
         .check-group { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--dark); cursor: pointer; margin-bottom: 15px; }
 
-        /* MODIFIKASI JALUR ADMIN (Mencolok) */
         .admin-selector {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -535,7 +525,6 @@
             font-weight: 900;
         }
 
-        /* NEW: History Item Style */
         .history-card {
             background: var(--white);
             padding: 14px;
@@ -583,34 +572,6 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-        }
-        
-        /* New Status Badge Styles */
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 8px;
-            border-top: 1px dashed #eee;
-        }
-        .status-badge {
-            font-size: 9px;
-            font-weight: 800;
-            padding: 4px 8px;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-        .status-pending { background: #fff1f2; color: #e11d48; }
-        .status-paid { background: #f0fdf4; color: #16a34a; }
-        .btn-confirm-pay {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 800;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -834,7 +795,6 @@
         <div id="caraOrderModal" class="modal">
             <div class="modal-content" style="max-width: 420px;">
                 <h3 style="margin-bottom:20px; font-size:18px; font-weight:800; text-align:center;">Cara Belanja di NoxPay</h3>
-                
                 <div class="step-order">
                     <div class="step-num">1</div>
                     <div class="step-text">Pilih kategori layanan (Game, Pulsa, atau E-Wallet).</div>
@@ -855,14 +815,12 @@
                     <div class="step-num">5</div>
                     <div class="step-text">Kamu akan diarahkan ke WhatsApp untuk menyelesaikan pembayaran.</div>
                 </div>
-
                 <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:10px;" onclick="closeCaraOrder()">Mengerti</button>
             </div>
         </div>
 
         <div id="creatorModal" class="modal">
             <div class="modal-content" style="max-width: 420px; margin: 10% auto;">
-                
                 <div id="creator-step-1">
                     <h3 style="margin-bottom:20px; font-size:18px; font-weight:800; text-align:center;">Pilih Kategori Digital</h3>
                     <div class="category-grid">
@@ -873,7 +831,6 @@
                     </div>
                     <button style="width:100%; padding:10px; border:none; background:none; color:var(--gray); font-weight:700; cursor:pointer; margin-top:20px;" onclick="closeCreatorModal()">Batal</button>
                 </div>
-
                 <div id="creator-step-terms" class="hidden">
                     <h3 style="margin-bottom:15px; font-size:18px; font-weight:800; text-align:center;">Syarat & Ketentuan</h3>
                     <div class="terms-box">
@@ -884,36 +841,29 @@
                     <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:10px;" onclick="goToCreatorForm()">Saya Setuju & Lanjut</button>
                     <button style="width:100%; padding:10px; border:none; background:none; color:var(--gray); font-weight:700; cursor:pointer; margin-top:10px;" onclick="backToCreatorCategories()">Batal</button>
                 </div>
-
                 <div id="creator-step-2" class="hidden">
                     <h3 style="margin-bottom:15px; font-size:18px; font-weight:800; text-align:center;">Formulir Pendaftaran</h3>
                     <p style="font-size: 11px; text-align:center; color: var(--primary); font-weight: 700; margin-bottom: 15px;" id="selected-cat-label"></p>
-                    
                     <div style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
                         <div class="creator-form-field">
                             <label>Nama Artist / Creator</label>
                             <input type="text" id="creator-name" placeholder="Contoh: Nox Music">
                         </div>
-                        
                         <div class="creator-form-field">
                             <label>Nomor WhatsApp</label>
                             <input type="number" id="creator-wa" placeholder="Contoh: 08123456789">
                         </div>
-
                         <hr style="margin: 20px 0; opacity: 0.1;">
                         <p style="font-size: 12px; font-weight: 800; color: var(--dark); margin-bottom: 12px;">Data Login (Untuk Dashboard Creator)</p>
-
                         <div class="creator-form-field">
                             <label>Username</label>
                             <input type="text" id="creator-user" placeholder="Buat username login">
                         </div>
-
                         <div class="creator-form-field">
                             <label>Password</label>
                             <input type="password" id="creator-pass" placeholder="Buat password login">
                         </div>
                     </div>
-
                     <button style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--primary); color:white; font-weight:800; cursor:pointer; margin-top:15px;" onclick="submitCreatorForm()">Kirim Pendaftaran</button>
                     <button style="width:100%; padding:10px; border:none; background:none; color:var(--gray); font-weight:700; cursor:pointer; margin-top:10px;" onclick="backToTerms()">Kembali</button>
                 </div>
@@ -923,23 +873,38 @@
         <footer>&copy; 2025 NoxPay Digital Payment.</footer>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
     <script>
-        // --- KONFIGURASI ADMIN ---
-        const WHATSAPP_NUMBER = "6283129555763"; // Admin Utama & Selain Game
-        
-        // WhatsApp Admin Khusus Game
+        // CONFIG FIREBASE (MESIN)
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin",
+            storageBucket: "noxpay-admin.firebasestorage.app",
+            messagingSenderId: "212794945472",
+            appId: "1:212794945472:web:bd803bb3e71b48ea99a225",
+            measurementId: "G-2PXC06145B"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        // KONSTANTA & STATE
+        const WHATSAPP_NUMBER = "6283129555763"; 
         const ADMIN_GAME_1 = "6283198721162"; 
         const ADMIN_GAME_2 = "6283129555763"; 
-
         const URL_QRIS_DANA = "HERO/qris.jpg"; 
-        
-        // FITUR BARU: KODE VERIFIKASI ADMIN (Silahkan ganti sesuai keinginan)
-        const ADMIN_VERIFICATION_CODE = "2025"; 
 
         let selectedCreatorCategory = "";
         let currentPaymentMethod = "Cash"; 
-        let selectedAdminGame = 1; // Default Admin 1
+        let selectedAdminGame = 1; 
 
+        // THEMES
         const heroThemes = {
             default: { bg: 'linear-gradient(135deg, #0066ff 0%, #00d2ff 100%)', icon: '📱', title: 'NoxPay -<br>Digital Payment Terpercaya', desc: 'Proses kilat 1-5 menit aktif 24 jam.', char: 'HERO/home1.png' },
             game: { bg: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)', icon: '🎮', title: 'Top Up Game<br>Favoritmu', desc: 'Diamond & Point murah setiap hari.', char: 'HERO/home1.png' },
@@ -951,52 +916,19 @@
             ff: { bg: 'linear-gradient(135deg, #ff4e00 0%, #ec9f05 100%)', icon: '🔥', title: 'Garena<br>Free Fire', desc: 'Diamond FF murah untuk Booyah lebih maksimal!', char: 'HERO/game.png' }
         };
 
+        // DATABASE PRODUK
         function generatePulsaPrices() {
             const prices = [];
             for (let val = 5000; val <= 100000; val += 5000) {
-                prices.push({
-                    a: val.toLocaleString('id-ID'),
-                    p: (val + 2000).toLocaleString('id-ID')
-                });
+                prices.push({ a: val.toLocaleString('id-ID'), p: (val + 2000).toLocaleString('id-ID') });
             }
             return prices;
         }
         
         const database = {
             game: [
-                { 
-                    id: 'ml', 
-                    name: 'MLBB', 
-                    img: 'GAME/mlbb.jpg', 
-                    heroImg: 'HERO/mlbb.png', 
-                    needsServer: true, 
-                    prices: [
-                        {a: '5 Diamond', p: '1.500'}, {a: '11 Diamond', p: '3.500'}, {a: '12 Diamond', p: '4.000'},
-                        {a: '15 Diamond', p: '5.000'}, {a: '19 Diamond', p: '6.000'}, {a: '20 Diamond', p: '6.500'},
-                        {a: '28 Diamond', p: '9.000'}, {a: '30 Diamond', p: '9.500'}, {a: '33 Diamond', p: '10.000'},
-                        {a: '36 Diamond', p: '10.500'}, {a: '40 Diamond', p: '11.500'}, {a: '46 Diamond', p: '13.500'},
-                        {a: '54 Diamond', p: '16.000'}, {a: '65 Diamond', p: '18.000'}, {a: '70 Diamond', p: '20.000'},
-                        {a: '75 Diamond', p: '22.000'}, {a: '81 Diamond', p: '24.000'}, {a: '92 Diamond', p: '26.000'},
-                        {a: '102 Diamond', p: '30.000'}, {a: '110 Diamond', p: '31.000'}, {a: '114 Diamond', p: '33.000'},
-                        {a: '140 Diamond', p: '38.000'}, {a: '153 Diamond', p: '41.000'}, {a: '168 Diamond', p: '46.000'},
-                        {a: 'WDP', p: '28.000'}, {a: '170 Diamond', p: '48.000'}
-                    ] 
-                },
-                { 
-                    id: 'ff', 
-                    name: 'Free Fire', 
-                    img: 'https://img.icons8.com/color/144/free-fire.png', 
-                    heroImg: 'HERO/game.png', 
-                    needsServer: false, 
-                    prices: [
-                        {a: '5 Diamond', p: '1.000'}, {a: '10 Diamond', p: '2.000'}, {a: '12 Diamond', p: '3.000'},
-                        {a: '15 Diamond', p: '3.500'}, {a: '20 Diamond', p: '3.500'}, {a: '25 Diamond', p: '4.000'},
-                        {a: '30 Diamond', p: '5.000'}, {a: '40 Diamond', p: '7.000'}, {a: '50 Diamond', p: '7.500'},
-                        {a: '55 Diamond', p: '8.000'}, {a: '70 Diamond', p: '9.000'}, {a: '80 Diamond', p: '11.000'},
-                        {a: '90 Diamond', p: '13.500'}, {a: '120 Diamond', p: '16.000'}, {a: '140 Diamond', p: '18.000'},
-                        {a: '150 Diamond', p: '20.000'}, {a: '160 Diamond', p: '22.000'}, {a: '190 Diamond', p: '26.000'}
-                    ] 
-                }
+                { id: 'ml', name: 'MLBB', img: 'GAME/mlbb.jpg', heroImg: 'HERO/mlbb.png', needsServer: true, prices: [{a: '5 Diamond', p: '1.500'}, {a: '11 Diamond', p: '3.500'}, {a: '12 Diamond', p: '4.000'}, {a: '15 Diamond', p: '5.000'}, {a: '19 Diamond', p: '6.000'}, {a: '20 Diamond', p: '6.500'}, {a: '28 Diamond', p: '9.000'}, {a: '30 Diamond', p: '9.500'}, {a: '33 Diamond', p: '10.000'}, {a: '36 Diamond', p: '10.500'}, {a: '40 Diamond', p: '11.500'}, {a: '46 Diamond', p: '13.500'}, {a: '54 Diamond', p: '16.000'}, {a: '65 Diamond', p: '18.000'}, {a: '70 Diamond', p: '20.000'}, {a: '75 Diamond', p: '22.000'}, {a: '81 Diamond', p: '24.000'}, {a: '92 Diamond', p: '26.000'}, {a: '102 Diamond', p: '30.000'}, {a: '110 Diamond', p: '31.000'}, {a: '114 Diamond', p: '33.000'}, {a: '140 Diamond', p: '38.000'}, {a: '153 Diamond', p: '41.000'}, {a: '168 Diamond', p: '46.000'}, {a: 'WDP', p: '28.000'}, {a: '170 Diamond', p: '48.000'}] },
+                { id: 'ff', name: 'Free Fire', img: 'https://img.icons8.com/color/144/free-fire.png', heroImg: 'HERO/game.png', needsServer: false, prices: [{a: '5 Diamond', p: '1.000'}, {a: '10 Diamond', p: '2.000'}, {a: '12 Diamond', p: '3.000'}, {a: '15 Diamond', p: '3.500'}, {a: '20 Diamond', p: '3.500'}, {a: '25 Diamond', p: '4.000'}, {a: '30 Diamond', p: '5.000'}, {a: '40 Diamond', p: '7.000'}, {a: '50 Diamond', p: '7.500'}, {a: '55 Diamond', p: '8.000'}, {a: '70 Diamond', p: '9.000'}, {a: '80 Diamond', p: '11.000'}, {a: '90 Diamond', p: '13.500'}, {a: '120 Diamond', p: '16.000'}, {a: '140 Diamond', p: '18.000'}, {a: '150 Diamond', p: '20.000'}, {a: '160 Diamond', p: '22.000'}, {a: '190 Diamond', p: '26.000'}] }
             ],
             pulsa: [
                 { id: 'tsel', name: 'Telkomsel', needsServer: false, prices: generatePulsaPrices() },
@@ -1004,123 +936,63 @@
                 { id: 'axis', name: 'Axis', needsServer: false, prices: generatePulsaPrices() }
             ],
             data: [
-                { 
-                    id: 'axis-data', 
-                    name: 'Axis AIGO', 
-                    needsServer: false, 
-                    prices: [
-                        {a: 'Kuota 500MB, 28 Hari', p: '6.179'}, {a: 'Kuota 1GB, 28 Hari', p: '9.475'},
-                        {a: 'AIGO 2GB + Lokal, 28 Hari', p: '16.874'}, {a: 'AIGO 3GB + Lokal, 28 Hari', p: '24.274'},
-                        {a: 'AIGO 5GB + Lokal, 28 Hari', p: '31.049'}, {a: 'AIGO 6GB + Lokal, 28 Hari', p: '31.609'},
-                        {a: 'AIGO 8GB + Lokal, 28 Hari', p: '39.599'}, {a: 'AIGO 14GB + Lokal, 28 Hari', p: '58.550'},
-                        {a: 'AIGO 20GB + Lokal, 28 Hari', p: '73.550'}, {a: 'AIGO 30GB + Lokal, 28 Hari', p: '90.782'},
-                        {a: 'AIGO 100GB + Lokal, 28 Hari', p: '170.374'}, {a: 'AIGO 150GB + Lokal, 28 Hari', p: '235.369'},
-                        {a: 'AIGO 250GB + Lokal, 28 Hari', p: '300.365'}
-                    ] 
-                }
+                { id: 'axis-data', name: 'Axis AIGO', needsServer: false, prices: [{a: 'Kuota 500MB, 28 Hari', p: '6.179'}, {a: 'Kuota 1GB, 28 Hari', p: '9.475'}, {a: 'AIGO 2GB + Lokal, 28 Hari', p: '16.874'}, {a: 'AIGO 3GB + Lokal, 28 Hari', p: '24.274'}, {a: 'AIGO 5GB + Lokal, 28 Hari', p: '31.049'}, {a: 'AIGO 6GB + Lokal, 28 Hari', p: '31.609'}, {a: 'AIGO 8GB + Lokal, 28 Hari', p: '39.599'}, {a: 'AIGO 14GB + Lokal, 28 Hari', p: '58.550'}, {a: 'AIGO 20GB + Lokal, 28 Hari', p: '73.550'}, {a: 'AIGO 30GB + Lokal, 28 Hari', p: '90.782'}, {a: 'AIGO 100GB + Lokal, 28 Hari', p: '170.374'}, {a: 'AIGO 150GB + Lokal, 28 Hari', p: '235.369'}, {a: 'AIGO 250GB + Lokal, 28 Hari', p: '300.365'}] }
             ],
-            pln: [{ 
-                id: 'token', 
-                name: 'Token PLN', 
-                img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Logo_PLN.svg/1200px-Logo_PLN.svg.png', 
-                needsServer: false, 
-                prices: [
-                    {a: '5.000', p: '8.000'}, {a: '10.000', p: '13.000'}, {a: '15.000', p: '18.000'}, 
-                    {a: '20.000', p: '23.000'}, {a: '50.000', p: '53.000'}, {a: '100.000', p: '103.000'}, 
-                    {a: '200.000', p: '203.000'}, {a: '500.000', p: '503.000'}, {a: '1.000.000', p: '1.003.000'}
-                ] 
-            }],
+            pln: [{ id: 'token', name: 'Token PLN', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Logo_PLN.svg/1200px-Logo_PLN.svg.png', needsServer: false, prices: [{a: '5.000', p: '8.000'}, {a: '10.000', p: '13.000'}, {a: '15.000', p: '18.000'}, {a: '20.000', p: '23.000'}, {a: '50.000', p: '53.000'}, {a: '100.000', p: '103.000'}, {a: '200.000', p: '203.000'}, {a: '500.000', p: '503.000'}, {a: '1.000.000', p: '1.003.000'}] }],
             ewallet: [
-                { 
-                    id: 'dana', 
-                    name: 'DANA', 
-                    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png', 
-                    needsServer: false, 
-                    prices: [
-                        {a: '5.000', p: '7.000'}, {a: '10.000', p: '12.000'}, {a: '15.000', p: '17.000'}, 
-                        {a: '20.000', p: '22.000'}, {a: '25.000', p: '27.000'}, {a: '30.000', p: '32.000'}, 
-                        {a: '35.000', p: '37.000'}, {a: '40.000', p: '42.000'}, {a: '45.000', p: '47.000'}, 
-                        {a: '50.000', p: '52.000'}, {a: '55.000', p: '57.000'}, {a: '60.000', p: '62.000'}, 
-                        {a: '65.000', p: '67.000'}, {a: '70.000', p: '72.000'}, {a: '75.000', p: '77.000'}, 
-                        {a: '80.000', p: '82.000'}, {a: '85.000', p: '87.000'}, {a: '90.000', p: '92.000'}, 
-                        {a: '95.000', p: '97.000'}, {a: '100.000', p: '102.000'}, {a: '200.000', p: '202.000'}, 
-                        {a: '300.000', p: '302.000'}, {a: '400.000', p: '402.000'}, {a: '500.000', p: '502.000'}, 
-                        {a: '600.000', p: '602.000'}, {a: '700.000', p: '702.000'}, {a: '800.000', p: '802.000'}, 
-                        {a: '900.000', p: '902.000'}, {a: '1.000.000', p: '1.002.000'}
-                    ] 
-                }
+                { id: 'dana', name: 'DANA', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png', needsServer: false, prices: [{a: '5.000', p: '7.000'}, {a: '10.000', p: '12.000'}, {a: '15.000', p: '17.000'}, {a: '20.000', p: '22.000'}, {a: '25.000', p: '27.000'}, {a: '30.000', p: '32.000'}, {a: '35.000', p: '37.000'}, {a: '40.000', p: '42.000'}, {a: '45.000', p: '47.000'}, {a: '50.000', p: '52.000'}, {a: '55.000', p: '57.000'}, {a: '60.000', p: '62.000'}, {a: '65.000', p: '67.000'}, {a: '70.000', p: '72.000'}, {a: '75.000', p: '77.000'}, {a: '80.000', p: '82.000'}, {a: '85.000', p: '87.000'}, {a: '90.000', p: '92.000'}, {a: '95.000', p: '97.000'}, {a: '100.000', p: '102.000'}, {a: '200.000', p: '202.000'}, {a: '300.000', p: '302.000'}, {a: '400.000', p: '402.000'}, {a: '500.000', p: '502.000'}, {a: '600.000', p: '602.000'}, {a: '700.000', p: '702.000'}, {a: '800.000', p: '802.000'}, {a: '900.000', p: '902.000'}, {a: '1.000.000', p: '1.002.000'}] }
             ]
         };
 
         let selectedCategory = '';
         let selectedProduct = null;
 
-        // --- CORE FUNCTIONS (MODIFIED HISTORY PROTECTION) ---
-        function saveToHistory(orderData) {
+        // --- MESIN BARU (FIREBASE LISTENER) ---
+        // Antena untuk mendeteksi perubahan status dari Admin
+        db.ref('orders/').on('value', (snapshot) => {
+            const allOrders = snapshot.val();
             let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            
-            // Tambahkan ID unik dan Status awal
-            orderData.id_order = "NPX-" + Date.now();
-            orderData.status = (orderData.payment === 'Tunai') ? 'pending' : 'paid';
+            let updated = false;
 
+            if (allOrders && history.length > 0) {
+                history.forEach((localItem, index) => {
+                    // Cari ID yang cocok di database
+                    if (allOrders[localItem.id_order]) {
+                        const onlineStatus = allOrders[localItem.id_order].status;
+                        if (localItem.status !== onlineStatus) {
+                            history[index].status = onlineStatus;
+                            updated = true;
+                        }
+                    }
+                });
+
+                if (updated) {
+                    localStorage.setItem('noxpay_history', JSON.stringify(history));
+                    renderHistory(); // Refresh tampilan riwayat
+                }
+            }
+        });
+
+        function saveToHistory(orderData, orderID) {
+            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+            orderData.id_order = orderID;
+            orderData.status = 'Pending'; // Status awal
             if (history.length >= 10) { history.pop(); }
-            
             history.unshift(orderData);
             localStorage.setItem('noxpay_history', JSON.stringify(history));
             renderHistory();
         }
 
-        function verifyPayment(id_order) {
-            const inputCode = prompt("MASUKKAN KODE VERIFIKASI ADMIN:");
-            if (inputCode === ADMIN_VERIFICATION_CODE) {
-                let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-                const index = history.findIndex(item => item.id_order === id_order);
-                if (index !== -1) {
-                    history[index].status = 'paid';
-                    localStorage.setItem('noxpay_history', JSON.stringify(history));
-                    alert("Pembayaran Berhasil Diverifikasi!");
-                    renderHistory();
-                }
-            } else if (inputCode !== null) {
-                alert("KODE SALAH!");
-            }
+        function kirimDataKeFirebase(data, orderID) {
+            db.ref('orders/' + orderID).set({
+                ...data,
+                id_trx: orderID,
+                status: "Pending",
+                waktu_masuk: new Date().toLocaleString('id-ID')
+            }).catch(e => console.error("Firebase Error:", e));
         }
 
-        // FUNGSI PROTEKSI: Hapus item satuan
-        function deleteHistoryItem(index) {
-            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            const item = history[index];
-
-            // Proteksi: Jika pending, tidak bisa dihapus
-            if (item.status === 'pending') {
-                alert("❌ Transaksi belum dibayar! Silahkan bayar ke admin terlebih dahulu sebelum menghapus riwayat.");
-                return;
-            }
-
-            history.splice(index, 1);
-            localStorage.setItem('noxpay_history', JSON.stringify(history));
-            renderHistory();
-        }
-
-        // FUNGSI PROTEKSI: Hapus semua
-        function deleteAllHistory() {
-            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            
-            // Filter: Hanya ambil yang statusnya 'pending' untuk tetap dipertahankan
-            const pendingItems = history.filter(item => item.status === 'pending');
-            const paidCount = history.length - pendingItems.length;
-
-            if (paidCount === 0) {
-                alert("Tidak ada transaksi selesai yang bisa dihapus.");
-                return;
-            }
-
-            if (confirm(`Hapus ${paidCount} riwayat transaksi yang sudah selesai? (Transaksi PENDING tidak akan terhapus)`)) {
-                localStorage.setItem('noxpay_history', JSON.stringify(pendingItems));
-                renderHistory();
-            }
-        }
-
+        // --- LOGIKA RIWAYAT ---
         function renderHistory() {
             const historyList = document.getElementById('history-list');
             const history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
@@ -1130,15 +1002,12 @@
                 return;
             }
 
-            let html = `
-                <button class="delete-all-btn" onclick="deleteAllHistory()">
-                    🗑️ Bersihkan Riwayat Selesai
-                </button>
-            `;
+            let html = `<button class="delete-all-btn" onclick="deleteAllHistory()">🗑️ Bersihkan Semua Riwayat</button>`;
 
             history.forEach((item, index) => {
-                const isPending = item.status === 'pending';
-                const isDana = item.payment === 'DANA'; // Cek apakah metode DANA
+                // Warna Status Sukses
+                const statusColor = (item.status === "Success" || item.status === "Selesai") ? "#22c55e" : "#f59e0b";
+                const statusLabel = item.status || "Pending";
 
                 html += `
                     <div class="history-card fade-in">
@@ -1146,35 +1015,40 @@
                             <div style="flex:1">
                                 <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
                                 <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
+                                <div style="font-size: 10px; font-weight: 900; color:${statusColor}; margin-top:4px;">Status: ${statusLabel.toUpperCase()}</div>
                             </div>
                             <div style="text-align: right;">
                                 <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
                                 <div style="font-size: 9px; color: var(--gray);">${item.date}</div>
                             </div>
-                            ${(!isPending || isDana) ? `<button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>` : ''}
+                            <button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>
                         </div>
-                        
-                        ${!isDana ? `
-                        <div class="status-row">
-                            <div>
-                                <span class="status-badge ${isPending ? 'status-pending' : 'status-paid'}">
-                                    ${isPending ? '⏳ Menunggu Pembayaran' : '✅ Sudah Dibayar'}
-                                </span>
-                            </div>
-                            ${isPending ? `<button class="btn-confirm-pay" onclick="verifyPayment('${item.id_order}')">Konfirmasi Bayar</button>` : ''}
-                        </div>
-                        ` : ''}
                     </div>
                 `;
             });
-            
             historyList.innerHTML = html;
         }
 
+        function deleteHistoryItem(index) {
+            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+            history.splice(index, 1);
+            localStorage.setItem('noxpay_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function deleteAllHistory() {
+            if (confirm(`Hapus semua riwayat transaksi?`)) {
+                localStorage.setItem('noxpay_history', JSON.stringify([]));
+                renderHistory();
+            }
+        }
+
+        // --- TAMPILAN INVOICE & WHATSAPP ---
         function showInvoice(data) {
             const invoiceDetails = document.getElementById('invoice-details');
-            const orderID = "NPX-" + Math.floor(100000 + Math.random() * 900000);
+            const orderID = "NPX-" + Date.now(); // Gunakan timestamp agar ID selalu unik & sinkron
             const now = new Date().toLocaleString('id-ID');
+            
             invoiceDetails.innerHTML = `
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>ID Trx:</span> <b>${orderID}</b></div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Waktu:</span> <b>${now}</b></div>
@@ -1186,8 +1060,13 @@
                 <div style="display:flex; justify-content:space-between; font-size: 16px;"><span>TOTAL:</span> <b>Rp ${data.price}</b></div>
             `;
             document.getElementById('invoiceModal').style.display = 'block';
+            
             document.getElementById('final-wa-btn').onclick = () => {
-                saveToHistory({ product: data.product, nominal: data.nominal, target: data.target, price: data.price, payment: data.payment, date: now, buyerName: data.buyerName });
+                // 1. Simpan ke Firebase (Agar muncul di Panel Admin)
+                kirimDataKeFirebase(data, orderID);
+                // 2. Simpan ke Riwayat HP User
+                saveToHistory({ ...data, date: now }, orderID);
+                // 3. Arahkan ke WhatsApp
                 sendWhatsApp(data, orderID);
             };
         }
@@ -1216,6 +1095,7 @@
             window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
+        // --- NAVIGATION & UI HANDLER ---
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -1231,7 +1111,6 @@
 
         function openCaraOrder() { document.getElementById('caraOrderModal').style.display = 'block'; }
         function closeCaraOrder() { document.getElementById('caraOrderModal').style.display = 'none'; }
-        
         function openCreatorModal() { document.getElementById('creatorModal').style.display = 'block'; backToCreatorCategories(); }
         function closeCreatorModal() { document.getElementById('creatorModal').style.display = 'none'; }
 
@@ -1481,54 +1360,10 @@
                 buyerName: custName ? custName : 'Pelanggan'
             };
             showInvoice(data);
-            kirimDataKeAdmin(data);
         };
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
     </script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
-<script>
-  // Konfigurasi sesuai data terbaru Anda
-  const firebaseConfig = {
-    apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
-    authDomain: "noxpay-admin.firebaseapp.com",
-    databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "noxpay-admin",
-    storageBucket: "noxpay-admin.firebasestorage.app",
-    messagingSenderId: "212794945472",
-    appId: "1:212794945472:web:bd803bb3e71b48ea99a225",
-    measurementId: "G-2PXC06145B"
-  };
-
-  // Inisialisasi Firebase
-  if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-  }
-  const db = firebase.database();
-
-  // Fungsi untuk mengirim data pesanan
-  function kirimDataKeAdmin(orderData) {
-    // Membuat ID pesanan unik berdasarkan waktu
-    const orderID = "NPX-" + Date.now();
-    
-    // Menyimpan ke path 'orders/' di database Anda
-    db.ref('orders/' + orderID).set({
-      ...orderData,
-      id_trx: orderID,
-      status: "Pending",
-      waktu_masuk: new Date().toLocaleString('id-ID')
-    })
-    .then(() => {
-      console.log("Pesanan tersimpan di Firebase!");
-    })
-    .catch((error) => {
-      console.error("Gagal simpan ke Firebase: ", error);
-    });
-  }
-</script>
-
 </body>
 </html>
 
