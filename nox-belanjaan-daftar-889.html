@@ -3,105 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Pesanan NoxPay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>NoxPay Admin - Professional Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Pengaturan Background Utama */
+        :root {
+            --bg-main: #0b0f1a;
+            --card-bg: #161b2c;
+            --nox-blue: #007bff;
+            --accent-pink: #ff4d94;
+            --success: #00e676;
+            --pending: #ffc107;
+            --text-muted: #8b949e;
+        }
+
         body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #121212; /* Warna Background Gelap */
-            color: white; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg-main); 
+            color: #ffffff;
             margin: 0; 
-            padding: 20px;
+            padding: 16px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        h2 { 
-            font-size: 1.5rem; 
-            margin-bottom: 10px; 
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header-title {
+            margin-bottom: 24px;
+            border-left: 4px solid var(--nox-blue);
+            padding-left: 15px;
         }
 
-        .status-msg {
-            color: #3b82f6;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            font-weight: bold;
+        .header-title h2 { margin: 0; font-size: 1.25rem; letter-spacing: -0.5px; }
+        .status-dot { 
+            display: inline-block; width: 8px; height: 8px; 
+            background: var(--success); border-radius: 50%; margin-right: 5px;
         }
 
-        /* Styling Header Tabel Biru (Sesuai Gambar) */
-        .table-nav {
-            background-color: #007bff; /* Biru seperti gambar */
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 10px;
-            border-radius: 8px 8px 0 0;
-            font-weight: 600;
-            font-size: 0.85rem;
+        /* Container Tabel */
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .table-nav div {
-            flex: 1;
-            text-align: center;
-        }
-
-        /* Kontainer Tabel */
-        .order-container {
-            background-color: #1e1e1e; /* Warna kartu sedikit lebih terang dari bg */
-            border-radius: 0 0 8px 8px;
-            overflow-x: auto;
-        }
+        .scroll-wrapper { overflow-x: auto; }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px; /* Agar tidak terlalu sempit di HP */
+            min-width: 850px;
         }
 
+        /* Header Tabel Biru (Sesuai Gambar) */
+        thead tr {
+            background: var(--nox-blue);
+        }
+
+        th {
+            padding: 16px 12px;
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: white;
+        }
+
+        /* Isi Tabel */
         td {
-            padding: 15px 10px;
-            border-bottom: 1px solid #333;
-            text-align: center;
-            font-size: 0.8rem;
+            padding: 16px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.85rem;
+            color: #e6edf3;
         }
 
-        /* Status Badges */
-        .badge {
+        tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Detail Kolom */
+        .time-text { color: var(--text-muted); font-size: 0.8rem; }
+        .buyer-name { font-weight: 600; display: block; }
+        .product-tag { color: var(--text-muted); font-size: 0.75rem; margin-top: 2px; display: block; }
+        .target-id { 
+            font-family: 'JetBrains Mono', monospace; 
+            color: var(--accent-pink); 
+            font-weight: 700; 
+            background: rgba(255,77,148,0.1);
             padding: 4px 8px;
             border-radius: 4px;
+        }
+        .price-val { font-weight: 700; color: #79c0ff; }
+        
+        /* Badges */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 0.7rem;
-            font-weight: bold;
+            font-weight: 700;
+            display: inline-block;
+            text-align: center;
+            min-width: 70px;
         }
-        .pending { background: #f59e0b; color: black; }
-        .success { background: #10b981; color: white; }
+        .st-pending { background: rgba(255,193,7,0.15); color: var(--pending); border: 1px solid var(--pending); }
+        .st-success { background: rgba(0,230,118,0.15); color: var(--success); border: 1px solid var(--success); }
 
-        /* Scrollbar untuk Mobile */
-        .order-container::-webkit-scrollbar {
-            height: 5px;
-        }
-        .order-container::-webkit-scrollbar-thumb {
-            background: #333;
-        }
     </style>
 </head>
 <body>
 
-    <h2>Daftar Pesanan NoxPay<br>(Secure Mode)</h2>
-    <div class="status-msg" id="auth-status">Menghubungkan ke Firebase...</div>
+    <div class="container">
+        <div class="header-title">
+            <h2>Daftar Pesanan NoxPay</h2>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                <span class="status-dot"></span> <span id="auth-status">Menghubungkan Database...</span>
+            </div>
+        </div>
 
-    <div class="table-nav">
-        <div>Waktu</div>
-        <div>Nama</div>
-        <div>Produk</div>
-        <div>Target</div>
-        <div>Metode</div>
-        <div>Harga</div>
-        <div>Status</div>
-    </div>
-
-    <div class="order-container">
-        <table>
-            <tbody id="order-rows">
-                </tbody>
-        </table>
+        <div class="table-card">
+            <div class="scroll-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="10%">Waktu</th>
+                            <th width="20%">User</th>
+                            <th width="20%">Produk</th>
+                            <th width="20%">Target / ID</th>
+                            <th width="10%">Metode</th>
+                            <th width="10%">Harga</th>
+                            <th width="10%">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-rows">
+                        </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -122,16 +159,10 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         
-        // Login Anonim sesuai instruksi di gambar (Anonymous Auth)
-        firebase.auth().signInAnonymously()
-            .then(() => {
-                document.getElementById('auth-status').innerText = "Online - Akses Diberikan";
-                loadOrders();
-            })
-            .catch((error) => {
-                document.getElementById('auth-status').innerText = "Akses Ditolak! Aktifkan Anonymous Auth di Firebase.";
-                console.error(error);
-            });
+        firebase.auth().signInAnonymously().then(() => {
+            document.getElementById('auth-status').innerText = "Sistem Online (Secure Mode)";
+            loadOrders();
+        });
 
         function loadOrders() {
             db.ref('orders').on('value', (snapshot) => {
@@ -143,20 +174,18 @@
                 orders.reverse(); 
 
                 orders.forEach((data) => {
-                    const statusClass = data.status === 'Pending' ? 'pending' : 'success';
+                    const statusClass = (data.status || '').toLowerCase() === 'pending' ? 'st-pending' : 'st-success';
                     const jam = data.waktu_masuk ? data.waktu_masuk.split(',')[1]?.trim().substring(0,5) : '--:--';
                     
                     const row = `
                     <tr>
-                        <td style="width: 14%">${jam}</td>
-                        <td style="width: 14%">${data.buyerName || '-'}</td>
-                        <td style="width: 14%">${data.nominal || '-'}</td>
-                        <td style="width: 14%; color: #ff4757;">${data.target || '-'}</td>
-                        <td style="width: 14%">${data.metode || 'QRIS'}</td>
-                        <td style="width: 14%; font-weight: bold;">Rp${data.price || '0'}</td>
-                        <td style="width: 14%">
-                            <span class="badge ${statusClass}">${data.status}</span>
-                        </td>
+                        <td><span class="time-text">${jam}</span></td>
+                        <td><span class="buyer-name">${data.buyerName || 'User'}</span></td>
+                        <td><span class="product-tag">${data.nominal || '-'}</span></td>
+                        <td><span class="target-id">${data.target || '-'}</span></td>
+                        <td><span style="font-size:0.75rem; opacity:0.8">${data.metode || 'QRIS'}</span></td>
+                        <td><span class="price-val">Rp${data.price || '0'}</span></td>
+                        <td><span class="badge ${statusClass}">${data.status || 'Success'}</span></td>
                     </tr>`;
                     tbody.innerHTML += row;
                 });
