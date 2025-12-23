@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel NoxPay</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #007bff; color: white; }
+        tr:hover { background: #f1f1f1; }
+        .status-pending { color: orange; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Daftar Pesanan NoxPay</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Waktu</th>
+                <th>Nama</th>
+                <th>Produk</th>
+                <th>Target</th>
+                <th>Metode</th>
+                <th>Harga</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="order-list">
+            </tbody>
+    </table>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script>
+        // Gunakan Config yang sama seperti di index.html
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin",
+            storageBucket: "noxpay-admin.firebasestorage.app",
+            messagingSenderId: "212794945472",
+            appId: "1:212794945472:web:bd803bb3e71b48ea99a225"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Mengambil data dari folder 'orders' secara realtime
+        db.ref('orders').on('value', (snapshot) => {
+            const list = document.getElementById('order-list');
+            list.innerHTML = ""; // Bersihkan tabel sebelum update
+            
+            snapshot.forEach((childSnapshot) => {
+                const data = childSnapshot.val();
+                const row = `<tr>
+                    <td>${data.waktu_masuk || '-'}</td>
+                    <td>${data.buyerName}</td>
+                    <td>${data.product} (${data.nominal})</td>
+                    <td>${data.target}</td>
+                    <td>${data.payment}</td>
+                    <td>Rp ${data.price}</td>
+                    <td class="status-pending">${data.status}</td>
+                </tr>`;
+                list.innerHTML += row;
+            });
+        });
+    </script>
+</body>
+</html>
