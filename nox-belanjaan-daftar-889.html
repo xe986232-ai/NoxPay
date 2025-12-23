@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoxPay Admin - Secure Panel</title>
+    <title>NoxPay Admin - Control Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -24,47 +24,57 @@
             padding: 16px;
         }
 
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1100px; margin: 0 auto; }
 
         /* Style Form Login */
         #login-form {
             max-width: 400px;
             margin: 100px auto;
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
+            padding: 35px;
+            border-radius: 16px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
 
-        #login-form h2 { margin-bottom: 20px; color: var(--nox-blue); }
+        #login-form h2 { margin-bottom: 25px; color: var(--nox-blue); font-weight: 700; }
         
         #login-form input {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin-bottom: 15px;
             background: #0b0f1a;
             border: 1px solid #333;
-            border-radius: 6px;
+            border-radius: 8px;
             color: white;
             box-sizing: border-box;
+            outline: none;
         }
 
         #login-form button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: var(--nox-blue);
             border: none;
             color: white;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: 0.3s;
         }
 
+        #login-form button:hover { opacity: 0.9; transform: translateY(-2px); }
+
         /* Style Tabel */
-        .header-title {
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 24px;
+        }
+
+        .header-title {
             border-left: 4px solid var(--nox-blue);
             padding-left: 15px;
         }
@@ -74,29 +84,47 @@
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
         .scroll-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 850px; }
-        thead tr { background: var(--nox-blue); }
-        th { padding: 16px 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: white; }
-        td { padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        thead tr { background: rgba(0, 123, 255, 0.1); border-bottom: 2px solid var(--nox-blue); }
+        th { padding: 18px 12px; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: var(--nox-blue); letter-spacing: 1px; }
+        td { padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; vertical-align: middle; }
         
-        .time-text { color: var(--text-muted); }
-        .target-id { color: var(--accent-pink); font-weight: 700; background: rgba(255,77,148,0.1); padding: 4px 8px; border-radius: 4px; }
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; border: 1px solid; }
-        .st-pending { color: var(--pending); border-color: var(--pending); }
-        .st-success { color: var(--success); border-color: var(--success); }
+        .time-text { color: var(--text-muted); font-size: 0.75rem; }
+        .target-id { color: var(--accent-pink); font-weight: 700; background: rgba(255,77,148,0.1); padding: 4px 8px; border-radius: 4px; font-family: monospace; }
+        
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; border: 1px solid; display: inline-block; margin-bottom: 5px; }
+        .st-pending { color: var(--pending); border-color: var(--pending); background: rgba(255, 193, 7, 0.05); }
+        .st-success { color: var(--success); border-color: var(--success); background: rgba(0, 230, 118, 0.05); }
+
+        /* Tombol Aksi */
+        .btn-action {
+            background: var(--success);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-action:hover { transform: scale(1.05); background: #00ff84; }
         
         #btn-logout {
-            margin-top: 20px;
-            background: transparent;
+            background: rgba(255, 77, 77, 0.1);
             color: #ff4d4d;
             border: 1px solid #ff4d4d;
-            padding: 8px 15px;
+            padding: 8px 20px;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: 0.3s;
         }
+        #btn-logout:hover { background: #ff4d4d; color: white; }
     </style>
 </head>
 <body>
@@ -109,12 +137,15 @@
     </div>
 
     <div id="admin-content" class="container" style="display:none;">
-        <div class="header-title">
-            <h2>Panel Database NoxPay</h2>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
-                <span style="display:inline-block; width:8px; height:8px; background:var(--success); border-radius:50%"></span> 
-                Admin Terverifikasi
+        <div class="header-flex">
+            <div class="header-title">
+                <h2 style="margin:0;">Panel Database NoxPay</h2>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                    <span style="display:inline-block; width:8px; height:8px; background:var(--success); border-radius:50%"></span> 
+                    Sistem Kontrol Transaksi
+                </div>
             </div>
+            <button id="btn-logout" onclick="logout()">Logout</button>
         </div>
 
         <div class="table-card">
@@ -124,18 +155,19 @@
                         <tr>
                             <th>Waktu</th>
                             <th>User</th>
-                            <th>Produk</th>
-                            <th>Target / ID</th>
+                            <th>Produk/Nominal</th>
+                            <th>ID Transaksi (NPX)</th>
                             <th>Metode</th>
                             <th>Harga</th>
-                            <th>Status</th>
+                            <th>Status & Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="order-rows"></tbody>
+                    <tbody id="order-rows">
+                        <tr><td colspan="7" style="text-align:center; padding:50px; color:var(--text-muted);">Memuat data database...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
-        <button id="btn-logout" onclick="logout()">Logout / Keluar</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -153,61 +185,98 @@
             appId: "1:212794945472:web:bd803bb3e71b48ea99a225"
         };
 
-        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
+
+        // CEK STATUS LOGIN OTOMATIS
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                loadOrders();
+            } else {
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('admin-content').style.display = 'none';
+            }
+        });
 
         // FUNGSI LOGIN
         function handleLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            if(!email || !password) return alert("Isi email dan password!");
 
             auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Berhasil Login
-                    document.getElementById('login-form').style.display = 'none';
-                    document.getElementById('admin-content').style.display = 'block';
-                    loadOrders(); // Panggil data setelah login
-                })
-                .catch((error) => {
-                    alert("Akses Ditolak: Pastikan Email & Password benar!");
-                });
+                .catch((error) => alert("Gagal Masuk: " + error.message));
         }
 
-        // FUNGSI LOAD DATA
+        // FUNGSI LOAD DATA (REAL-TIME)
         function loadOrders() {
             db.ref('orders').on('value', (snapshot) => {
                 const tbody = document.getElementById('order-rows');
                 tbody.innerHTML = "";
                 
+                if (!snapshot.exists()) {
+                    tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:30px;'>Belum ada transaksi di database.</td></tr>";
+                    return;
+                }
+
                 const orders = [];
-                snapshot.forEach(child => { orders.push(child.val()); });
+                snapshot.forEach(child => { 
+                    let item = child.val();
+                    item.key = child.key; // Mengambil NPX-xxxx sebagai Key
+                    orders.push(item); 
+                });
+                
+                // Urutkan: Data terbaru berada di paling atas
                 orders.reverse(); 
 
                 orders.forEach((data) => {
-                    const statusClass = (data.status || '').toLowerCase() === 'pending' ? 'st-pending' : 'st-success';
-                    const jam = data.waktu_masuk ? data.waktu_masuk.split(',')[1]?.trim().substring(0,5) : '--:--';
+                    const statusVal = (data.status || 'Pending');
+                    const isPending = statusVal.toLowerCase() === 'pending';
+                    const statusClass = isPending ? 'st-pending' : 'st-success';
                     
+                    // Tombol Aksi Konfirmasi
+                    const actionButton = isPending 
+                        ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">Konfirmasi Bayar</button>`
+                        : `<span style="color:var(--success); font-size:11px;">Sudah Diproses</span>`;
+
                     const row = `
                     <tr>
-                        <td><span class="time-text">${jam}</span></td>
+                        <td><span class="time-text">${data.waktu_masuk || '--:--'}</span></td>
                         <td><span style="font-weight:600">${data.buyerName || 'User'}</span></td>
                         <td><span style="color:var(--text-muted); font-size:0.75rem">${data.nominal || '-'}</span></td>
-                        <td><span class="target-id">${data.target || '-'}</span></td>
+                        <td><span class="target-id">${data.key}</span></td>
                         <td><span style="font-size:0.75rem; opacity:0.8">${data.metode || 'QRIS'}</span></td>
                         <td><span style="font-weight:700; color:#79c0ff">Rp${data.price || '0'}</span></td>
-                        <td><span class="badge ${statusClass}">${data.status || 'Success'}</span></td>
+                        <td>
+                            <span class="badge ${statusClass}">${statusVal}</span><br>
+                            ${actionButton}
+                        </td>
                     </tr>`;
                     tbody.innerHTML += row;
                 });
             });
         }
 
+        // FUNGSI KONFIRMASI (UPDATE STATUS)
+        function konfirmasiTransaksi(orderID) {
+            if (confirm("Konfirmasi bahwa pesanan " + orderID + " telah dibayar?")) {
+                db.ref('orders/' + orderID).update({
+                    status: "Success"
+                })
+                .then(() => {
+                    console.log("Status updated!");
+                })
+                .catch((err) => {
+                    alert("Gagal update: " + err.message);
+                });
+            }
+        }
+
         function logout() {
-            auth.signOut().then(() => {
-                location.reload();
-            });
+            auth.signOut().then(() => location.reload());
         }
     </script>
 </body>
