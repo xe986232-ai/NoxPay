@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoxPay Admin Panel</title>
+    <title>NoxPay Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #4f46e5;
-            --bg: #f8fafc;
+            --bg: #f1f5f9;
             --card: #ffffff;
             --text-main: #1e293b;
             --text-sub: #64748b;
             --success: #10b981;
             --pending: #f59e0b;
+            --border: #e2e8f0;
         }
-
-        * { box-sizing: border-box; }
 
         body { 
             font-family: 'Inter', sans-serif; 
@@ -24,141 +23,123 @@
             color: var(--text-main); 
             margin: 0; 
             padding: 20px;
-            line-height: 1.5;
         }
 
-        .header {
-            margin-bottom: 25px;
-            text-align: left;
-        }
-
-        h2 { 
-            margin: 0; 
-            font-size: 1.25rem; 
-            font-weight: 700; 
-            letter-spacing: -0.025em;
-        }
-
-        #status-cloud { 
-            font-size: 0.75rem; 
-            margin-top: 5px;
-            font-weight: 500;
-        }
-
-        /* Container List */
-        .order-container {
-            display: grid;
-            gap: 12px;
-            max-width: 500px;
+        .container {
+            max-width: 1000px;
             margin: 0 auto;
         }
 
-        /* Card Styling */
-        .order-card {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
-            border: 1px solid #eef2f6;
-            transition: transform 0.2s;
-        }
-
-        .order-card:active { transform: scale(0.98); }
-
-        .order-header {
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 24px;
         }
 
-        .order-id { 
-            font-size: 0.7rem; 
-            font-weight: 700; 
+        h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+
+        #status-cloud { font-size: 0.85rem; font-weight: 500; }
+
+        /* Table Styling */
+        .table-wrapper {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        thead {
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 16px;
+            font-weight: 600;
             color: var(--text-sub);
             text-transform: uppercase;
+            font-size: 0.75rem;
             letter-spacing: 0.05em;
         }
 
-        .order-time { font-size: 0.75rem; color: var(--text-sub); }
-        
-        /* Grid Details */
-        .order-body { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 12px;
-            margin-bottom: 16px;
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
         }
 
-        .info-group { flex: 1 1 40%; }
-        
-        .label { 
-            font-size: 0.65rem; 
-            font-weight: 600;
-            color: var(--text-sub); 
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 2px;
-        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f8fafc; }
 
-        .value { 
-            font-size: 0.85rem; 
-            font-weight: 600; 
-            color: var(--text-main);
-            display: block; 
-        }
-        
-        .target-val { color: #db2777; } /* Pink-600 untuk Target */
-
-        /* Footer Card */
-        .price-tag {
-            padding-top: 12px;
-            border-top: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .payment-method {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-        }
-
-        .total-price { 
-            display: block;
-            color: var(--text-main); 
-            font-weight: 800; 
-            font-size: 1rem; 
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-size: 0.7rem;
+        /* Typography inside Table */
+        .customer-name { font-weight: 600; color: var(--text-main); }
+        .product-info { color: var(--text-sub); font-size: 0.8rem; }
+        .target-id { 
+            font-family: 'Courier New', monospace; 
+            background: #fdf2f8; 
+            color: #db2777; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
             font-weight: 700;
-            text-transform: uppercase;
         }
 
-        .badge-pending { background: #fffbeb; color: var(--pending); }
-        .badge-success { background: #ecfdf5; color: var(--success); }
-
-        /* Animasi masuk */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Badge Styling */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
         }
-        .order-card { animation: fadeIn 0.3s ease-out; }
+
+        .badge-pending { background: #fffbeb; color: #b45309; }
+        .badge-success { background: #ecfdf5; color: #047857; }
+
+        .price { font-weight: 700; color: var(--primary); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .table-wrapper { overflow-x: auto; }
+            table { min-width: 800px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2>Pesanan Masuk</h2>
-        <div id="status-cloud" style="color: var(--text-sub);">Menghubungkan...</div>
-    </div>
-
-    <div id="order-list" class="order-container">
+    <div class="container">
+        <div class="header">
+            <div>
+                <h2>Daftar Pesanan NoxPay</h2>
+                <div id="status-cloud">Menghubungkan...</div>
+            </div>
         </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Waktu</th>
+                        <th>Pelanggan</th>
+                        <th>Produk / Nominal</th>
+                        <th>Target ID</th>
+                        <th>Total Bayar</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="order-rows">
+                    </tbody>
+            </table>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -179,7 +160,7 @@
         const db = firebase.database();
         
         firebase.auth().signInAnonymously().then(() => {
-            document.getElementById('status-cloud').innerHTML = "<span style='color:var(--success)'>●</span> Terhubung";
+            document.getElementById('status-cloud').innerHTML = "<span style='color:var(--success)'>●</span> Server Aktif";
             loadOrders();
         }).catch(() => {
             document.getElementById('status-cloud').innerHTML = "<span style='color:red'>●</span> Koneksi Terputus";
@@ -187,48 +168,37 @@
 
         function loadOrders() {
             db.ref('orders').on('value', (snapshot) => {
-                const container = document.getElementById('order-list');
-                container.innerHTML = "";
+                const tbody = document.getElementById('order-rows');
+                tbody.innerHTML = "";
                 
                 const orders = [];
-                snapshot.forEach(child => { orders.push(child.val()); });
+                snapshot.forEach(child => { 
+                    orders.push(child.val()); 
+                });
                 orders.reverse(); 
 
                 orders.forEach((data) => {
                     const statusClass = data.status === 'Pending' ? 'badge-pending' : 'badge-success';
-                    const card = `
-                    <div class="order-card">
-                        <div class="order-header">
-                            <span class="order-id">#${data.waktu_masuk ? data.waktu_masuk.split(',')[1].trim().replace(/\s/g, '') : 'REC'}</span>
-                            <span class="order-time">${data.waktu_masuk || '-'}</span>
-                        </div>
-                        <div class="order-body">
-                            <div class="info-group">
-                                <span class="label">Pelanggan</span>
-                                <span class="value">${data.buyerName}</span>
-                            </div>
-                            <div class="info-group">
-                                <span class="label">Produk</span>
-                                <span class="value">${data.product}</span>
-                            </div>
-                            <div class="info-group">
-                                <span class="label">Target ID</span>
-                                <span class="value target-val">${data.target}</span>
-                            </div>
-                            <div class="info-group">
-                                <span class="label">Nominal</span>
-                                <span class="value">${data.nominal}</span>
-                            </div>
-                        </div>
-                        <div class="price-tag">
-                            <div>
-                                <span class="payment-method">${data.payment}</span>
-                                <span class="total-price">Rp ${data.price}</span>
-                            </div>
-                            <span class="badge ${statusClass}">${data.status}</span>
-                        </div>
-                    </div>`;
-                    container.innerHTML += card;
+                    
+                    const row = `
+                    <tr>
+                        <td style="font-size: 0.8rem; color: var(--text-sub);">
+                            ${data.waktu_masuk || '-'}
+                        </td>
+                        <td>
+                            <div class="customer-name">${data.buyerName}</div>
+                            <div style="font-size: 0.7rem; color: var(--text-sub)">Via ${data.payment}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 500">${data.product}</div>
+                            <div class="product-info">${data.nominal}</div>
+                        </td>
+                        <td><span class="target-id">${data.target}</span></td>
+                        <td class="price">Rp ${data.price}</td>
+                        <td><span class="badge ${statusClass}">${data.status}</span></td>
+                    </tr>`;
+                    
+                    tbody.innerHTML += row;
                 });
             });
         }
