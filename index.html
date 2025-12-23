@@ -1084,12 +1084,18 @@
     // Gunakan variabel statusColor dan statusText di bawah ini
     card.style.borderLeft = `4px solid ${statusColor}`;
     card.innerHTML = `
-        <div class="history-info">
-            <h4>${item.product}</h4>
-            <p style="color: ${statusColor}; font-weight: bold;">${statusText}</p>
-        </div>
-    `;
-    historyList.appendChild(card);
+    <div class="history-info">
+        <h4>${item.product}</h4>
+        <p style="color: ${statusColor}; font-weight: bold;">${statusText}</p>
+    </div>
+    <div style="text-align: right;">
+        <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
+        <div style="font-size: 9px; color: var(--gray);">${item.date}</div>
+    </div>
+    <button class="delete-btn" onclick="deleteHistoryItem(${index})">×</button>
+`;
+
+
 });
 
 
@@ -1478,22 +1484,31 @@ db.ref('orders/').on('value', (snapshot) => {
     const firebaseData = snapshot.val();
     if (!firebaseData) return;
 
+    // Pastikan pakai 'noxpay_history' sesuai baris 1064
     let localHistory = JSON.parse(localStorage.getItem('noxpay_history') || '[]');
 
     if (localHistory.length > 0) {
         let adaPerubahan = false;
         localHistory.forEach((item, index) => {
-            // Kita coba cek semua kemungkinan nama ID (id_order atau id)
-            const orderID = item.id_order || item.id; 
+            // Kita coba cek semua kemungkinan nama ID (id atau id_order)
+            const currentID = item.id || item.id_order; 
             
-            if (orderID && firebaseData[orderID]) {
-                const statusBaru = firebaseData[orderID].status;
+            if (currentID && firebaseData[currentID]) {
+                const statusBaru = firebaseData[currentID].status;
                 if (localHistory[index].status !== statusBaru) {
                     localHistory[index].status = statusBaru;
                     adaPerubahan = true;
                 }
             }
         });
+
+        if (adaPerubahan) {
+            localStorage.setItem('noxpay_history', JSON.stringify(localHistory));
+            renderHistory(); // Otomatis menggambar ulang warna hijau
+        }
+    }
+});
+
 
         if (adaPerubahan) {
             localStorage.setItem('noxpay_history', JSON.stringify(localHistory));
