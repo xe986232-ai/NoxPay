@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoxPay Admin - Professional Panel</title>
+    <title>NoxPay Admin - Secure Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -22,113 +22,98 @@
             color: #ffffff;
             margin: 0; 
             padding: 16px;
-            -webkit-font-smoothing: antialiased;
         }
 
         .container { max-width: 1000px; margin: 0 auto; }
 
+        /* Style Form Login */
+        #login-form {
+            max-width: 400px;
+            margin: 100px auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        #login-form h2 { margin-bottom: 20px; color: var(--nox-blue); }
+        
+        #login-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: #0b0f1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        #login-form button {
+            width: 100%;
+            padding: 12px;
+            background: var(--nox-blue);
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* Style Tabel */
         .header-title {
             margin-bottom: 24px;
             border-left: 4px solid var(--nox-blue);
             padding-left: 15px;
         }
 
-        .header-title h2 { margin: 0; font-size: 1.25rem; letter-spacing: -0.5px; }
-        .status-dot { 
-            display: inline-block; width: 8px; height: 8px; 
-            background: var(--success); border-radius: 50%; margin-right: 5px;
-        }
-
-        /* Container Tabel */
         .table-card {
             background: var(--card-bg);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.05);
         }
 
         .scroll-wrapper { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 850px;
-        }
-
-        /* Header Tabel Biru (Sesuai Gambar) */
-        thead tr {
-            background: var(--nox-blue);
-        }
-
-        th {
-            padding: 16px 12px;
-            text-align: left;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: white;
-        }
-
-        /* Isi Tabel */
-        td {
-            padding: 16px 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.85rem;
-            color: #e6edf3;
-        }
-
-        tbody tr:hover { background: rgba(255,255,255,0.02); }
-
-        /* Detail Kolom */
-        .time-text { color: var(--text-muted); font-size: 0.8rem; }
-        .buyer-name { font-weight: 600; display: block; }
-        .product-tag { color: var(--text-muted); font-size: 0.75rem; margin-top: 2px; display: block; }
-        .target-id { 
-            font-family: 'JetBrains Mono', monospace; 
-            color: var(--accent-pink); 
-            font-weight: 700; 
-            background: rgba(255,77,148,0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        .price-val { font-weight: 700; color: #79c0ff; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        thead tr { background: var(--nox-blue); }
+        th { padding: 16px 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: white; }
+        td { padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
         
-        /* Badges */
-        .badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            display: inline-block;
-            text-align: center;
-            min-width: 70px;
+        .time-text { color: var(--text-muted); }
+        .target-id { color: var(--accent-pink); font-weight: 700; background: rgba(255,77,148,0.1); padding: 4px 8px; border-radius: 4px; }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; border: 1px solid; }
+        .st-pending { color: var(--pending); border-color: var(--pending); }
+        .st-success { color: var(--success); border-color: var(--success); }
+        
+        #btn-logout {
+            margin-top: 20px;
+            background: transparent;
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
         }
-        .st-pending { background: rgba(255,193,7,0.15); color: var(--pending); border: 1px solid var(--pending); }
-        .st-success { background: rgba(0,230,118,0.15); color: var(--success); border: 1px solid var(--success); }
-
     </style>
 </head>
 <body>
+
     <div id="login-form">
-    <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="Email Admin">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="handleLogin()">Login</button>
-</div>
+        <h2>NoxPay Admin</h2>
+        <input type="email" id="email" placeholder="Email Admin">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="handleLogin()">Masuk Sekarang</button>
+    </div>
 
-<div id="admin-content" style="display:none;">
-    <h1>Selamat Datang, Admin!</h1>
-    <div id="data-database"></div>
-</div>
-    
-
-    <div class="container">
+    <div id="admin-content" class="container" style="display:none;">
         <div class="header-title">
-            <h2>Daftar Pesanan NoxPay</h2>
+            <h2>Panel Database NoxPay</h2>
             <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
-                <span class="status-dot"></span> <span id="auth-status">Menghubungkan Database...</span>
+                <span style="display:inline-block; width:8px; height:8px; background:var(--success); border-radius:50%"></span> 
+                Admin Terverifikasi
             </div>
         </div>
 
@@ -137,20 +122,20 @@
                 <table>
                     <thead>
                         <tr>
-                            <th width="10%">Waktu</th>
-                            <th width="20%">User</th>
-                            <th width="20%">Produk</th>
-                            <th width="20%">Target / ID</th>
-                            <th width="10%">Metode</th>
-                            <th width="10%">Harga</th>
-                            <th width="10%">Status</th>
+                            <th>Waktu</th>
+                            <th>User</th>
+                            <th>Produk</th>
+                            <th>Target / ID</th>
+                            <th>Metode</th>
+                            <th>Harga</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="order-rows">
-                        </tbody>
+                    <tbody id="order-rows"></tbody>
                 </table>
             </div>
         </div>
+        <button id="btn-logout" onclick="logout()">Logout / Keluar</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -168,14 +153,29 @@
             appId: "1:212794945472:web:bd803bb3e71b48ea99a225"
         };
 
+        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        
-        firebase.auth().signInAnonymously().then(() => {
-            document.getElementById('auth-status').innerText = "Sistem Online (Secure Mode)";
-            loadOrders();
-        });
+        const auth = firebase.auth();
 
+        // FUNGSI LOGIN
+        function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Berhasil Login
+                    document.getElementById('login-form').style.display = 'none';
+                    document.getElementById('admin-content').style.display = 'block';
+                    loadOrders(); // Panggil data setelah login
+                })
+                .catch((error) => {
+                    alert("Akses Ditolak: Pastikan Email & Password benar!");
+                });
+        }
+
+        // FUNGSI LOAD DATA
         function loadOrders() {
             db.ref('orders').on('value', (snapshot) => {
                 const tbody = document.getElementById('order-rows');
@@ -192,44 +192,24 @@
                     const row = `
                     <tr>
                         <td><span class="time-text">${jam}</span></td>
-                        <td><span class="buyer-name">${data.buyerName || 'User'}</span></td>
-                        <td><span class="product-tag">${data.nominal || '-'}</span></td>
+                        <td><span style="font-weight:600">${data.buyerName || 'User'}</span></td>
+                        <td><span style="color:var(--text-muted); font-size:0.75rem">${data.nominal || '-'}</span></td>
                         <td><span class="target-id">${data.target || '-'}</span></td>
                         <td><span style="font-size:0.75rem; opacity:0.8">${data.metode || 'QRIS'}</span></td>
-                        <td><span class="price-val">Rp${data.price || '0'}</span></td>
+                        <td><span style="font-weight:700; color:#79c0ff">Rp${data.price || '0'}</span></td>
                         <td><span class="badge ${statusClass}">${data.status || 'Success'}</span></td>
                     </tr>`;
                     tbody.innerHTML += row;
                 });
             });
         }
+
+        function logout() {
+            auth.signOut().then(() => {
+                location.reload();
+            });
+        }
     </script>
-    import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-
-const auth = getAuth();
-
-function handleLogin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Login Berhasil
-            const user = userCredential.user;
-            console.log("Logged in as:", user.uid);
-            
-            // Sembunyikan form login, tampilkan konten admin
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('admin-content').style.display = 'block';
-
-            // Panggil fungsi utama Anda untuk mengambil data database di sini
-            loadDatabaseData(); 
-        })
-        .catch((error) => {
-            alert("Login Gagal: " + error.message);
-        });
-}
-    
 </body>
 </html>
 
