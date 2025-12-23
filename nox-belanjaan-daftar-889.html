@@ -204,6 +204,32 @@
             });
         }
     </script>
+    import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
+const auth = getAuth();
+
+function handleLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Login Berhasil
+            const user = userCredential.user;
+            console.log("Logged in as:", user.uid);
+            
+            // Sembunyikan form login, tampilkan konten admin
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+
+            // Panggil fungsi utama Anda untuk mengambil data database di sini
+            loadDatabaseData(); 
+        })
+        .catch((error) => {
+            alert("Login Gagal: " + error.message);
+        });
+}
+    
 </body>
 </html>
 
