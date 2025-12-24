@@ -1074,11 +1074,37 @@
 
 
         function deleteAllHistory() {
-            if (confirm(`Hapus semua riwayat transaksi?`)) {
-                localStorage.setItem('noxpay_history', JSON.stringify([]));
-                renderHistory();
-            }
+    // 1. Ambil data riwayat saat ini
+    let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+
+    if (history.length === 0) {
+        alert("Riwayat sudah kosong.");
+        return;
+    }
+
+    if (confirm("Apakah Anda yakin ingin menghapus semua riwayat yang sudah selesai? (Transaksi yang belum dibayar tidak akan terhapus)")) {
+        
+        // 2. Logika penyaringan (Filtering)
+        // Kita hanya menyimpan transaksi yang statusnya mengandung kata "BELUM", "PENDING", atau "PROSES"
+        let dataYangTersisa = history.filter(item => {
+            let status = item.status ? item.status.toUpperCase() : "";
+            return status.includes("BELUM") || status.includes("PENDING") || status.includes("PROSES");
+        });
+
+        // 3. Cek apakah ada data yang terhapus atau tidak
+        if (dataYangTersisa.length === history.length) {
+            alert("Tidak ada riwayat yang bisa dihapus karena semua transaksi Anda masih dalam proses/belum dibayar.");
+        } else {
+            // 4. Update localStorage dengan data yang tersisa saja
+            localStorage.setItem('noxpay_history', JSON.stringify(dataYangTersisa));
+            renderHistory();
+            
+            let jumlahTerhapus = history.length - dataYangTersisa.length;
+            alert(`Berhasil membersihkan ${jumlahTerhapus} riwayat yang sudah selesai.`);
         }
+    }
+}
+
 
         // --- TAMPILAN INVOICE & WHATSAPP ---
         function showInvoice(data) {
