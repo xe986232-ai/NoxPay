@@ -1049,11 +1049,29 @@
 
 
         function deleteHistoryItem(index) {
-            let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
-            history.splice(index, 1);
-            localStorage.setItem('noxpay_history', JSON.stringify(history));
-            renderHistory();
-        }
+    // 1. Ambil data dari storage
+    let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
+    let item = history[index];
+
+    if (!item) return;
+
+    // 2. Ambil status dan ubah ke huruf besar agar pengecekan akurat
+    let statusSekarang = item.status ? item.status.toUpperCase() : "";
+
+    // 3. LOGIKA BARU: Cek kata "BELUM DIBAYAR"
+    if (statusSekarang === "BELUM DIBAYAR" || statusSekarang === "PENDING") {
+        alert("⚠️ TRANSAKSI BELUM DIBAYAR!\n\nAnda tidak diperbolehkan menghapus riwayat yang statusnya masih 'BELUM DIBAYAR'. Silahkan selesaikan transaksi atau tunggu konfirmasi Admin.");
+        return; // Berhenti di sini, data TIDAK AKAN terhapus
+    }
+
+    // 4. Jika statusnya "SUDAH DIBAYAR" atau "SUCCESS", baru boleh dihapus
+    if (confirm(`Hapus riwayat transaksi ${item.product}?`)) {
+        history.splice(index, 1);
+        localStorage.setItem('noxpay_history', JSON.stringify(history));
+        renderHistory();
+    }
+}
+
 
         function deleteAllHistory() {
             if (confirm(`Hapus semua riwayat transaksi?`)) {
