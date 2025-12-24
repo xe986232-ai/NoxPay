@@ -993,6 +993,7 @@
         }
 
         // --- LOGIKA RIWAYAT ---
+                // --- LOGIKA RIWAYAT (SUDAH DIUBAH STATUSNYA) ---
         function renderHistory() {
             const historyList = document.getElementById('history-list');
             const history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
@@ -1005,9 +1006,26 @@
             let html = `<button class="delete-all-btn" onclick="deleteAllHistory()">🗑️ Bersihkan Semua Riwayat</button>`;
 
             history.forEach((item, index) => {
-                // Warna Status Sukses
-                const statusColor = (item.status === "Success" || item.status === "Selesai") ? "#22c55e" : "#f59e0b";
-                const statusLabel = item.status || "Pending";
+                // --- LOGIKA PERUBAHAN NAMA STATUS ---
+                let statusTeks = "";
+                let statusColor = "";
+
+                // Menyesuaikan dengan status dari database
+                const statusDatabase = (item.status || "Pending").toUpperCase();
+
+                if (statusDatabase === "SUCCESS" || statusDatabase === "SELESAI") {
+                    statusTeks = "SUDAH DIBAYAR";
+                    statusColor = "#22c55e"; // Hijau
+                } else if (statusDatabase === "PENDING") {
+                    statusTeks = "BELUM DIBAYAR";
+                    statusColor = "#f59e0b"; // Oranye/Kuning
+                } else if (statusDatabase === "FAILED" || statusDatabase === "GAGAL") {
+                    statusTeks = "PEMBAYARAN GAGAL";
+                    statusColor = "#ef4444"; // Merah
+                } else {
+                    statusTeks = statusDatabase;
+                    statusColor = "#64748b"; // Abu-abu untuk status lain
+                }
 
                 html += `
                     <div class="history-card fade-in">
@@ -1015,7 +1033,7 @@
                             <div style="flex:1">
                                 <div style="font-size: 12px; font-weight: 800;">${item.product}</div>
                                 <div style="font-size: 10px; color: var(--gray);">${item.nominal} - ${item.target}</div>
-                                <div style="font-size: 10px; font-weight: 900; color:${statusColor}; margin-top:4px;">Status: ${statusLabel.toUpperCase()}</div>
+                                <div style="font-size: 10px; font-weight: 900; color:${statusColor}; margin-top:4px;">Status: ${statusTeks}</div>
                             </div>
                             <div style="text-align: right;">
                                 <div style="font-size: 12px; font-weight: 800; color: var(--primary);">Rp ${item.price}</div>
@@ -1028,6 +1046,7 @@
             });
             historyList.innerHTML = html;
         }
+
 
         function deleteHistoryItem(index) {
             let history = JSON.parse(localStorage.getItem('noxpay_history')) || [];
