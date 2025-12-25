@@ -606,9 +606,14 @@
                     <div class="logo-text-nav"><span>Nox</span><span>Pay</span></div>
                 </div>
                 <nav class="nav-right">
-                    <span class="menu-link" onclick="handleHome()">Home</span>
-                    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
-                </nav>
+    <div class="notification-wrapper" style="position: relative; margin-right: 5px;">
+        <span class="menu-link" id="noti-btn" style="font-size: 18px;">🔔</span>
+        <span id="noti-badge" class="badge" style="display: none; position: absolute; top: -8px; right: -8px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 9px; font-weight: 800;">0</span>
+    </div>
+    
+    <span class="menu-link" onclick="handleHome()">Home</span>
+    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
+</nav>
             </div>
         </header>
 
@@ -871,6 +876,18 @@
         </div>
 
         <footer>&copy; 2025 NoxPay Digital Payment.</footer>
+        <div id="notiModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 18px; font-weight: 800;">Notifikasi</h3>
+            <button onclick="closeNotiModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+        </div>
+        <div id="noti-list-container" style="max-height: 400px; overflow-y: auto;">
+            <p style="text-align: center; color: var(--gray); font-size: 12px; padding: 20px;">Memuat pesan...</p>
+        </div>
+        <button style="width:100%; padding:12px; border-radius:12px; border:none; background:var(--primary-light); color:var(--primary); font-weight:800; cursor:pointer; margin-top:15px;" onclick="closeNotiModal()">Tutup</button>
+    </div>
+</div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -1473,6 +1490,51 @@ function pantauStatusAdmin() {
 
 // Jalankan fungsi pemantau
 pantauStatusAdmin();
+muatNotifikasi();
+function muatNotifikasi() {
+    const container = document.getElementById('noti-list-container');
+    
+    // Mendengarkan perubahan di folder 'notifikasi' secara real-time
+    db.ref('notifikasi').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            container.innerHTML = ''; // Bersihkan tulisan "Memuat..."
+            
+            // Ambil data, balik urutan agar yang terbaru di atas
+            Object.values(data).reverse().forEach(item => {
+                container.innerHTML += `
+                    <div style="padding: 12px; border-bottom: 1px solid #eee; margin-bottom: 8px; background: #fdfdfd; border-radius: 8px;">
+                        <p style="font-size: 14px; margin: 0; color: #333; line-height: 1.4;">${item.pesan}</p>
+                        <small style="color: #bbb; font-size: 10px;">${item.waktu}</small>
+                    </div>
+                `;
+            });
+        } else {
+            container.innerHTML = '<p style="text-align: center; color: gray; font-size: 12px; padding: 20px;">Belum ada notifikasi.</p>';
+        }
+    });
+}
+
+// Jalankan fungsinya
+muatNotifikasi();
+// Fungsi untuk membuka modal notifikasi
+function openNotiModal() {
+    document.getElementById('notiModal').style.display = 'flex';
+}
+
+// Fungsi untuk menutup modal notifikasi
+function closeNotiModal() {
+    document.getElementById('notiModal').style.display = 'none';
+}
+
+// Menghubungkan klik ikon lonceng ke fungsi buka
+// Ganti baris 1504 dengan ini agar lebih aman
+window.addEventListener('load', function() {
+    const notiBtn = document.getElementById('noti-btn');
+    if (notiBtn) {
+        notiBtn.onclick = openNotiModal;
+    }
+});
 </script>
 
 </body>
