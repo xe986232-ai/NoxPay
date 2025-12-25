@@ -3,34 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoxPay Admin PRO - Realtime</title>
+    <title>NoxPay Admin Fix - 100% Otomatis</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-main: #0b0f1a;
             --card-bg: #161b2c;
             --nox-blue: #007bff;
-            --accent-pink: #ff4d94;
             --success: #00e676;
-            --pending: #ffc107;
             --text-muted: #8b949e;
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: #ffffff; margin: 0; padding: 10px; }
         .container { max-width: 1200px; margin: 0 auto; }
-        #login-form { max-width: 350px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        #login-form input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box; }
-        #login-form button { width: 100%; padding: 12px; background: var(--nox-blue); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .table-card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; overflow: hidden; }
-        .scroll-wrapper { overflow-x: auto; }
+        .table-card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { padding: 15px 10px; text-align: left; font-size: 0.65rem; color: var(--nox-blue); background: rgba(0, 123, 255, 0.05); }
+        th { padding: 15px 10px; text-align: left; font-size: 0.65rem; color: var(--nox-blue); background: rgba(0, 123, 255, 0.05); text-transform: uppercase; }
         td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; }
-        .target-id { color: var(--accent-pink); font-weight: 700; background: rgba(255,77,148,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; border: 1px solid; }
-        .st-pending { color: var(--pending); border-color: var(--pending); }
-        .st-success { color: var(--success); border-color: var(--success); }
         .btn-action { background: var(--success); color: #000; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+        #login-form { max-width: 350px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 16px; text-align: center; }
+        #login-form input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white; }
     </style>
 </head>
 <body>
@@ -39,17 +30,17 @@
         <h2 style="color:var(--nox-blue)">NoxPay Admin</h2>
         <input type="email" id="email" placeholder="Email Admin">
         <input type="password" id="password" placeholder="Password">
-        <button onclick="handleLogin()">Login</button>
+        <button onclick="handleLogin()" style="width:100%; padding:12px; background:var(--nox-blue); border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">Login</button>
     </div>
 
     <div id="admin-content" class="container" style="display:none;">
-        <div class="header-flex">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2>Panel Database Noxpay</h2>
-            <button id="btn-logout" onclick="logout()" style="background:none; color:red; border:1px solid red; padding:5px 10px; border-radius:5px;">Logout</button>
+            <button onclick="logout()" style="background:none; color:red; border:1px solid red; padding:5px 10px; border-radius:5px;">Logout</button>
         </div>
 
         <div class="table-card">
-            <div class="scroll-wrapper">
+            <div style="overflow-x:auto;">
                 <table>
                     <thead>
                         <tr>
@@ -57,12 +48,11 @@
                             <th>User</th>
                             <th>Produk</th>
                             <th>ID Trx</th>
-                            <th>Harga</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="order-rows">
-                        <tr><td colspan="6" style="text-align:center; padding:40px;">Memuat data transaksi...</td></tr>
+                        <tr><td colspan="5" style="text-align:center; padding:40px;">Memuat data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -102,9 +92,7 @@
         });
 
         function handleLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(email, password).catch(e => alert(e.message));
+            auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value).catch(e => alert(e.message));
         }
 
         function loadOrders() {
@@ -112,28 +100,20 @@
                 const tbody = document.getElementById('order-rows');
                 tbody.innerHTML = "";
                 if (!snapshot.exists()) return;
-
                 let orders = [];
-                snapshot.forEach(child => {
-                    let data = child.val();
-                    data.key = child.key;
-                    orders.push(data);
-                });
-
+                snapshot.forEach(child => { let d = child.val(); d.key = child.key; orders.push(d); });
                 orders.reverse().forEach((data) => {
-                    const statusText = (data.status || '').toUpperCase();
-                    const isPending = statusText !== 'SUCCESS' && statusText !== 'SELESAI';
+                    const isPending = (data.status || '').toUpperCase() !== 'SUCCESS';
                     const actionHtml = isPending 
                         ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">TERIMA & +1 KOIN</button>`
-                        : `<span class="badge st-success">SELESAI</span>`;
+                        : `<span style="color:var(--success); font-weight:bold;">SELESAI</span>`;
 
                     tbody.innerHTML += `
                     <tr>
                         <td>${data.waktu_masuk || '-'}</td>
-                        <td><b>${data.nama_user || data.buyerName || 'User'}</b></td>
-                        <td>${data.product || '-'} (${data.nominal || '0'})</td>
-                        <td><span class="target-id">${data.key}</span></td>
-                        <td>Rp${data.price || '0'}</td>
+                        <td><b>${data.buyerName || 'User'}</b></td>
+                        <td>${data.product || '-'}</td>
+                        <td>${data.key}</td>
                         <td>${actionHtml}</td>
                     </tr>`;
                 });
@@ -142,51 +122,33 @@
 
         async function konfirmasiTransaksi(orderID) {
             try {
-                // Ambil data order terbaru
                 const snap = await db.ref('orders/' + orderID).once('value');
-                if (!snap.exists()) {
-                    alert("Data transaksi tidak ditemukan!");
-                    return;
-                }
                 const orderData = snap.val();
                 
-                // Cari ID User dari semua kemungkinan field
-                let targetUID = orderData.userID || orderData.id_user || orderData.idUser || orderData.buyerID || orderData.uid;
-
-                // Jika benar-benar tidak ada di database, baru tanya manual (emergency)
-                if (!targetUID) {
-                    targetUID = prompt("ID User tidak ditemukan di data order. Masukkan manual (Contoh: USER-593086):");
-                }
+                // MENGAMBIL userID SESUAI SCREENSHOT (DENGAN HURUF 'ID' BESAR)
+                const targetUID = orderData.userID; 
 
                 if (!targetUID) {
-                    alert("Proses dibatalkan karena ID User kosong.");
+                    alert("Gagal: userID tidak ditemukan di database!");
                     return;
                 }
 
-                const confirmAction = confirm("Terima Transaksi " + orderID + " dan TAMBAH 1 Koin ke " + targetUID + "?");
-                
-                if (confirmAction) {
-                    // 1. Tambah Koin di Firestore (MENGGUNAKAN INCREMENT)
-                    // Menggunakan firebase.firestore.FieldValue secara spesifik agar tidak crash
-                    const userRef = fs.collection("users").doc(targetUID);
-                    
-                    await userRef.set({
-                        coins: firebase.firestore.FieldValue.increment(1),
-                        lastUpdate: firebase.firestore.Timestamp.now()
-                    }, { merge: true });
+                // 1. Tambah Koin di Firestore (PASTI BERTAMBAH)
+                const userRef = fs.collection("users").doc(targetUID);
+                await userRef.update({
+                    coins: firebase.firestore.FieldValue.increment(1)
+                });
 
-                    // 2. Update status di Realtime Database setelah koin berhasil masuk
-                    await db.ref('orders/' + orderID).update({
-                        status: "Success",
-                        waktu_selesai: new Date().toLocaleString('id-ID')
-                    });
+                // 2. Update status di Realtime Database
+                await db.ref('orders/' + orderID).update({
+                    status: "Success",
+                    waktu_selesai: new Date().toLocaleString('id-ID')
+                });
 
-                    alert("BERHASIL! Status Selesai & Koin bertambah otomatis ke " + targetUID);
-                }
+                alert("BERHASIL! Koin bertambah otomatis ke " + targetUID);
 
             } catch (error) {
-                console.error("Error Konfirmasi:", error);
-                alert("Gagal Konfirmasi: " + error.message);
+                alert("Eror: " + error.message);
             }
         }
 
