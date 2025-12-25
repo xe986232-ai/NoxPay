@@ -659,18 +659,18 @@
                     
                     <div id="admin-selection-group" class="hidden" style="margin-bottom: 20px;">
                         <label style="display:block; font-size:12px; font-weight:800; margin-bottom:12px; color:var(--dark); text-align:center; letter-spacing:1px;">⚡ PILIH JALUR ADMIN ⚡</label>
-                        <div class="admin-selector">
-                            <div class="admin-box active" id="admin-box-1" onclick="selectAdmin(1)">
-                                <h5>Admin 1</h5>
-                                <p>Wall</p>
-                            </div>
-                            <div class="admin-box" id="admin-box-2" onclick="selectAdmin(2)">
-                                <h5>Admin 2</h5>
-                                <p>Rizz</p>
-                            </div>
-                        </div>
-                    </div>
-
+                    <div class="admin-selector">
+    <div class="admin-box active" id="admin-box-1" onclick="selectAdmin(1)">
+        <h5>Admin 1</h5>
+        <p>Wall</p>
+        <small id="status-wall" style="font-size: 9px; font-weight: 800; display: block; margin-top: 4px; color: #8b949e;">○ OFFLINE</small>
+    </div>
+    <div class="admin-box" id="admin-box-2" onclick="selectAdmin(2)">
+        <h5>Admin 2</h5>
+        <p>Rizz</p>
+        <small id="status-rizz" style="font-size: 9px; font-weight: 800; display: block; margin-top: 4px; color: #8b949e;">○ OFFLINE</small>
+    </div>
+</div>
                     <div class="form-group">
                         <label id="label-id" style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Tujuan</label>
                         <input type="text" id="target-id" placeholder="Masukkan Nomor/ID" inputmode="numeric">
@@ -1445,6 +1445,36 @@
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
     </script>
+    <script>
+// Fungsi untuk memantau status Online/Offline Admin dari Firebase
+function pantauStatusAdmin() {
+    // 1. Pantau Admin Wall
+    // Ganti 'UID_ADMIN_WALL' dengan UID asli dari Firebase status_admin
+    db.ref('status_admin/UID_ADMIN_WALL').on('value', (snapshot) => {
+        const status = snapshot.val();
+        const el = document.getElementById('status-wall');
+        if (el) {
+            el.innerText = (status === 'online') ? '● ONLINE' : '○ OFFLINE';
+            el.style.color = (status === 'online') ? '#22c55e' : '#8b949e';
+        }
+    });
+
+    // 2. Pantau Admin Rizz
+    // Ganti 'UID_ADMIN_RIZZ' dengan UID asli dari Firebase status_admin
+    db.ref('status_admin/bMWnTsLGj6Q4kiZZo5zQnXnmRpQ2').on('value', (snapshot) => {
+        const status = snapshot.val();
+        const el = document.getElementById('status-rizz');
+        if (el) {
+            el.innerText = (status === 'online') ? '● ONLINE' : '○ OFFLINE';
+            el.style.color = (status === 'online') ? '#22c55e' : '#8b949e';
+        }
+    });
+}
+
+// Jalankan fungsi pemantau
+pantauStatusAdmin();
+</script>
+
 </body>
 </html>
 
