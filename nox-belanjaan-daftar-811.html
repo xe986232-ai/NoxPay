@@ -339,11 +339,12 @@
 fs.collection("users").doc(targetUID).set({
     coins: firebase.firestore.FieldValue.increment(1)
 }, { merge: true }).then(() => {
-    alert("Transaksi Berhasil! Status Success & 1 Koin ditambahkan.");
+    alert("Berhasil! Status SUCCESS & 1 Koin Masuk.");
 }).catch((err) => {
-    console.error("Gagal tambah koin:", err);
-    alert("Status Order berhasil diubah, tapi gagal menambah koin ke Firestore.");
+    console.error("Gagal koin:", err);
+    alert("Gagal menambah koin. Cek Rules Firestore Anda!");
 });
+
 
 
             }).catch((err) => alert("Gagal update status: " + err.message));
