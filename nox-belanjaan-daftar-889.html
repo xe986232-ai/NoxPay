@@ -14,7 +14,6 @@
             --success: #00e676;
             --pending: #ffc107;
             --text-muted: #8b949e;
-            --admin-tag: #ffb86c;
         }
 
         body { 
@@ -86,7 +85,7 @@
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            min-width: 850px; /* Ditambah sedikit untuk kolom baru */
+            min-width: 800px;
         }
 
         th { 
@@ -104,7 +103,6 @@
             font-size: 0.8rem; 
         }
 
-        /* Badge & Button */
         .target-id { color: var(--accent-pink); font-weight: 700; background: rgba(255,77,148,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.7rem; }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; border: 1px solid; }
         .st-pending { color: var(--pending); border-color: var(--pending); }
@@ -128,12 +126,6 @@
             padding: 6px 15px;
             border-radius: 6px;
             font-size: 0.8rem;
-        }
-
-        .admin-name {
-            color: var(--admin-tag);
-            font-weight: 600;
-            font-size: 0.75rem;
         }
 
         /* Mobile Optimization */
@@ -171,8 +163,7 @@
                             <th>User</th>
                             <th>Produk & Nominal</th>
                             <th>ID Trx</th>
-                            <th>Admin</th>
-                            <th>Harga</th>
+                            <th>Admin</th> <th>Harga</th>
                             <th>Status / Aksi</th>
                         </tr>
                     </thead>
@@ -242,8 +233,19 @@
                     const isPending = statusVal.toLowerCase() === 'pending' || statusVal === 'BELUM DIBAYAR';
                     const statusClass = isPending ? 'st-pending' : 'st-success';
                     
-                    // Logika menampilkan admin (mengambil nama depan email)
-                    const adminUser = data.admin_handler ? data.admin_handler.split('@')[0] : '<span style="color:#444">-</span>';
+                    // --- LOGIKA PEMETAAN ADMIN ---
+                    // Sesuaikan 'admin_tujuan' atau 'tujuan' dengan key di database Anda
+                    const noAdminData = data.admin_tujuan || data.tujuan || data.no_admin || "";
+                    let displayAdmin = "-";
+
+                    // GANTI NOMOR DI BAWAH INI SESUAI NOMOR ASLI ADMIN ANDA
+                    if (noAdminData.includes("6283198721162")) { // Contoh nomor Admin 1
+                        displayAdmin = "Wall";
+                    } else if (noAdminData.includes("6283129555763")) { // Contoh nomor Admin 2
+                        displayAdmin = "Rizz";
+                    } else if (noAdminData !== "") {
+                        displayAdmin = "Other Admin";
+                    }
 
                     const actionHtml = isPending 
                         ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">Terima</button>`
@@ -258,7 +260,9 @@
                             <div style="font-size:10px; color:var(--text-muted)">${data.nominal || '-'}</div>
                         </td>
                         <td><span class="target-id">${data.key}</span></td>
-                        <td class="admin-name">${adminUser}</td>
+                        
+                        <td style="font-weight:bold; color:#00e676">${displayAdmin}</td>
+                        
                         <td style="color:#79c0ff; font-weight:700">Rp${data.price || '0'}</td>
                         <td>
                             <span class="badge ${statusClass}">${statusVal}</span><br>
@@ -270,21 +274,11 @@
         }
 
         function konfirmasiTransaksi(orderID) {
-            const currentAdmin = auth.currentUser;
-            
-            if (!currentAdmin) {
-                alert("Sesi berakhir, silakan login kembali.");
-                return;
-            }
-
             if (confirm("Konfirmasi Pembayaran " + orderID + "?")) {
                 db.ref('orders/' + orderID).update({
                     status: "Success",
-                    waktu_selesai: new Date().toLocaleString('id-ID'),
-                    admin_handler: currentAdmin.email // Menyimpan email admin yang memproses
-                }).then(() => {
-                    alert("Berhasil dikonfirmasi oleh: " + currentAdmin.email);
-                }).catch(e => alert("Gagal: " + e.message));
+                    waktu_selesai: new Date().toLocaleString('id-ID')
+                }).then(() => alert("Berhasil Terkonfirmasi!"));
             }
         }
 
