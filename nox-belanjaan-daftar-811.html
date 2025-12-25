@@ -320,35 +320,37 @@
         db.ref('orders/' + orderID).once('value').then((snapshot) => {
             const orderData = snapshot.val();
             
-            // Mengambil userID yang sudah kita siapkan di file Index sebelumnya
-            const userID = orderData.userID; 
+            // Mengambil userID (Pastikan di index.html sudah menyimpan userID saat checkout)
+            const targetUID = orderData.userID; 
 
-            if (!userID) {
-                alert("Gagal: ID User tidak ditemukan dalam data pesanan! User mungkin menggunakan versi aplikasi lama.");
+            if (!targetUID) {
+                alert("Gagal: ID User tidak ditemukan! User mungkin menggunakan versi lama atau data tidak lengkap.");
                 return;
             }
 
-            // 1. Update status pesanan di Realtime Database agar jadi 'Success'
+            // 1. Update status pesanan di Realtime Database
             db.ref('orders/' + orderID).update({
                 status: "Success",
                 waktu_selesai: new Date().toLocaleString('id-ID')
             }).then(() => {
                 
-                // 2. Tambah 1 Koin ke Firestore (Menggunakan variabel 'fs' yang Anda buat di baris 209)
-                const userRef = fs.collection("users").doc(userID);
-                
-                userRef.set({
-                    // FieldValue.increment akan menambah angka koin lama dengan +1
-                    coins: firebase.firestore.FieldValue.increment(1) 
-                }, { merge: true }).then(() => {
-                    alert("Berhasil! Pesanan Selesai & 1 Koin terkirim ke User.");
-                });
+                // 2. Tambahkan koin di Firestore ke user yang tepat
+                // Menggunakan set dengan merge agar jika field 'coins' belum ada di Firestore, dia akan dibuat otomatis
+fs.collection("users").doc(targetUID).set({
+    coins: firebase.firestore.FieldValue.increment(1)
+}, { merge: true }).then(() => {
+    alert("Transaksi Berhasil! Status Success & 1 Koin ditambahkan.");
+}).catch((err) => {
+    console.error("Gagal tambah koin:", err);
+    alert("Status Order berhasil diubah, tapi gagal menambah koin ke Firestore.");
+});
 
-            });
-        }).catch((e) => alert("Error: " + e.message));
+
+            }).catch((err) => alert("Gagal update status: " + err.message));
+
+        }).catch((e) => alert("Error Database: " + e.message));
     }
 }
-
         // ----------------------------------------------
 
         function kirimNotifikasi() {
