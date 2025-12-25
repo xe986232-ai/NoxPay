@@ -75,6 +75,7 @@
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.05);
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
         }
 
         .scroll-wrapper { 
@@ -165,7 +166,8 @@
                             <th>User</th>
                             <th>Produk & Nominal</th>
                             <th>ID Trx</th>
-                            <th>Admin</th> <th>Harga</th>
+                            <th>Admin</th> 
+                            <th>Harga</th>
                             <th>Status / Aksi</th>
                         </tr>
                     </thead>
@@ -175,18 +177,20 @@
                 </table>
             </div>
         </div>
+
+        <div class="table-card" style="padding: 20px;">
+            <h3 style="margin-top:0; font-size: 1rem; color: var(--nox-blue);">Kirim Notifikasi ke User</h3>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="input-pesan-admin" placeholder="Ketik pengumuman atau promo di sini..." 
+                    style="flex: 1; padding: 12px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white;">
+                <button onclick="kirimNotifikasi()" 
+                    style="padding: 12px 25px; background: var(--nox-blue); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                    Kirim
+                </button>
+            </div>
+        </div>
     </div>
-<div class="table-card" style="margin-bottom: 20px; padding: 20px;">
-    <h3 style="margin-top:0; font-size: 1rem; color: var(--nox-blue);">Kirim Notifikasi ke User</h3>
-    <div style="display: flex; gap: 10px;">
-        <input type="text" id="input-pesan-admin" placeholder="Ketik pengumuman atau promo di sini..." 
-            style="flex: 1; padding: 12px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white;">
-        <button onclick="kirimNotifikasi()" 
-            style="padding: 12px 25px; background: var(--nox-blue); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer;">
-            Kirim
-        </button>
-    </div>
-</div>
+
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -212,7 +216,7 @@
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 loadOrders();
-                monitorAdminStatus(); // Mulai pantau status saat login
+                monitorAdminStatus();
             } else {
                 document.getElementById('login-form').style.display = 'block';
                 document.getElementById('admin-content').style.display = 'none';
@@ -227,7 +231,6 @@
                 statusRef.on('value', (snapshot) => {
                     const status = snapshot.val() || 'offline';
                     const statusElement = document.getElementById('admin-status-text');
-                    
                     if (statusElement) {
                         if (status === 'online') {
                             statusElement.innerHTML = '● ONLINE';
@@ -322,30 +325,26 @@
             }
         }
 
-        function logout() { auth.signOut().then(() => location.reload()); }
         function kirimNotifikasi() {
-    const pesanInput = document.getElementById('input-pesan-admin');
-    const teks = pesanInput.value;
-    
-    // Ambil jam menit saat ini
-    const jamSekarang = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const pesanInput = document.getElementById('input-pesan-admin');
+            const teks = pesanInput.value;
+            const jamSekarang = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-    if (teks.trim() !== "") {
-        // Mengirim data ke folder 'notifikasi' di Firebase
-        db.ref('notifikasi').push({
-            pesan: teks,
-            waktu: jamSekarang,
-            timestamp: Date.now()
-        }).then(() => {
-            alert("Notifikasi terkirim ke user!");
-            pesanInput.value = ""; // Bersihkan kolom input
-        }).catch((e) => {
-            alert("Gagal kirim: " + e.message);
-        });
-    } else {
-        alert("Harap isi pesan terlebih dahulu!");
-    }
-}
+            if (teks.trim() !== "") {
+                db.ref('notifikasi').push({
+                    pesan: teks,
+                    waktu: jamSekarang,
+                    timestamp: Date.now()
+                }).then(() => {
+                    alert("Notifikasi terkirim ke user!");
+                    pesanInput.value = "";
+                }).catch((e) => alert("Gagal kirim: " + e.message));
+            } else {
+                alert("Harap isi pesan terlebih dahulu!");
+            }
+        }
+
+        function logout() { auth.signOut().then(() => location.reload()); }
     </script>
 </body>
 </html>
