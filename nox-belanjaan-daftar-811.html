@@ -149,7 +149,9 @@
         <div class="header-flex">
             <div>
                 <h2 style="margin:0;">Panel Database</h2>
-                <small style="color:var(--success)">● Sistem Kontrol Transaksi</small>
+                <div style="cursor: pointer; margin-top: 5px;" onclick="toggleStatus()">
+                    <small id="admin-status-text" style="color:var(--text-muted); font-weight: 600;">Memuat Status...</small>
+                </div>
             </div>
             <button id="btn-logout" onclick="logout()">Logout</button>
         </div>
@@ -194,16 +196,53 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
+        // 1. MONITOR LOGIN STATUS
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 loadOrders();
+                monitorAdminStatus(); // Mulai pantau status saat login
             } else {
                 document.getElementById('login-form').style.display = 'block';
                 document.getElementById('admin-content').style.display = 'none';
             }
         });
+
+        // 2. MONITOR & TAMPILKAN STATUS ADMIN
+        function monitorAdminStatus() {
+            const user = auth.currentUser;
+            if (user) {
+                const statusRef = db.ref('status_admin/' + user.uid);
+                statusRef.on('value', (snapshot) => {
+                    const status = snapshot.val() || 'offline';
+                    const statusElement = document.getElementById('admin-status-text');
+                    
+                    if (statusElement) {
+                        if (status === 'online') {
+                            statusElement.innerHTML = '● ONLINE';
+                            statusElement.style.color = 'var(--success)';
+                        } else {
+                            statusElement.innerHTML = '○ OFFLINE';
+                            statusElement.style.color = 'var(--text-muted)';
+                        }
+                    }
+                });
+            }
+        }
+
+        // 3. FUNGSI UBAH STATUS (TOGGLE)
+        function toggleStatus() {
+            const user = auth.currentUser;
+            if (user) {
+                const statusRef = db.ref('status_admin/' + user.uid);
+                statusRef.once('value').then((snapshot) => {
+                    const currentStatus = snapshot.val() || 'offline';
+                    const newStatus = currentStatus === 'online' ? 'offline' : 'online';
+                    statusRef.set(newStatus);
+                });
+            }
+        }
 
         function handleLogin() {
             const email = document.getElementById('email').value;
@@ -233,18 +272,12 @@
                     const isPending = statusVal.toLowerCase() === 'pending' || statusVal === 'BELUM DIBAYAR';
                     const statusClass = isPending ? 'st-pending' : 'st-success';
                     
-// --- LOGIKA PEMETAAN ADMIN (VERSI SINKRON) ---
-let displayAdmin = data.admin_name || "-";
-
-if (displayAdmin === "-") {
-    const noAdminData = data.admin_tujuan || data.tujuan || "";
-    if (noAdminData.includes("6283198721162")) {
-        displayAdmin = "Wall";
-    } else if (noAdminData.includes("6283129555763")) {
-        displayAdmin = "Rizz";
-    }
-}
-
+                    let displayAdmin = data.admin_name || "-";
+                    if (displayAdmin === "-") {
+                        const noAdminData = data.admin_tujuan || data.tujuan || "";
+                        if (noAdminData.includes("6283198721162")) displayAdmin = "Wall";
+                        else if (noAdminData.includes("6283129555763")) displayAdmin = "Rizz";
+                    }
 
                     const actionHtml = isPending 
                         ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">Terima</button>`
@@ -259,9 +292,7 @@ if (displayAdmin === "-") {
                             <div style="font-size:10px; color:var(--text-muted)">${data.nominal || '-'}</div>
                         </td>
                         <td><span class="target-id">${data.key}</span></td>
-                        
                         <td style="font-weight:bold; color:#00e676">${displayAdmin}</td>
-                        
                         <td style="color:#79c0ff; font-weight:700">Rp${data.price || '0'}</td>
                         <td>
                             <span class="badge ${statusClass}">${statusVal}</span><br>
