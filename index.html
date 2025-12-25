@@ -983,14 +983,26 @@
             renderHistory();
         }
 
-        function kirimDataKeFirebase(data, orderID) {
+                function kirimDataKeFirebase(data, orderID) {
+            // Tentukan nomor admin berdasarkan pilihan user
+            let nomorAdminTujuan = "";
+            if (selectedCategory === 'game') {
+                nomorAdminTujuan = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
+            } else {
+                // Untuk kategori selain game (Pulsa, PLN, dll) langsung ke nomor utama
+                nomorAdminTujuan = WHATSAPP_NUMBER; 
+            }
+
             db.ref('orders/' + orderID).set({
                 ...data,
                 id_trx: orderID,
                 status: "Pending",
-                waktu_masuk: new Date().toLocaleString('id-ID')
+                waktu_masuk: new Date().toLocaleString('id-ID'),
+                // TAMBAHKAN BARIS INI:
+                admin_tujuan: nomorAdminTujuan 
             }).catch(e => console.error("Firebase Error:", e));
         }
+
 
         // --- LOGIKA RIWAYAT ---
                 // --- LOGIKA RIWAYAT (SUDAH DIUBAH STATUSNYA) ---
