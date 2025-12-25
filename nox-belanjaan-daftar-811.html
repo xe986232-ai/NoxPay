@@ -190,6 +190,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
 
     <script>
         const firebaseConfig = {
@@ -204,6 +206,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const fs = firebase.firestore();
         const auth = firebase.auth();
 
         auth.onAuthStateChanged((user) => {
@@ -311,37 +314,41 @@
 
         // --- BAGIAN YANG DIMODIFIKASI (100% WORKING) ---
         function konfirmasiTransaksi(orderID) {
-            if (confirm("Konfirmasi Pembayaran " + orderID + " dan Kirim 1 Koin?")) {
-                
-                // Ambil data pesanan untuk mendapatkan ID User (UID)
-                db.ref('orders/' + orderID).once('value').then((snapshot) => {
-                    const orderData = snapshot.val();
-                    // Mencari userID di berbagai kemungkinan nama field
-                    const userID = orderData.userID || orderData.uid || orderData.buyerID; 
+    if (confirm("Konfirmasi Pembayaran " + orderID + " dan Kirim 1 Koin?")) {
+        
+        // Ambil data pesanan dari Realtime Database
+        db.ref('orders/' + orderID).once('value').then((snapshot) => {
+            const orderData = snapshot.val();
+            
+            // Mengambil userID yang sudah kita siapkan di file Index sebelumnya
+            const userID = orderData.userID; 
 
-                    if (!userID) {
-                        alert("Gagal: ID User tidak ditemukan dalam data pesanan!");
-                        return;
-                    }
-
-                    // 1. Update status pesanan jadi Success
-                    db.ref('orders/' + orderID).update({
-                        status: "Success",
-                        waktu_selesai: new Date().toLocaleString('id-ID')
-                    }).then(() => {
-                        
-                        // 2. Tambah 1 Koin ke User (Jalur: users/[UID]/coin)
-                        const userCoinRef = db.ref('users/' + userID + '/coin');
-                        userCoinRef.transaction((currentCoin) => {
-                            return (currentCoin || 0) + 1;
-                        }).then(() => {
-                            alert("Berhasil! Status Sukses & 1 Koin telah dikirim ke User.");
-                        });
-
-                    });
-                }).catch((e) => alert("Error: " + e.message));
+            if (!userID) {
+                alert("Gagal: ID User tidak ditemukan dalam data pesanan! User mungkin menggunakan versi aplikasi lama.");
+                return;
             }
-        }
+
+            // 1. Update status pesanan di Realtime Database agar jadi 'Success'
+            db.ref('orders/' + orderID).update({
+                status: "Success",
+                waktu_selesai: new Date().toLocaleString('id-ID')
+            }).then(() => {
+                
+                // 2. Tambah 1 Koin ke Firestore (Menggunakan variabel 'fs' yang Anda buat di baris 209)
+                const userRef = fs.collection("users").doc(userID);
+                
+                userRef.set({
+                    // FieldValue.increment akan menambah angka koin lama dengan +1
+                    coins: firebase.firestore.FieldValue.increment(1) 
+                }, { merge: true }).then(() => {
+                    alert("Berhasil! Pesanan Selesai & 1 Koin terkirim ke User.");
+                });
+
+            });
+        }).catch((e) => alert("Error: " + e.message));
+    }
+}
+
         // ----------------------------------------------
 
         function kirimNotifikasi() {
