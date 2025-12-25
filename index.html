@@ -1130,9 +1130,8 @@ localStorage.setItem('nox_user_id', userUniqueId);
         }
 
             function kirimDataKeFirebase(data, orderID) {
-    // Tentukan nomor dan NAMA admin secara eksplisit
     let nomorAdminTujuan = WHATSAPP_NUMBER; 
-    let namaAdminTujuan = "NoxPay"; // Default
+    let namaAdminTujuan = "NoxPay"; 
 
     if (selectedCategory === 'game') {
         if (selectedAdminGame === 1) {
@@ -1144,15 +1143,18 @@ localStorage.setItem('nox_user_id', userUniqueId);
         }
     }
 
+    // PERBAIKAN: Menambahkan userID agar Admin bisa menambah koin
     db.ref('orders/' + orderID).set({
         ...data,
         id_trx: orderID,
+        userID: userUniqueId, // <--- INI KUNCI UTAMANYA
         status: "Pending",
         waktu_masuk: new Date().toLocaleString('id-ID'),
         admin_tujuan: nomorAdminTujuan,
-        admin_name: namaAdminTujuan // Kunci perbaikan: kirim namanya langsung
+        admin_name: namaAdminTujuan 
     }).catch(e => console.error("Firebase Error:", e));
 }
+
 
 
 
