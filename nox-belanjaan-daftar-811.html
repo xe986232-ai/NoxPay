@@ -312,47 +312,43 @@
             });
         }
 
-        // --- BAGIAN YANG DIMODIFIKASI (100% WORKING) ---
+        // --- UPGRADED KONFIRMASI (REAL-TIME INCREMENT) ---
         function konfirmasiTransaksi(orderID) {
-    if (confirm("Konfirmasi Pembayaran " + orderID + " dan Kirim 1 Koin?")) {
-        
-        // Ambil data pesanan dari Realtime Database
-        db.ref('orders/' + orderID).once('value').then((snapshot) => {
-            const orderData = snapshot.val();
-            
-            // Mengambil userID (Pastikan di index.html sudah menyimpan userID saat checkout)
-            const targetUID = orderData.userID; 
-
-            if (!targetUID) {
-                alert("Gagal: ID User tidak ditemukan! User mungkin menggunakan versi lama atau data tidak lengkap.");
-                return;
-            }
-
-            // 1. Update status pesanan di Realtime Database
-            db.ref('orders/' + orderID).update({
-                status: "Success",
-                waktu_selesai: new Date().toLocaleString('id-ID')
-            }).then(() => {
+            if (confirm("Konfirmasi Pembayaran " + orderID + " dan Tambah Koin?")) {
                 
-                // 2. Tambahkan koin di Firestore ke user yang tepat
-                // Menggunakan set dengan merge agar jika field 'coins' belum ada di Firestore, dia akan dibuat otomatis
-fs.collection("users").doc(targetUID).set({
-    coins: firebase.firestore.FieldValue.increment(1)
-}, { merge: true }).then(() => {
-    alert("Berhasil! Status SUCCESS & 1 Koin Masuk.");
-}).catch((err) => {
-    console.error("Gagal koin:", err);
-    alert("Gagal menambah koin. Cek Rules Firestore Anda!");
-});
+                db.ref('orders/' + orderID).once('value').then((snapshot) => {
+                    const orderData = snapshot.val();
+                    const targetUID = orderData.userID || orderData.id_user; // Mencari ID User
 
+                    if (!targetUID) {
+                        alert("Gagal: ID User tidak ditemukan dalam data pesanan!");
+                        return;
+                    }
 
+                    // 1. Update Status di Realtime Database
+                    db.ref('orders/' + orderID).update({
+                        status: "Success",
+                        waktu_selesai: new Date().toLocaleString('id-ID')
+                    }).then(() => {
+                        
+                        // 2. Tambah Koin secara Otomatis (INCREMENT) di Firestore
+                        const userRef = fs.collection("users").doc(targetUID);
+                        
+                        userRef.set({
+                            coins: firebase.firestore.FieldValue.increment(1),
+                            lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true }).then(() => {
+                            alert("Berhasil! Status SUCCESS dan Koin Bertambah Otomatis.");
+                        }).catch((err) => {
+                            console.error("Firestore Error:", err);
+                            alert("Koin gagal bertambah, cek Rules Firestore Anda.");
+                        });
 
-            }).catch((err) => alert("Gagal update status: " + err.message));
+                    }).catch((err) => alert("Gagal update status: " + err.message));
 
-        }).catch((e) => alert("Error Database: " + e.message));
-    }
-}
-        // ----------------------------------------------
+                }).catch((e) => alert("Error Database: " + e.message));
+            }
+        }
 
         function kirimNotifikasi() {
             const pesanInput = document.getElementById('input-pesan-admin');
