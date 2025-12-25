@@ -14,6 +14,7 @@
             --success: #00e676;
             --pending: #ffc107;
             --text-muted: #8b949e;
+            --admin-tag: #ffb86c;
         }
 
         body { 
@@ -85,7 +86,7 @@
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            min-width: 750px; /* Diperkecil agar lebih pas */
+            min-width: 850px; /* Ditambah sedikit untuk kolom baru */
         }
 
         th { 
@@ -129,6 +130,12 @@
             font-size: 0.8rem;
         }
 
+        .admin-name {
+            color: var(--admin-tag);
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
         /* Mobile Optimization */
         @media (max-width: 600px) {
             body { padding: 8px; }
@@ -164,7 +171,7 @@
                             <th>User</th>
                             <th>Produk & Nominal</th>
                             <th>ID Trx</th>
-                            <th>Metode</th>
+                            <th>Admin</th>
                             <th>Harga</th>
                             <th>Status / Aksi</th>
                         </tr>
@@ -235,6 +242,9 @@
                     const isPending = statusVal.toLowerCase() === 'pending' || statusVal === 'BELUM DIBAYAR';
                     const statusClass = isPending ? 'st-pending' : 'st-success';
                     
+                    // Logika menampilkan admin (mengambil nama depan email)
+                    const adminUser = data.admin_handler ? data.admin_handler.split('@')[0] : '<span style="color:#444">-</span>';
+
                     const actionHtml = isPending 
                         ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">Terima</button>`
                         : `<span style="color:var(--success); font-size:10px;">SELESAI</span>`;
@@ -248,7 +258,7 @@
                             <div style="font-size:10px; color:var(--text-muted)">${data.nominal || '-'}</div>
                         </td>
                         <td><span class="target-id">${data.key}</span></td>
-                        <td style="font-size:10px">${data.payment_method || 'Tunai'}</td>
+                        <td class="admin-name">${adminUser}</td>
                         <td style="color:#79c0ff; font-weight:700">Rp${data.price || '0'}</td>
                         <td>
                             <span class="badge ${statusClass}">${statusVal}</span><br>
@@ -260,11 +270,21 @@
         }
 
         function konfirmasiTransaksi(orderID) {
+            const currentAdmin = auth.currentUser;
+            
+            if (!currentAdmin) {
+                alert("Sesi berakhir, silakan login kembali.");
+                return;
+            }
+
             if (confirm("Konfirmasi Pembayaran " + orderID + "?")) {
                 db.ref('orders/' + orderID).update({
                     status: "Success",
-                    waktu_selesai: new Date().toLocaleString('id-ID')
-                }).then(() => alert("Berhasil Terkonfirmasi!"));
+                    waktu_selesai: new Date().toLocaleString('id-ID'),
+                    admin_handler: currentAdmin.email // Menyimpan email admin yang memproses
+                }).then(() => {
+                    alert("Berhasil dikonfirmasi oleh: " + currentAdmin.email);
+                }).catch(e => alert("Gagal: " + e.message));
             }
         }
 
