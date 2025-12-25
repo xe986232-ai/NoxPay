@@ -875,6 +875,128 @@
             </div>
         </div>
 
+       <div class="nox-coin-widget" onclick="openCoinModal()" style="
+    position: fixed;
+    bottom: 25px;
+    left: 20px;
+    z-index: 4999;
+    cursor: pointer;
+    text-align: center;
+    animation: floating 3s ease-in-out infinite;
+">
+    <div style="
+        width: 60px;
+        height: 60px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2);
+        border: 2px solid #FFD700;
+        position: relative;
+    ">
+        <span style="font-size: 35px;">🪙</span>
+        <div id="display-coin-badge" style="
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        ">NEW</div>
+    </div>
+    <p style="
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--dark);
+        margin-top: 5px;
+        text-shadow: 0 2px 4px rgba(255,255,255,1);
+        letter-spacing: 0.5px;
+    ">NOX COIN</p>
+</div>
+<div id="coinModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 999999; transition: all 0.3s ease;">
+    <div class="modal-content" style="max-width: 380px; width: 90%; border-radius: 30px; padding: 0; overflow: hidden; border: 1px solid rgba(255, 215, 0, 0.3); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); background: #fff;">
+        
+        <div style="background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%); padding: 40px 20px; text-align: center; position: relative;">
+            <div style="position: absolute; top: 10px; right: 20px; font-size: 40px; opacity: 0.2; transform: rotate(15deg);">💎</div>
+            <div style="font-size: 60px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2)); margin-bottom: 10px;">🪙</div>
+            <h3 style="font-size: 22px; font-weight: 900; margin: 0; color: #1e293b; text-transform: uppercase; letter-spacing: 1px;">Nox Coin Elite</h3>
+            <p style="font-size: 11px; font-weight: 700; color: #1e293b; opacity: 0.7; margin-top: 5px;">Loyalty Program Exclusive NoxPay</p>
+        </div>
+
+        <div style="padding: 20px; background: #f8fafc;">
+            <div style="background: white; padding: 20px; border-radius: 20px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); margin-top: -50px; position: relative; z-index: 1;">
+                <p style="font-size: 10px; font-weight: 800; color: #64748b; margin-bottom: 8px; letter-spacing: 2px;">SALDO ANDA SEKARANG</p>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span style="font-size: 45px; font-weight: 900; color: #1e293b;" id="user-coin-count">0</span>
+                    <div style="text-align: left;">
+                        <p style="font-size: 14px; font-weight: 800; color: #FFD700; margin: 0;">COINS</p>
+                        <p style="font-size: 9px; color: #94a3b8; margin: 0;">Verified Member</p>
+                    </div>
+                </div>
+                
+                <div style="width: 100%; height: 6px; background: #f1f5f9; border-radius: 10px; margin-top: 15px; overflow: hidden;">
+                    <div style="width: 30%; height: 100%; background: linear-gradient(90deg, #FFD700, #FFA500); border-radius: 10px;"></div>
+                </div>
+                <p style="font-size: 9px; color: #64748b; margin-top: 8px; font-weight: 600;">Kumpulkan 10 koin lagi untuk reward berikutnya!</p>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <h4 style="font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <span style="background: #FFD700; width: 5px; height: 18px; border-radius: 10px;"></span>
+                    REWARD PENUKARAN
+                </h4>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border: 1px solid #f1f5f9; border-radius: 18px; margin-bottom: 10px; transition: 0.3s;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="font-size: 24px;">🎁</div>
+                        <div>
+                            <p style="font-size: 13px; font-weight: 800; color: #1e293b; margin: 0;">Pulsa 5.000</p>
+                            <p style="font-size: 10px; color: #FFA500; font-weight: 700; margin: 0;">Biaya: 10 Coins</p>
+                        </div>
+                    </div>
+                    <button onclick="tukarKoin(10, 'Pulsa 5rb')" style="background: #1e293b; color: white; border: none; padding: 10px 18px; border-radius: 12px; font-size: 11px; font-weight: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">TUKAR</button>
+                </div>
+            </div>
+
+            <button onclick="closeCoinModal()" style="width: 100%; margin-top: 10px; padding: 16px; border-radius: 18px; border: none; background: #f1f5f9; color: #64748b; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s;">KEMBALI KE BERANDA</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Ambil data koin dari penyimpanan HP
+    let userCoins = parseInt(localStorage.getItem('nox_coins')) || 0;
+    document.getElementById('user-coin-count').innerText = userCoins;
+
+    function openCoinModal() {
+        // Update angka koin dulu sebelum buka modal
+        document.getElementById('user-coin-count').innerText = userCoins;
+        document.getElementById('coinModal').style.display = 'flex';
+    }
+
+    function closeCoinModal() {
+        document.getElementById('coinModal').style.display = 'none';
+    }
+
+    function tukarKoin(harga, hadiah) {
+        if (userCoins < harga) {
+            alert("Maaf, koin Anda tidak cukup untuk menukar " + hadiah + ". Ayo kumpulkan lagi!");
+        } else {
+            userCoins -= harga;
+            localStorage.setItem('nox_coins', userCoins);
+            document.getElementById('user-coin-count').innerText = userCoins;
+            alert("Selamat! Penukaran " + hadiah + " berhasil diproses. Silahkan hubungi Admin untuk klaim!");
+        }
+    }
+</script>
+
+
         <footer>&copy; 2025 NoxPay Digital Payment.</footer>
         <div id="notiModal" class="modal">
     <div class="modal-content" style="max-width: 400px;">
@@ -892,6 +1014,8 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
 
     <script>
         // CONFIG FIREBASE (MESIN)
@@ -910,6 +1034,11 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.database();
+        const fs = firebase.firestore();
+// Membuat ID unik untuk user ini jika belum ada
+let userUniqueId = localStorage.getItem('nox_user_id') || 'USER-' + Math.floor(Math.random() * 1000000);
+localStorage.setItem('nox_user_id', userUniqueId);
+
 
         // KONSTANTA & STATE
         const WHATSAPP_NUMBER = "6283129555763"; 
@@ -1171,25 +1300,24 @@
 
         function closeInvoice() { document.getElementById('invoiceModal').style.display = 'none'; }
 
-        function sendWhatsApp(data, orderID) {
+                function sendWhatsApp(data, orderID) {
             let targetWA = WHATSAPP_NUMBER;
             if (selectedCategory === 'game') {
                 targetWA = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
             }
-            let closingMsg = (data.payment === 'DANA') ? 
-                `Saya akan segera mengirimkan Bukti Transfer. Mohon segera diproses ya, terima kasih!` : 
-                `Mohon segera diproses ya, terima kasih!`;
-
+            
             let msg = `Halo *NoxPay*, saya ingin order.\n\n` +
-                      `*--- DETAIL PESANAN ---*\n` +
-                      `*ID TRX:* ${orderID}\n` +
-                      `*Nama:* ${data.buyerName}\n` +
-                      `*Produk:* ${data.product}\n` +
-                      `*Nominal:* ${data.nominal}\n` +
-                      `*ID/No:* ${data.target}\n` +
-                      `*Metode Bayar:* ${data.payment}\n` +
-                      `*Total Harga:* Rp ${data.price}\n\n` +
-                      closingMsg;
+                `*--- DETAIL PESANAN ---*\n` +
+                `*ID TRX:* ${orderID}\n` +
+                `*User ID:* ${userUniqueId}\n` +
+                `*Nama:* ${data.buyerName}\n` +
+                `*Produk:* ${data.product}\n` +
+                `*Nominal:* ${data.nominal}\n` +
+                `*ID/No:* ${data.target}\n` +
+                `*Metode Bayar:* ${data.payment}\n` +
+                `*Total Harga:* Rp ${data.price}\n\n` +
+                `Mohon segera diproses ya, terima kasih!`;
+    
             window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -1260,6 +1388,9 @@
                     setTimeout(() => { document.getElementById('main-character').classList.add('animate'); }, 100);
                 }, 2500);
             }
+            pantauStatusAdmin();
+            muatNotifikasi();
+            updateCoinDisplay();
         });
 
         function applyTheme(themeKey) {
@@ -1461,81 +1592,68 @@
         };
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
-    </script>
-    <script>
-// Fungsi untuk memantau status Online/Offline Admin dari Firebase
-function pantauStatusAdmin() {
-    // 1. Pantau Admin Wall
-    // Ganti 'UID_ADMIN_WALL' dengan UID asli dari Firebase status_admin
-    db.ref('status_admin/3boi9bdsGeSRG6p0gVaR7vyPl1m1').on('value', (snapshot) => {
-        const status = snapshot.val();
-        const el = document.getElementById('status-wall');
-        if (el) {
-            el.innerText = (status === 'online') ? '● ONLINE' : '○ OFFLINE';
-            el.style.color = (status === 'online') ? '#22c55e' : '#8b949e';
-        }
-    });
 
-    // 2. Pantau Admin Rizz
-    // Ganti 'UID_ADMIN_RIZZ' dengan UID asli dari Firebase status_admin
-    db.ref('status_admin/bMWnTsLGj6Q4kiZZo5zQnXnmRpQ2').on('value', (snapshot) => {
-        const status = snapshot.val();
-        const el = document.getElementById('status-rizz');
-        if (el) {
-            el.innerText = (status === 'online') ? '● ONLINE' : '○ OFFLINE';
-            el.style.color = (status === 'online') ? '#22c55e' : '#8b949e';
-        }
-    });
-}
-
-// Jalankan fungsi pemantau
-pantauStatusAdmin();
-muatNotifikasi();
-function muatNotifikasi() {
-    const container = document.getElementById('noti-list-container');
-    
-    // Mendengarkan perubahan di folder 'notifikasi' secara real-time
-    db.ref('notifikasi').on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            container.innerHTML = ''; // Bersihkan tulisan "Memuat..."
-            
-            // Ambil data, balik urutan agar yang terbaru di atas
-            Object.values(data).reverse().forEach(item => {
-                container.innerHTML += `
-                    <div style="padding: 12px; border-bottom: 1px solid #eee; margin-bottom: 8px; background: #fdfdfd; border-radius: 8px;">
-                        <p style="font-size: 14px; margin: 0; color: #333; line-height: 1.4;">${item.pesan}</p>
-                        <small style="color: #bbb; font-size: 10px;">${item.waktu}</small>
-                    </div>
-                `;
+        function pantauStatusAdmin() {
+            db.ref('status_admin/3boi9bdsGeSRG6p0gVaR7vyPl1m1').on('value', (snapshot) => {
+                const status = snapshot.val();
+                const el = document.getElementById('status-wall');
+                if (el) {
+                    el.innerText = (status === 'online') ? '● ONLINE' : '○ OFFLINE';
+                    el.style.color = (status === 'online') ? '#22c55e' : '#8b949e';
+                }
             });
-        } else {
-            container.innerHTML = '<p style="text-align: center; color: gray; font-size: 12px; padding: 20px;">Belum ada notifikasi.</p>';
+
+            db.ref('status_admin/bMWnTsLGj6Q4kiZZo5zQnXnmRpQ2').on('value', (snapshot) => {
+                const status = snapshot.val();
+                const el = document.getElementById('status-rizz');
+                if (el) {
+                    el.innerText = (status === 'online') ? '● ONLINE' : '○ OFFLINE';
+                    el.style.color = (status === 'online') ? '#22c55e' : '#8b949e';
+                }
+            });
         }
-    });
-}
 
-// Jalankan fungsinya
-muatNotifikasi();
-// Fungsi untuk membuka modal notifikasi
-function openNotiModal() {
-    document.getElementById('notiModal').style.display = 'flex';
-}
+        function muatNotifikasi() {
+            const container = document.getElementById('noti-list-container');
+            db.ref('notifikasi').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    container.innerHTML = '';
+                    Object.values(data).reverse().forEach(item => {
+                        container.innerHTML += `
+                            <div style="padding: 12px; border-bottom: 1px solid #eee; margin-bottom: 8px; background: #fdfdfd; border-radius: 8px;">
+                                <p style="font-size: 14px; margin: 0; color: #333; line-height: 1.4;">${item.pesan}</p>
+                                <small style="color: #bbb; font-size: 10px;">${item.waktu}</small>
+                            </div>
+                        `;
+                    });
+                }
+            });
+        }
 
-// Fungsi untuk menutup modal notifikasi
-function closeNotiModal() {
-    document.getElementById('notiModal').style.display = 'none';
-}
+        function openNotiModal() { document.getElementById('notiModal').style.display = 'flex'; }
+        function closeNotiModal() { document.getElementById('notiModal').style.display = 'none'; }
 
-// Menghubungkan klik ikon lonceng ke fungsi buka
-// Ganti baris 1504 dengan ini agar lebih aman
-window.addEventListener('load', function() {
-    const notiBtn = document.getElementById('noti-btn');
-    if (notiBtn) {
-        notiBtn.onclick = openNotiModal;
-    }
-});
-</script>
+        const notiBtn = document.getElementById('noti-btn');
+        if (notiBtn) { notiBtn.onclick = openNotiModal; }
 
+        function updateCoinDisplay() {
+            fs.collection("users").doc(userUniqueId).onSnapshot((doc) => {
+                const coinElement = document.getElementById('user-coin-count');
+                if (doc.exists) {
+                    let coins = doc.data().coins || 0;
+                    if(coinElement) coinElement.innerText = coins;
+                    localStorage.setItem('nox_coins', coins);
+                } else {
+                    fs.collection("users").doc(userUniqueId).set({ 
+                        coins: 0,
+                        id: userUniqueId,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+        }
+    </script>
 </body>
 </html>
+
