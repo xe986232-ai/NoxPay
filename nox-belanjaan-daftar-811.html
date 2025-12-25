@@ -176,7 +176,17 @@
             </div>
         </div>
     </div>
-
+<div class="table-card" style="margin-bottom: 20px; padding: 20px;">
+    <h3 style="margin-top:0; font-size: 1rem; color: var(--nox-blue);">Kirim Notifikasi ke User</h3>
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="input-pesan-admin" placeholder="Ketik pengumuman atau promo di sini..." 
+            style="flex: 1; padding: 12px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white;">
+        <button onclick="kirimNotifikasi()" 
+            style="padding: 12px 25px; background: var(--nox-blue); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer;">
+            Kirim
+        </button>
+    </div>
+</div>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -313,6 +323,29 @@
         }
 
         function logout() { auth.signOut().then(() => location.reload()); }
+        function kirimNotifikasi() {
+    const pesanInput = document.getElementById('input-pesan-admin');
+    const teks = pesanInput.value;
+    
+    // Ambil jam menit saat ini
+    const jamSekarang = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+    if (teks.trim() !== "") {
+        // Mengirim data ke folder 'notifikasi' di Firebase
+        db.ref('notifikasi').push({
+            pesan: teks,
+            waktu: jamSekarang,
+            timestamp: Date.now()
+        }).then(() => {
+            alert("Notifikasi terkirim ke user!");
+            pesanInput.value = ""; // Bersihkan kolom input
+        }).catch((e) => {
+            alert("Gagal kirim: " + e.message);
+        });
+    } else {
+        alert("Harap isi pesan terlebih dahulu!");
+    }
+}
     </script>
 </body>
 </html>
