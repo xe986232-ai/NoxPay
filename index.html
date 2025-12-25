@@ -1130,34 +1130,30 @@ localStorage.setItem('nox_user_id', userUniqueId);
         }
 
             function kirimDataKeFirebase(data, orderID) {
-    let nomorAdminTujuan = WHATSAPP_NUMBER; 
-    let namaAdminTujuan = "NoxPay"; 
+    let nomorAdminTujuan = WHATSAPP_NUMBER;
+    let namaAdminTujuan = "NoxPay";
 
     if (selectedCategory === 'game') {
         if (selectedAdminGame === 1) {
             nomorAdminTujuan = ADMIN_GAME_1;
-            namaAdminTujuan = "Wall"; 
+            namaAdminTujuan = "Wall";
         } else {
             nomorAdminTujuan = ADMIN_GAME_2;
             namaAdminTujuan = "Rizz";
         }
     }
 
-    // PERBAIKAN: Menambahkan userID agar Admin bisa menambah koin
+    // SIMPAN KE DATABASE
     db.ref('orders/' + orderID).set({
         ...data,
         id_trx: orderID,
-        userID: userUniqueId, // <--- INI KUNCI UTAMANYA
+        userID: userUniqueId, // KUNCI UTAMA
         status: "Pending",
         waktu_masuk: new Date().toLocaleString('id-ID'),
-        admin_tujuan: nomorAdminTujuan,
-        admin_name: namaAdminTujuan 
+        admin_tujuan: nomorAdminTujuan, // Sesuai baris 1153 di foto
+        admin_name: namaAdminTujuan    // Sesuai baris 1154 di foto
     }).catch(e => console.error("Firebase Error:", e));
 }
-
-
-
-
         // --- LOGIKA RIWAYAT ---
                 // --- LOGIKA RIWAYAT (SUDAH DIUBAH STATUSNYA) ---
         function renderHistory() {
