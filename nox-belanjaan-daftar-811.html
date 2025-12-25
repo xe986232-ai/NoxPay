@@ -121,7 +121,8 @@
                 });
 
                 orders.reverse().forEach((data) => {
-                    const isPending = (data.status || '').toLowerCase() !== 'success';
+                    const statusText = (data.status || '').toUpperCase();
+                    const isPending = statusText !== 'SUCCESS' && statusText !== 'SELESAI';
                     const actionHtml = isPending 
                         ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">TERIMA & +1 KOIN</button>`
                         : `<span class="badge st-success">SELESAI</span>`;
@@ -129,7 +130,7 @@
                     tbody.innerHTML += `
                     <tr>
                         <td>${data.waktu_masuk || '-'}</td>
-                        <td><b>${data.nama_user || 'User'}</b></td>
+                        <td><b>${data.nama_user || data.buyerName || 'User'}</b></td>
                         <td>${data.product || '-'} (${data.nominal || '0'})</td>
                         <td><span class="target-id">${data.key}</span></td>
                         <td>Rp${data.price || '0'}</td>
@@ -139,42 +140,53 @@
             });
         }
 
-        // --- FUNGSI PALING PENTING: TAMBAH KOIN REALTIME ---
         async function konfirmasiTransaksi(orderID) {
             try {
+                // Ambil data order terbaru
                 const snap = await db.ref('orders/' + orderID).once('value');
+                if (!snap.exists()) {
+                    alert("Data transaksi tidak ditemukan!");
+                    return;
+                }
                 const orderData = snap.val();
                 
-                // Cari ID User di data transaksi
-                let targetUID = orderData.userID || orderData.id_user || orderData.buyerID;
+                // Cari ID User dari semua kemungkinan field
+                let targetUID = orderData.userID || orderData.id_user || orderData.idUser || orderData.buyerID || orderData.uid;
 
-                // Jika ID tidak ditemukan otomatis, tanya Admin
+                // Jika benar-benar tidak ada di database, baru tanya manual (emergency)
                 if (!targetUID) {
-                    targetUID = prompt("ID User tidak terbaca! Masukkan ID User secara manual (lihat di layar HP pelanggan):");
+                    targetUID = prompt("ID User tidak ditemukan di data order. Masukkan manual (Contoh: USER-593086):");
                 }
 
-                if (!targetUID) return; // Batal jika tidak diisi
+                if (!targetUID) {
+                    alert("Proses dibatalkan karena ID User kosong.");
+                    return;
+                }
 
-                if (confirm("Tambah 1 Koin ke " + targetUID + "?")) {
+                const confirmAction = confirm("Terima Transaksi " + orderID + " dan TAMBAH 1 Koin ke " + targetUID + "?");
+                
+                if (confirmAction) {
+                    // 1. Tambah Koin di Firestore (MENGGUNAKAN INCREMENT)
+                    // Menggunakan firebase.firestore.FieldValue secara spesifik agar tidak crash
+                    const userRef = fs.collection("users").doc(targetUID);
                     
-                    // 1. Update status pesanan di Realtime DB
+                    await userRef.set({
+                        coins: firebase.firestore.FieldValue.increment(1),
+                        lastUpdate: firebase.firestore.Timestamp.now()
+                    }, { merge: true });
+
+                    // 2. Update status di Realtime Database setelah koin berhasil masuk
                     await db.ref('orders/' + orderID).update({
                         status: "Success",
                         waktu_selesai: new Date().toLocaleString('id-ID')
                     });
 
-                    // 2. TAMBAH KOIN (INCREMENT) - Ini yang bikin koin 1 jadi 2, 2 jadi 3
-                    const userRef = fs.collection("users").doc(targetUID);
-                    
-                    await userRef.set({
-                        coins: firebase.firestore.FieldValue.increment(1),
-                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
-
-                    alert("BERHASIL! Koin untuk " + targetUID + " sudah bertambah +1.");
+                    alert("BERHASIL! Status Selesai & Koin bertambah otomatis ke " + targetUID);
                 }
+
             } catch (error) {
-                alert("Eror: " + error.message);
+                console.error("Error Konfirmasi:", error);
+                alert("Gagal Konfirmasi: " + error.message);
             }
         }
 
