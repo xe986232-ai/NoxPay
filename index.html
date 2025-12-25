@@ -573,6 +573,11 @@
             justify-content: center;
             gap: 6px;
         }
+        #notif-container:hover {
+    transform: scale(1.1);
+    transition: 0.2s;
+}
+
     </style>
 </head>
 <body>
@@ -606,9 +611,15 @@
                     <div class="logo-text-nav"><span>Nox</span><span>Pay</span></div>
                 </div>
                 <nav class="nav-right">
-                    <span class="menu-link" onclick="handleHome()">Home</span>
-                    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
-                </nav>
+    <div id="notif-container" style="position: relative; cursor: pointer; margin-right: 12px; display: flex; align-items: center;" onclick="bukaKotakPesan()">
+        <span style="font-size: 20px;">✉️</span>
+        <span id="notif-badge" style="display:none; position: absolute; top: -5px; right: -5px; background: #ff007a; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: 800; border: 2px solid white;">!</span>
+    </div>
+    
+    <span class="menu-link" onclick="handleHome()">Home</span>
+    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
+</nav>
+
             </div>
         </header>
 
@@ -1473,7 +1484,28 @@ function pantauStatusAdmin() {
 
 // Jalankan fungsi pemantau
 pantauStatusAdmin();
+function bukaKotakPesan() {
+    // Menampilkan modal
+    document.getElementById('modal-pesan').style.display = 'flex';
+}
+
+function tutupKotakPesan() {
+    // Menutup modal
+    document.getElementById('modal-pesan').style.display = 'none';
+}
 </script>
+<div id="modal-pesan" class="modal" style="display:none; align-items:center; justify-content:center;">
+    <div class="modal-content" style="max-width: 350px; padding: 0; overflow: hidden; border-radius: 20px;">
+        <div style="background: var(--grad-fancy); color: white; padding: 15px; text-align: center; font-weight: 800;">
+            📩 PESAN DARI ADMIN
+        </div>
+        <div id="isi-pesan-body" style="padding: 20px; font-size: 14px; color: var(--dark); line-height: 1.6; text-align: center; background: white;">
+            </div>
+        <div style="padding: 15px; background: #f8fafc;">
+            <button onclick="tutupKotakPesan()" style="width:100%; padding:12px; border:none; border-radius:10px; background:var(--primary); color:white; font-weight:700; cursor:pointer;">OK, Saya Mengerti</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
