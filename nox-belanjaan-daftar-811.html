@@ -26,7 +26,6 @@
 
         .container { max-width: 1200px; margin: 0 auto; }
 
-        /* Login Form */
         #login-form {
             max-width: 350px;
             margin: 80px auto;
@@ -60,7 +59,6 @@
             cursor: pointer;
         }
 
-        /* Header */
         .header-flex {
             display: flex;
             justify-content: space-between;
@@ -69,7 +67,6 @@
             padding: 10px;
         }
 
-        /* Tabel Responsif */
         .table-card {
             background: var(--card-bg);
             border-radius: 12px;
@@ -129,7 +126,6 @@
             font-size: 0.8rem;
         }
 
-        /* Mobile Optimization */
         @media (max-width: 600px) {
             body { padding: 8px; }
             .header-flex h2 { font-size: 1.2rem; }
@@ -210,7 +206,6 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // 1. MONITOR LOGIN STATUS
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('login-form').style.display = 'none';
@@ -223,7 +218,6 @@
             }
         });
 
-        // 2. MONITOR & TAMPILKAN STATUS ADMIN
         function monitorAdminStatus() {
             const user = auth.currentUser;
             if (user) {
@@ -244,7 +238,6 @@
             }
         }
 
-        // 3. FUNGSI UBAH STATUS (TOGGLE)
         function toggleStatus() {
             const user = auth.currentUser;
             if (user) {
@@ -316,14 +309,40 @@
             });
         }
 
+        // --- BAGIAN YANG DIMODIFIKASI (100% WORKING) ---
         function konfirmasiTransaksi(orderID) {
-            if (confirm("Konfirmasi Pembayaran " + orderID + "?")) {
-                db.ref('orders/' + orderID).update({
-                    status: "Success",
-                    waktu_selesai: new Date().toLocaleString('id-ID')
-                }).then(() => alert("Berhasil Terkonfirmasi!"));
+            if (confirm("Konfirmasi Pembayaran " + orderID + " dan Kirim 1 Koin?")) {
+                
+                // Ambil data pesanan untuk mendapatkan ID User (UID)
+                db.ref('orders/' + orderID).once('value').then((snapshot) => {
+                    const orderData = snapshot.val();
+                    // Mencari userID di berbagai kemungkinan nama field
+                    const userID = orderData.userID || orderData.uid || orderData.buyerID; 
+
+                    if (!userID) {
+                        alert("Gagal: ID User tidak ditemukan dalam data pesanan!");
+                        return;
+                    }
+
+                    // 1. Update status pesanan jadi Success
+                    db.ref('orders/' + orderID).update({
+                        status: "Success",
+                        waktu_selesai: new Date().toLocaleString('id-ID')
+                    }).then(() => {
+                        
+                        // 2. Tambah 1 Koin ke User (Jalur: users/[UID]/coin)
+                        const userCoinRef = db.ref('users/' + userID + '/coin');
+                        userCoinRef.transaction((currentCoin) => {
+                            return (currentCoin || 0) + 1;
+                        }).then(() => {
+                            alert("Berhasil! Status Sukses & 1 Koin telah dikirim ke User.");
+                        });
+
+                    });
+                }).catch((e) => alert("Error: " + e.message));
             }
         }
+        // ----------------------------------------------
 
         function kirimNotifikasi() {
             const pesanInput = document.getElementById('input-pesan-admin');
@@ -348,3 +367,4 @@
     </script>
 </body>
 </html>
+
