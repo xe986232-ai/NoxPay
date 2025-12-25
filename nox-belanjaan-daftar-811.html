@@ -128,6 +128,7 @@
             font-size: 0.8rem;
         }
 
+        /* Mobile Optimization */
         @media (max-width: 600px) {
             body { padding: 8px; }
             .header-flex h2 { font-size: 1.2rem; }
@@ -195,18 +196,20 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
+        // 1. MONITOR LOGIN STATUS
         auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 loadOrders();
-                monitorAdminStatus();
+                monitorAdminStatus(); // Mulai pantau status saat login
             } else {
                 document.getElementById('login-form').style.display = 'block';
                 document.getElementById('admin-content').style.display = 'none';
             }
         });
 
+        // 2. MONITOR & TAMPILKAN STATUS ADMIN
         function monitorAdminStatus() {
             const user = auth.currentUser;
             if (user) {
@@ -214,6 +217,7 @@
                 statusRef.on('value', (snapshot) => {
                     const status = snapshot.val() || 'offline';
                     const statusElement = document.getElementById('admin-status-text');
+                    
                     if (statusElement) {
                         if (status === 'online') {
                             statusElement.innerHTML = '● ONLINE';
@@ -227,6 +231,7 @@
             }
         }
 
+        // 3. FUNGSI UBAH STATUS (TOGGLE)
         function toggleStatus() {
             const user = auth.currentUser;
             if (user) {
@@ -275,8 +280,7 @@
                     }
 
                     const actionHtml = isPending 
-                        ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">Terima</button>
-                           <button onclick="tagihUser('${data.key}', '${data.price}')" style="background:#ff9800; color:white; border:none; padding:6px 10px; border-radius:4px; font-size:0.7rem; font-weight:700; cursor:pointer; margin-top:5px; width:100%;">Tagih</button>`
+                        ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">Terima</button>`
                         : `<span style="color:var(--success); font-size:10px;">SELESAI</span>`;
 
                     tbody.innerHTML += `
@@ -304,29 +308,7 @@
                 db.ref('orders/' + orderID).update({
                     status: "Success",
                     waktu_selesai: new Date().toLocaleString('id-ID')
-                }).then(() => {
-                    // Otomatis hapus pesan tagihan saat transaksi dikonfirmasi
-                    db.ref('pesan_user/' + orderID).remove(); 
-                    alert("Berhasil Terkonfirmasi!");
-                }).catch((error) => {
-                    alert("Gagal update database: " + error.message);
-                });
-            }
-        }
-
-        function tagihUser(orderID, harga) {
-            const pesanTagihan = `Halo! Pesanan Anda dengan ID TRX: ${orderID} belum kami terima pembayarannya. Silakan transfer sebesar Rp${harga} agar pesanan segera diproses. Terima kasih!`;
-
-            if (confirm("Kirim pesan tagihan Rp" + harga + " ke order " + orderID + "?")) {
-                db.ref('pesan_user/' + orderID).set({
-                    pesan: pesanTagihan,
-                    status: "unread",
-                    waktu: new Date().toLocaleString('id-ID')
-                }).then(() => {
-                    alert("Pesan tagihan berhasil dikirim!");
-                }).catch((e) => {
-                    alert("Gagal kirim pesan: " + e.message);
-                });
+                }).then(() => alert("Berhasil Terkonfirmasi!"));
             }
         }
 
@@ -335,3 +317,4 @@
 </body>
 </html>
 
+Ini
