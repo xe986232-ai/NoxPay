@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoxPay Admin - Control Panel</title>
+    <title>NoxPay Admin PRO - Realtime</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,122 +15,22 @@
             --pending: #ffc107;
             --text-muted: #8b949e;
         }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg-main); 
-            color: #ffffff;
-            margin: 0; 
-            padding: 10px;
-        }
-
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: #ffffff; margin: 0; padding: 10px; }
         .container { max-width: 1200px; margin: 0 auto; }
-
-        #login-form {
-            max-width: 350px;
-            margin: 80px auto;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-        }
-
-        #login-form input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            background: #0b0f1a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: white;
-            box-sizing: border-box;
-        }
-
-        #login-form button {
-            width: 100%;
-            padding: 12px;
-            background: var(--nox-blue);
-            border: none;
-            color: white;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 10px;
-        }
-
-        .table-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-
-        .scroll-wrapper { 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch;
-        }
-
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            min-width: 800px;
-        }
-
-        th { 
-            padding: 15px 10px; 
-            text-align: left; 
-            font-size: 0.65rem; 
-            text-transform: uppercase; 
-            color: var(--nox-blue); 
-            background: rgba(0, 123, 255, 0.05);
-        }
-
-        td { 
-            padding: 12px 10px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
-            font-size: 0.8rem; 
-        }
-
-        .target-id { color: var(--accent-pink); font-weight: 700; background: rgba(255,77,148,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.7rem; }
+        #login-form { max-width: 350px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        #login-form input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box; }
+        #login-form button { width: 100%; padding: 12px; background: var(--nox-blue); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .table-card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; overflow: hidden; }
+        .scroll-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { padding: 15px 10px; text-align: left; font-size: 0.65rem; color: var(--nox-blue); background: rgba(0, 123, 255, 0.05); }
+        td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; }
+        .target-id { color: var(--accent-pink); font-weight: 700; background: rgba(255,77,148,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; border: 1px solid; }
         .st-pending { color: var(--pending); border-color: var(--pending); }
         .st-success { color: var(--success); border-color: var(--success); }
-
-        .btn-action {
-            background: var(--success);
-            color: #000;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        #btn-logout {
-            background: none;
-            color: #ff4d4d;
-            border: 1px solid #ff4d4d;
-            padding: 6px 15px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-        }
-
-        @media (max-width: 600px) {
-            body { padding: 8px; }
-            .header-flex h2 { font-size: 1.2rem; }
-            td { font-size: 0.75rem; }
-        }
+        .btn-action { background: var(--success); color: #000; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -144,13 +44,8 @@
 
     <div id="admin-content" class="container" style="display:none;">
         <div class="header-flex">
-            <div>
-                <h2 style="margin:0;">Panel Database Noxpay</h2>
-                <div style="cursor: pointer; margin-top: 5px;" onclick="toggleStatus()">
-                    <small id="admin-status-text" style="color:var(--text-muted); font-weight: 600;">Memuat Status...</small>
-                </div>
-            </div>
-            <button id="btn-logout" onclick="logout()">Logout</button>
+            <h2>Panel Database Noxpay</h2>
+            <button id="btn-logout" onclick="logout()" style="background:none; color:red; border:1px solid red; padding:5px 10px; border-radius:5px;">Logout</button>
         </div>
 
         <div class="table-card">
@@ -160,29 +55,16 @@
                         <tr>
                             <th>Waktu</th>
                             <th>User</th>
-                            <th>Produk & Nominal</th>
+                            <th>Produk</th>
                             <th>ID Trx</th>
-                            <th>Admin</th> 
                             <th>Harga</th>
-                            <th>Status / Aksi</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="order-rows">
-                        <tr><td colspan="7" style="text-align:center; padding:40px;">Memuat data...</td></tr>
+                        <tr><td colspan="6" style="text-align:center; padding:40px;">Memuat data transaksi...</td></tr>
                     </tbody>
                 </table>
-            </div>
-        </div>
-
-        <div class="table-card" style="padding: 20px;">
-            <h3 style="margin-top:0; font-size: 1rem; color: var(--nox-blue);">Kirim Notifikasi ke User</h3>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="input-pesan-admin" placeholder="Ketik pengumuman atau promo di sini..." 
-                    style="flex: 1; padding: 12px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white;">
-                <button onclick="kirimNotifikasi()" 
-                    style="padding: 12px 25px; background: var(--nox-blue); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer;">
-                    Kirim
-                </button>
             </div>
         </div>
     </div>
@@ -191,7 +73,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-
 
     <script>
         const firebaseConfig = {
@@ -214,44 +95,11 @@
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 loadOrders();
-                monitorAdminStatus();
             } else {
                 document.getElementById('login-form').style.display = 'block';
                 document.getElementById('admin-content').style.display = 'none';
             }
         });
-
-        function monitorAdminStatus() {
-            const user = auth.currentUser;
-            if (user) {
-                const statusRef = db.ref('status_admin/' + user.uid);
-                statusRef.on('value', (snapshot) => {
-                    const status = snapshot.val() || 'offline';
-                    const statusElement = document.getElementById('admin-status-text');
-                    if (statusElement) {
-                        if (status === 'online') {
-                            statusElement.innerHTML = '● ONLINE';
-                            statusElement.style.color = 'var(--success)';
-                        } else {
-                            statusElement.innerHTML = '○ OFFLINE';
-                            statusElement.style.color = 'var(--text-muted)';
-                        }
-                    }
-                });
-            }
-        }
-
-        function toggleStatus() {
-            const user = auth.currentUser;
-            if (user) {
-                const statusRef = db.ref('status_admin/' + user.uid);
-                statusRef.once('value').then((snapshot) => {
-                    const currentStatus = snapshot.val() || 'offline';
-                    const newStatus = currentStatus === 'online' ? 'offline' : 'online';
-                    statusRef.set(newStatus);
-                });
-            }
-        }
 
         function handleLogin() {
             const email = document.getElementById('email').value;
@@ -263,11 +111,7 @@
             db.ref('orders').on('value', (snapshot) => {
                 const tbody = document.getElementById('order-rows');
                 tbody.innerHTML = "";
-                
-                if (!snapshot.exists()) {
-                    tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:20px;'>Database Kosong</td></tr>";
-                    return;
-                }
+                if (!snapshot.exists()) return;
 
                 let orders = [];
                 snapshot.forEach(child => {
@@ -275,97 +119,62 @@
                     data.key = child.key;
                     orders.push(data);
                 });
-                
-                orders.reverse().forEach((data) => {
-                    const statusVal = data.status || 'Pending';
-                    const isPending = statusVal.toLowerCase() === 'pending' || statusVal === 'BELUM DIBAYAR';
-                    const statusClass = isPending ? 'st-pending' : 'st-success';
-                    
-                    let displayAdmin = data.admin_name || "-";
-                    if (displayAdmin === "-") {
-                        const noAdminData = data.admin_tujuan || data.tujuan || "";
-                        if (noAdminData.includes("6283198721162")) displayAdmin = "Wall";
-                        else if (noAdminData.includes("6283129555763")) displayAdmin = "Rizz";
-                    }
 
+                orders.reverse().forEach((data) => {
+                    const isPending = (data.status || '').toLowerCase() !== 'success';
                     const actionHtml = isPending 
-                        ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">Terima</button>`
-                        : `<span style="color:var(--success); font-size:10px;">SELESAI</span>`;
+                        ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">TERIMA & +1 KOIN</button>`
+                        : `<span class="badge st-success">SELESAI</span>`;
 
                     tbody.innerHTML += `
                     <tr>
-                        <td style="font-size:10px; color:var(--text-muted)">${data.waktu_masuk || '-'}</td>
-                        <td><b>${data.nama_user || data.buyerName || 'User'}</b></td>
-                        <td>
-                            <div style="font-weight:600">${data.product || '-'}</div>
-                            <div style="font-size:10px; color:var(--text-muted)">${data.nominal || '-'}</div>
-                        </td>
+                        <td>${data.waktu_masuk || '-'}</td>
+                        <td><b>${data.nama_user || 'User'}</b></td>
+                        <td>${data.product || '-'} (${data.nominal || '0'})</td>
                         <td><span class="target-id">${data.key}</span></td>
-                        <td style="font-weight:bold; color:#00e676">${displayAdmin}</td>
-                        <td style="color:#79c0ff; font-weight:700">Rp${data.price || '0'}</td>
-                        <td>
-                            <span class="badge ${statusClass}">${statusVal}</span><br>
-                            <div style="margin-top:5px">${actionHtml}</div>
-                        </td>
+                        <td>Rp${data.price || '0'}</td>
+                        <td>${actionHtml}</td>
                     </tr>`;
                 });
             });
         }
 
-        // --- UPGRADED KONFIRMASI (REAL-TIME INCREMENT) ---
-        function konfirmasiTransaksi(orderID) {
-            if (confirm("Konfirmasi Pembayaran " + orderID + " dan Tambah Koin?")) {
+        // --- FUNGSI PALING PENTING: TAMBAH KOIN REALTIME ---
+        async function konfirmasiTransaksi(orderID) {
+            try {
+                const snap = await db.ref('orders/' + orderID).once('value');
+                const orderData = snap.val();
                 
-                db.ref('orders/' + orderID).once('value').then((snapshot) => {
-                    const orderData = snapshot.val();
-                    const targetUID = orderData.userID || orderData.id_user; // Mencari ID User
+                // Cari ID User di data transaksi
+                let targetUID = orderData.userID || orderData.id_user || orderData.buyerID;
 
-                    if (!targetUID) {
-                        alert("Gagal: ID User tidak ditemukan dalam data pesanan!");
-                        return;
-                    }
+                // Jika ID tidak ditemukan otomatis, tanya Admin
+                if (!targetUID) {
+                    targetUID = prompt("ID User tidak terbaca! Masukkan ID User secara manual (lihat di layar HP pelanggan):");
+                }
 
-                    // 1. Update Status di Realtime Database
-                    db.ref('orders/' + orderID).update({
+                if (!targetUID) return; // Batal jika tidak diisi
+
+                if (confirm("Tambah 1 Koin ke " + targetUID + "?")) {
+                    
+                    // 1. Update status pesanan di Realtime DB
+                    await db.ref('orders/' + orderID).update({
                         status: "Success",
                         waktu_selesai: new Date().toLocaleString('id-ID')
-                    }).then(() => {
-                        
-                        // 2. Tambah Koin secara Otomatis (INCREMENT) di Firestore
-                        const userRef = fs.collection("users").doc(targetUID);
-                        
-                        userRef.set({
-                            coins: firebase.firestore.FieldValue.increment(1),
-                            lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
-                        }, { merge: true }).then(() => {
-                            alert("Berhasil! Status SUCCESS dan Koin Bertambah Otomatis.");
-                        }).catch((err) => {
-                            console.error("Firestore Error:", err);
-                            alert("Koin gagal bertambah, cek Rules Firestore Anda.");
-                        });
+                    });
 
-                    }).catch((err) => alert("Gagal update status: " + err.message));
+                    // 2. TAMBAH KOIN (INCREMENT) - Ini yang bikin koin 1 jadi 2, 2 jadi 3
+                    const userRef = fs.collection("users").doc(targetUID);
+                    
+                    await userRef.set({
+                        coins: firebase.firestore.FieldValue.increment(1),
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
 
-                }).catch((e) => alert("Error Database: " + e.message));
-            }
-        }
-
-        function kirimNotifikasi() {
-            const pesanInput = document.getElementById('input-pesan-admin');
-            const teks = pesanInput.value;
-            const jamSekarang = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-            if (teks.trim() !== "") {
-                db.ref('notifikasi').push({
-                    pesan: teks,
-                    waktu: jamSekarang,
-                    timestamp: Date.now()
-                }).then(() => {
-                    alert("Notifikasi terkirim ke user!");
-                    pesanInput.value = "";
-                }).catch((e) => alert("Gagal kirim: " + e.message));
-            } else {
-                alert("Harap isi pesan terlebih dahulu!");
+                    alert("BERHASIL! Koin untuk " + targetUID + " sudah bertambah +1.");
+                }
+            } catch (error) {
+                alert("Eror: " + error.message);
             }
         }
 
