@@ -233,19 +233,18 @@
                     const isPending = statusVal.toLowerCase() === 'pending' || statusVal === 'BELUM DIBAYAR';
                     const statusClass = isPending ? 'st-pending' : 'st-success';
                     
-                    // --- LOGIKA PEMETAAN ADMIN ---
-                    // Sesuaikan 'admin_tujuan' atau 'tujuan' dengan key di database Anda
-                    const noAdminData = data.admin_tujuan || data.tujuan || data.no_admin || "";
-                    let displayAdmin = "-";
+// --- LOGIKA PEMETAAN ADMIN (VERSI SINKRON) ---
+let displayAdmin = data.admin_name || "-";
 
-                    // GANTI NOMOR DI BAWAH INI SESUAI NOMOR ASLI ADMIN ANDA
-                    if (noAdminData.includes("6283198721162")) { // Contoh nomor Admin 1
-                        displayAdmin = "Wall";
-                    } else if (noAdminData.includes("6283129555763")) { // Contoh nomor Admin 2
-                        displayAdmin = "Rizz";
-                    } else if (noAdminData !== "") {
-                        displayAdmin = "Other Admin";
-                    }
+if (displayAdmin === "-") {
+    const noAdminData = data.admin_tujuan || data.tujuan || "";
+    if (noAdminData.includes("6283198721162")) {
+        displayAdmin = "Wall";
+    } else if (noAdminData.includes("6283129555763")) {
+        displayAdmin = "Rizz";
+    }
+}
+
 
                     const actionHtml = isPending 
                         ? `<button class="btn-action" onclick="konfirmasiTransaksi('${data.key}')">Terima</button>`
