@@ -869,41 +869,14 @@
                 </div>
             </div>
         </div>
-       <div class="nox-coin-widget" onclick="openCoinModal()" style="
-    position: fixed;
-    bottom: 25px;
-    left: 20px;
-    z-index: 4999;
-    cursor: pointer;
-    text-align: center;
-    animation: floating 3s ease-in-out infinite;
-">
-    <div style="
-        width: 60px;
-        height: 60px;
-        background: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2);
-        border: 2px solid #FFD700;
-        position: relative;
-    ">
+<div id="floating-event" class="nox-coin-widget" onclick="openCoinModal()" style="touch-action: none; position: fixed; bottom: 25px; left: 20px; z-index: 4999; cursor: pointer; text-align: center; animation: floating 3s ease-in-out infinite;">
+    <div style="width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0, 102, 255, 0.2); border: 2px solid #FFD700; position: relative;">
         <span style="font-size: 35px;">🪙</span>
-        <div id="display-coin-badge" style="
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--accent);
-            color: white;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 7px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        ">NEW</div>
+        <div id="display-coin-badge" style="position: absolute; top: -5px; right: -5px; background: #ff3b30; color: white; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px;">NEW</div>
     </div>
+</div>
+
+
     <p style="
         font-size: 10px;
         font-weight: 800;
@@ -919,7 +892,7 @@
         <div style="background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%); padding: 40px 20px; text-align: center; position: relative;">
             <div style="position: absolute; top: 10px; right: 20px; font-size: 40px; opacity: 0.2; transform: rotate(15deg);">💎</div>
             <div style="font-size: 60px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2)); margin-bottom: 10px;">🪙</div>
-            <h3 style="font-size: 22px; font-weight: 900; margin: 0; color: #1e293b; text-transform: uppercase; letter-spacing: 1px;">Nox Coin Elite</h3>
+            <h3 style="font-size: 22px; font-weight: 900; margin: 0; color: #1e293b; text-transform: uppercase; letter-spacing: 1px;">Nox Coin</h3>
             <p style="font-size: 11px; font-weight: 700; color: #1e293b; opacity: 0.7; margin-top: 5px;">Loyalty Program Exclusive NoxPay</p>
         </div>
 
@@ -940,23 +913,53 @@
                 <p style="font-size: 9px; color: #64748b; margin-top: 8px; font-weight: 600;">Kumpulkan 10 koin lagi untuk reward berikutnya!</p>
             </div>
 
-            <div style="margin-top: 25px;">
-                <h4 style="font-size: 13px; font-weight: 800; color: #1e293b; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                    <span style="background: #FFD700; width: 5px; height: 18px; border-radius: 10px;"></span>
-                    REWARD PENUKARAN
-                </h4>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border: 1px solid #f1f5f9; border-radius: 18px; margin-bottom: 10px; transition: 0.3s;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="font-size: 24px;">🎁</div>
-                        <div>
-                            <p style="font-size: 13px; font-weight: 800; color: #1e293b; margin: 0;">Pulsa 5.000</p>
-                            <p style="font-size: 10px; color: #FFA500; font-weight: 700; margin: 0;">Biaya: 10 Coins</p>
-                        </div>
-                    </div>
-                    <button onclick="tukarKoin(10, 'Pulsa 5rb')" style="background: #1e293b; color: white; border: none; padding: 10px 18px; border-radius: 12px; font-size: 11px; font-weight: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">TUKAR</button>
-                </div>
-            </div>
+            <div id="event-status-container" style="background: #0f172a; padding: 25px 10px; border-radius: 30px; border: 2px solid #FFD700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); margin: 20px 0; text-align: center; position: relative;">
+    
+    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #FFD700; color: #000; padding: 4px 15px; border-radius: 20px; font-size: 10px; font-weight: 900; letter-spacing: 1px; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        LIMITED NEW YEAR EVENT
+    </div>
+
+    <h3 style="color: #fff; font-size: 14px; font-weight: 800; margin: 10px 0 20px 0; text-shadow: 0 0 10px rgba(255,255,255,0.3);">
+        OXY <span style="color: #FFD700;">PREMIUM</span> REWARD
+    </h3>
+
+    <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+        <div style="flex: 1; max-width: 65px;">
+            <div id="days" style="background: rgba(255,255,255,0.05); font-size: 22px; font-weight: 900; color: #fff; padding: 12px 0; border-radius: 15px; border-bottom: 3px solid #FFD700;">00</div>
+            <p style="font-size: 8px; color: #64748b; margin-top: 8px; font-weight: 700; text-transform: uppercase;">Hari</p>
+        </div>
+
+        <div style="font-size: 20px; color: #FFD700; font-weight: 900; margin-bottom: 20px;">:</div>
+
+        <div style="flex: 1; max-width: 65px;">
+            <div id="hours" style="background: rgba(255,255,255,0.05); font-size: 22px; font-weight: 900; color: #fff; padding: 12px 0; border-radius: 15px; border-bottom: 3px solid #FFD700;">00</div>
+            <p style="font-size: 8px; color: #64748b; margin-top: 8px; font-weight: 700; text-transform: uppercase;">Jam</p>
+        </div>
+
+        <div style="font-size: 20px; color: #FFD700; font-weight: 900; margin-bottom: 20px;">:</div>
+
+        <div style="flex: 1; max-width: 65px;">
+            <div id="minutes" style="background: rgba(255,255,255,0.05); font-size: 22px; font-weight: 900; color: #fff; padding: 12px 0; border-radius: 15px; border-bottom: 3px solid #FFD700;">00</div>
+            <p style="font-size: 8px; color: #64748b; margin-top: 8px; font-weight: 700; text-transform: uppercase;">Menit</p>
+        </div>
+
+        <div style="font-size: 20px; color: #FFD700; font-weight: 900; margin-bottom: 20px;">:</div>
+
+        <div style="flex: 1; max-width: 65px;">
+            <div id="seconds" style="background: #FFD700; font-size: 22px; font-weight: 900; color: #000; padding: 12px 0; border-radius: 15px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);">00</div>
+            <p style="font-size: 8px; color: #FFD700; margin-top: 8px; font-weight: 800; text-transform: uppercase;">Detik</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px; padding: 10px; background: rgba(255, 215, 0, 0.05); border-radius: 12px; border: 1px dashed rgba(255, 215, 0, 0.2);">
+        <p style="font-size: 10px; color: #FFD700; margin: 0; font-weight: 600;">⚠️ Hadiah terkunci hingga hitungan mundur selesai!</p>
+    </div>
+</div>
+
+<div id="reward-section" style="display: none;">
+    </div>
+
+
 
             <button onclick="closeCoinModal()" style="width: 100%; margin-top: 10px; padding: 16px; border-radius: 18px; border: none; background: #f1f5f9; color: #64748b; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s;">KEMBALI KE BERANDA</button>
         </div>
@@ -1624,8 +1627,87 @@ function tukarKoin(harga, hadiah) {
 
 // Jalankan fungsi saat web dibuka
 updateCoinDisplay();
+function startOxyEventTimer() {
+    const targetDate = new Date("Jan 1, 2026 00:00:00").getTime();
+
+    const timerInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+        if (document.getElementById("days")) {
+            document.getElementById("days").innerText = d.toString().padStart(2, '0');
+            document.getElementById("hours").innerText = h.toString().padStart(2, '0');
+            document.getElementById("minutes").innerText = m.toString().padStart(2, '0');
+            document.getElementById("seconds").innerText = s.toString().padStart(2, '0');
+        }
+
+        if (distance < 0) {
+            clearInterval(timerInterval);
+            document.getElementById("event-status-container").style.display = "none";
+            document.getElementById("reward-section").style.display = "block";
+        }
+    }, 1000);
+}
+startOxyEventTimer();
+// --- MESIN PENGGERAK KOIN (PASTE DI BARIS 1682) ---
+function setTranslate(xPos, yPos, el) {
+    el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+}
+
+const dragItem = document.querySelector("#floating-event");
+let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+if (dragItem) {
+    dragItem.addEventListener("touchstart", dragStart, false);
+    dragItem.addEventListener("touchend", dragEnd, false);
+    dragItem.addEventListener("touchmove", drag, false);
+    dragItem.addEventListener("mousedown", dragStart, false);
+    dragItem.addEventListener("mouseup", dragEnd, false);
+    dragItem.addEventListener("mousemove", drag, false);
+}
+
+function dragStart(e) {
+    if (e.type === "touchstart") {
+        initialX = e.touches[0].clientX - xOffset;
+        initialY = e.touches[0].clientY - yOffset;
+    } else {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+    }
+    if (dragItem.contains(e.target)) active = true;
+}
+
+function dragEnd() { 
+    initialX = currentX; 
+    initialY = currentY; 
+    active = false; 
+}
+
+function drag(e) {
+    if (active) {
+        e.preventDefault();
+        if (e.type === "touchmove") {
+            currentX = e.touches[0].clientX - initialX;
+            currentY = e.touches[0].clientY - initialY;
+        } else {
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+        }
+        xOffset = currentX; 
+        yOffset = currentY;
+        setTranslate(currentX, currentY, dragItem);
+    }
+}
+
+startOxyEventTimer();
+
+
 
     </script>
 </body>
 </html>
-
