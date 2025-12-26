@@ -52,7 +52,7 @@
 
         #login-form input:focus { border-color: var(--nox-blue); outline: none; background: rgba(0,0,0,0.4); }
 
-        .container { max-width: 1500px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
         
         header {
             display: flex;
@@ -90,7 +90,7 @@
 
         .table-wrapper { overflow-x: auto; }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1500px; }
         
         th { 
             padding: 16px 12px; 
@@ -136,12 +136,17 @@
         .btn-coin { background: var(--success); color: white; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
         .btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        code { 
+        /* ID TRX STYLING */
+        .trx-id { 
             background: rgba(255, 77, 148, 0.1); 
             color: #ff4d94; 
-            padding: 3px 6px; 
-            border-radius: 4px; 
-            font-size: 0.75rem;
+            padding: 5px 10px; 
+            border-radius: 6px; 
+            font-size: 0.8rem;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
         }
 
         ::-webkit-scrollbar { height: 8px; width: 8px; }
@@ -192,7 +197,7 @@
                     <thead>
                         <tr>
                             <th>Waktu Masuk</th>
-                            <th>ID Trx</th>
+                            <th style="min-width: 180px;">ID Transaksi</th>
                             <th>Buyer Name</th>
                             <th>UserID</th>
                             <th>Produk & Nominal</th>
@@ -200,7 +205,7 @@
                             <th>Metode</th>
                             <th>Admin</th>
                             <th>Status</th>
-                            <th>Aksi Pembayaran</th>
+                            <th>Aksi Bayar</th>
                             <th>Aksi Koin</th>
                         </tr>
                     </thead>
@@ -231,7 +236,6 @@
         const fs = firebase.firestore();
         const auth = firebase.auth();
 
-        // Variabel untuk melacak koin yang sudah dikirim di sesi ini
         let coinSentHistory = new Set();
 
         auth.onAuthStateChanged(user => {
@@ -274,12 +278,10 @@
                     const isPaid = (data.status || '').toLowerCase() === 'success';
                     const statusBadge = isPaid ? '<span class="status-badge paid">SUCCESS</span>' : '<span class="status-badge unpaid">PENDING</span>';
                     
-                    // Kolom Aksi Pembayaran
                     let payAction = isPaid ? 
-                        `<span style="color:var(--text-muted); font-size:0.7rem;">TERVALIDASI</span>` : 
+                        `<span style="color:var(--text-muted); font-size:0.7rem; font-weight:bold;">TERVALIDASI</span>` : 
                         `<button class="btn btn-confirm" onclick="konfirmasiBayar('${data.key}')">Konfirmasi</button>`;
 
-                    // Kolom Aksi Koin
                     let coinAction = '-';
                     if (isPaid) {
                         if (!coinSentHistory.has(data.key)) {
@@ -288,7 +290,7 @@
                             coinAction = `<b style="color:var(--success); font-size:0.7rem;">SENT ✓</b>`;
                         }
                     } else {
-                        coinAction = `<span style="color:var(--text-muted); font-size:0.7rem;">Menunggu Bayar</span>`;
+                        coinAction = `<span style="color:var(--text-muted); font-size:0.7rem;">Wait Payment</span>`;
                     }
 
                     tbody.innerHTML += `<tr>
@@ -296,7 +298,7 @@
                             <div style="font-size:0.8rem;">${data.waktu_masuk ? data.waktu_masuk.split(',')[0] : '-'}</div>
                             <div style="font-size:0.65rem; color:var(--text-muted)">${data.waktu_masuk ? data.waktu_masuk.split(',')[1] : ''}</div>
                         </td>
-                        <td><code>${data.key.substring(0,8)}...</code></td>
+                        <td><span class="trx-id">${data.key}</span></td>
                         <td><div style="font-weight:700;">${data.buyerName || '-'}</div></td>
                         <td><b style="color:var(--nox-blue)">${data.userID || '-'}</b></td>
                         <td>
@@ -314,42 +316,31 @@
             });
         }
 
-        // FUNGSI 1: Hanya Konfirmasi Pembayaran
         async function konfirmasiBayar(trxID) {
-            if(!confirm("Uang sudah masuk? Status akan diubah ke SUCCESS.")) return;
+            if(!confirm("Ubah status ke SUCCESS?")) return;
             try {
                 await db.ref('orders/' + trxID).update({
                     status: "Success",
                     waktu_selesai: new Date().toLocaleString('id-ID')
                 });
-                alert("Pembayaran Berhasil Dikonfirmasi!");
-            } catch (err) {
-                alert("Gagal: " + err.message);
-            }
+            } catch (err) { alert(err.message); }
         }
 
-        // FUNGSI 2: Hanya Kirim Koin ke User
         async function kirimKoin(trxID) {
             try {
                 const snap = await db.ref('orders/' + trxID).once('value');
                 const order = snap.val();
                 const uid = order.userID;
+                if (!uid) return alert("UID Kosong!");
 
-                if (!uid) return alert("Error: UserID tidak ditemukan!");
-
-                // Proses tambah 1 koin ke Firestore
                 await fs.collection("users").doc(uid).update({
                     coins: firebase.firestore.FieldValue.increment(1)
                 });
 
-                // Tandai agar tombol berubah jadi "SENT"
                 coinSentHistory.add(trxID);
-                loadOrders(); // Refresh table view
-
-                alert("KOIN BERHASIL DIKIRIM ke " + uid);
-            } catch (err) {
-                alert("Gagal Kirim Koin: " + err.message);
-            }
+                loadOrders();
+                alert("Koin Terkirim!");
+            } catch (err) { alert(err.message); }
         }
 
         function logout() { auth.signOut().then(() => location.reload()); }
