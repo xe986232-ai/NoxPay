@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoxPay Admin - Full Data & Logic</title>
+    <title>NoxPay Admin - Full Data Control</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -19,7 +19,7 @@
         #login-form { max-width: 350px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         #login-form input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box; }
         .table-card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1400px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1500px; }
         th { padding: 12px 8px; text-align: left; font-size: 0.6rem; color: var(--nox-blue); background: rgba(0, 123, 255, 0.05); text-transform: uppercase; }
         td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem; }
         
@@ -58,6 +58,7 @@
                             <th>Produk</th>
                             <th>Nominal</th>
                             <th>Target</th>
+                            <th>Metode Bayar</th>
                             <th>Admin Tujuan</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -124,7 +125,6 @@
                     const isPaid = (data.status || '').toLowerCase() === 'success';
                     const statusBadge = isPaid ? '<span class="status-badge paid">SUDAH DIBAYAR</span>' : '<span class="status-badge unpaid">BELUM DIBAYAR</span>';
                     
-                    // Logika Filter Tombol
                     let actionHtml = '';
                     if (!isPaid) {
                         actionHtml = `<button class="btn-confirm" onclick="proses('${data.key}', 'konfirmasi')">KONFIRMASI</button>`;
@@ -136,9 +136,6 @@
                         }
                     }
 
-                    // Menampilkan Nama Admin/Metode Pembayaran
-                    const adminPilihan = data.admin_name || data.payment || '-';
-
                     tbody.innerHTML += `<tr>
                         <td style="color:#8b949e; font-size:0.65rem;">${data.waktu_masuk || '-'}</td>
                         <td><code>${data.key}</code></td>
@@ -147,7 +144,8 @@
                         <td>${data.product || '-'}</td>
                         <td>${data.nominal || '-'}</td>
                         <td>${data.target || '-'}</td>
-                        <td style="color:var(--warning)">${adminPilihan}</td>
+                        <td style="color:#00e676">${data.payment || '-'}</td>
+                        <td style="color:var(--warning)">${data.admin_name || '-'}</td>
                         <td>${statusBadge}</td>
                         <td>${actionHtml}</td>
                     </tr>`;
@@ -163,12 +161,10 @@
 
                 if (!uid) return alert("userID tidak ditemukan!");
 
-                // 1. Tambah Koin di Firestore
                 await fs.collection("users").doc(uid).update({
                     coins: firebase.firestore.FieldValue.increment(1)
                 });
 
-                // 2. Jika tipe Konfirmasi, ubah status di Realtime Database
                 if (tipe === 'konfirmasi') {
                     await db.ref('orders/' + trxID).update({
                         status: "Success",
@@ -176,7 +172,6 @@
                     });
                 }
 
-                // 3. Jika tipe Sync, tandai agar tombol hilang
                 if (tipe === 'sync') {
                     syncHistory.add(trxID);
                 }
