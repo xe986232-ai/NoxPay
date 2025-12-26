@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoxPay Admin PRO - Anti Gagal</title>
+    <title>NoxPay Admin PRO - Sync System</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,18 +11,20 @@
             --card-bg: #161b2c;
             --nox-blue: #007bff;
             --success: #00e676;
-            --accent-pink: #ff4d94;
+            --warning: #ffc107;
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: #ffffff; margin: 0; padding: 10px; }
         .container { max-width: 1200px; margin: 0 auto; }
         #login-form { max-width: 350px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         #login-form input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box; }
-        .table-card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; overflow: hidden; }
+        .table-card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { padding: 15px 10px; text-align: left; font-size: 0.65rem; color: var(--nox-blue); background: rgba(0, 123, 255, 0.05); text-transform: uppercase; }
+        th { padding: 15px 10px; text-align: left; font-size: 0.65rem; color: var(--nox-blue); background: rgba(0, 123, 255, 0.05); }
         td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; }
-        .btn-action { background: var(--success); color: #000; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
-        .badge-success { color: var(--success); font-weight: bold; border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; }
+        .btn-confirm { background: var(--success); color: #000; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+        .btn-sync { background: var(--warning); color: #000; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+        .status-paid { color: var(--success); font-weight: bold; }
+        .status-unpaid { color: var(--warning); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -31,13 +33,13 @@
         <h2 style="color:var(--nox-blue)">NoxPay Admin</h2>
         <input type="email" id="email" placeholder="Email Admin">
         <input type="password" id="password" placeholder="Password">
-        <button onclick="handleLogin()" style="width:100%; padding:12px; background:var(--nox-blue); border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">LOG IN</button>
+        <button onclick="handleLogin()" style="width:100%; padding:12px; background:var(--nox-blue); border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">LOGIN</button>
     </div>
 
     <div id="admin-content" class="container" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2>Panel Database Noxpay</h2>
-            <button onclick="logout()" style="background:none; color:red; border:1px solid red; padding:5px 10px; border-radius:5px; cursor:pointer;">Logout</button>
+            <button onclick="logout()" style="background:none; color:red; border:1px solid red; padding:5px 10px; border-radius:5px;">Logout</button>
         </div>
 
         <div class="table-card">
@@ -46,15 +48,13 @@
                     <thead>
                         <tr>
                             <th>Waktu</th>
-                            <th>Nama User</th>
-                            <th>Produk</th>
-                            <th>ID Transaksi</th>
+                            <th>User</th>
+                            <th>Status (User)</th>
+                            <th>ID Trx</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="order-rows">
-                        <tr><td colspan="5" style="text-align:center; padding:40px;">Menghubungkan Database...</td></tr>
-                    </tbody>
+                    <tbody id="order-rows"></tbody>
                 </table>
             </div>
         </div>
@@ -81,7 +81,7 @@
         const fs = firebase.firestore();
         const auth = firebase.auth();
 
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
@@ -101,71 +101,53 @@
                 const tbody = document.getElementById('order-rows');
                 tbody.innerHTML = "";
                 if (!snapshot.exists()) return;
+
                 let orders = [];
                 snapshot.forEach(c => { let d = c.val(); d.key = c.key; orders.push(d); });
+                
                 orders.reverse().forEach((data) => {
-                    const isPending = (data.status || '').toUpperCase() !== 'SUCCESS';
-                    const actionBtn = isPending 
-                        ? `<button class="btn-action" onclick="prosesKoin('${data.key}')">TERIMA & +1 KOIN</button>`
-                        : `<span class="badge-success">BERHASIL</span>`;
+                    const isSuccess = (data.status || '').toLowerCase() === 'success';
+                    const statusTampilan = isSuccess ? '<span class="status-paid">SUDAH DIBAYAR</span>' : '<span class="status-unpaid">BELUM DIBAYAR</span>';
+                    
+                    // Tombol Hijau untuk konfirmasi baru, Tombol Kuning untuk sync ulang koin
+                    const actionBtn = !isSuccess 
+                        ? `<button class="btn-confirm" onclick="eksekusiKoin('${data.key}')">KONFIRMASI & +1 KOIN</button>`
+                        : `<button class="btn-sync" onclick="eksekusiKoin('${data.key}')">SYNC KOIN (+1)</button>`;
 
-                    tbody.innerHTML += `
-                    <tr>
-                        <td style="color:#8b949e">${data.waktu_masuk || '-'}</td>
+                    tbody.innerHTML += `<tr>
+                        <td>${data.waktu_masuk || '-'}</td>
                         <td><b>${data.buyerName || 'User'}</b></td>
-                        <td>${data.product || '-'}</td>
-                        <td><code style="color:var(--accent-pink)">${data.key}</code></td>
+                        <td>${statusTampilan}</td>
+                        <td><code>${data.key}</code></td>
                         <td>${actionBtn}</td>
                     </tr>`;
                 });
             });
         }
 
-        // --- FUNGSI PROSES MANUAL TAMBAH ---
-        async function prosesKoin(trxID) {
+        async function eksekusiKoin(trxID) {
             try {
-                // 1. Ambil data order
                 const snap = await db.ref('orders/' + trxID).once('value');
-                const orderData = snap.val();
-                const targetUID = orderData.userID; // Sesuai screenshot
+                const order = snap.val();
+                const uid = order.userID;
 
-                if (!targetUID) {
-                    alert("Gagal: Transaksi ini tidak memiliki userID!");
-                    return;
-                }
+                if (!uid) return alert("userID tidak ditemukan!");
 
-                if (!confirm("Proses transaksi untuk " + targetUID + "?")) return;
+                // UPDATE FIRESTORE (PASTI TAMBAH)
+                const userRef = fs.collection("users").doc(uid);
+                await userRef.update({
+                    coins: firebase.firestore.FieldValue.increment(1)
+                });
 
-                // 2. AMBIL DATA DARI FIRESTORE (CEK KOIN TERBARU)
-                const userRef = fs.collection("users").doc(targetUID);
-                const userDoc = await userRef.get();
-
-                let currentCoins = 0;
-                if (userDoc.exists) {
-                    // Ambil angka koin yang ada di Firestore sekarang
-                    currentCoins = userDoc.data().coins || 0;
-                }
-
-                // 3. TAMBAH MANUAL (X + 1)
-                const newCoinsValue = Number(currentCoins) + 1;
-
-                // 4. SIMPAN BALIK KE FIRESTORE
-                await userRef.set({
-                    coins: newCoinsValue,
-                    lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-
-                // 5. UPDATE STATUS DI REALTIME DB
+                // UPDATE REALTIME DB
                 await db.ref('orders/' + trxID).update({
                     status: "Success",
                     waktu_selesai: new Date().toLocaleString('id-ID')
                 });
 
-                alert("SUKSES! Koin " + targetUID + " sekarang menjadi: " + newCoinsValue);
-
+                alert("BERHASIL! Koin " + uid + " sudah bertambah.");
             } catch (err) {
-                alert("Error: " + err.message);
-                console.error(err);
+                alert("Gagal: " + err.message);
             }
         }
 
