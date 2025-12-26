@@ -606,14 +606,9 @@
                     <div class="logo-text-nav"><span>Nox</span><span>Pay</span></div>
                 </div>
                 <nav class="nav-right">
-    <div class="notification-wrapper" style="position: relative; margin-right: 5px;">
-        <span class="menu-link" id="noti-btn" style="font-size: 18px;">🔔</span>
-        <span id="noti-badge" class="badge" style="display: none; position: absolute; top: -8px; right: -8px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 9px; font-weight: 800;">0</span>
-    </div>
-    
-    <span class="menu-link" onclick="handleHome()">Home</span>
-    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
-</nav>
+                    <span class="menu-link" onclick="handleHome()">Home</span>
+                    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
+                </nav>
             </div>
         </header>
 
@@ -664,18 +659,18 @@
                     
                     <div id="admin-selection-group" class="hidden" style="margin-bottom: 20px;">
                         <label style="display:block; font-size:12px; font-weight:800; margin-bottom:12px; color:var(--dark); text-align:center; letter-spacing:1px;">⚡ PILIH JALUR ADMIN ⚡</label>
-                    <div class="admin-selector">
-    <div class="admin-box active" id="admin-box-1" onclick="selectAdmin(1)">
-        <h5>Admin 1</h5>
-        <p>Wall</p>
-        <small id="status-wall" style="font-size: 9px; font-weight: 800; display: block; margin-top: 4px; color: #8b949e;">○ OFFLINE</small>
-    </div>
-    <div class="admin-box" id="admin-box-2" onclick="selectAdmin(2)">
-        <h5>Admin 2</h5>
-        <p>Rizz</p>
-        <small id="status-rizz" style="font-size: 9px; font-weight: 800; display: block; margin-top: 4px; color: #8b949e;">○ OFFLINE</small>
-    </div>
-</div>
+                        <div class="admin-selector">
+                            <div class="admin-box active" id="admin-box-1" onclick="selectAdmin(1)">
+                                <h5>Admin 1</h5>
+                                <p>Wall</p>
+                            </div>
+                            <div class="admin-box" id="admin-box-2" onclick="selectAdmin(2)">
+                                <h5>Admin 2</h5>
+                                <p>Rizz</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label id="label-id" style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Tujuan</label>
                         <input type="text" id="target-id" placeholder="Masukkan Nomor/ID" inputmode="numeric">
@@ -874,7 +869,6 @@
                 </div>
             </div>
         </div>
-
        <div class="nox-coin-widget" onclick="openCoinModal()" style="
     position: fixed;
     bottom: 25px;
@@ -995,21 +989,7 @@
         }
     }
 </script>
-
-
         <footer>&copy; 2025 NoxPay Digital Payment.</footer>
-        <div id="notiModal" class="modal">
-    <div class="modal-content" style="max-width: 400px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="font-size: 18px; font-weight: 800;">Notifikasi</h3>
-            <button onclick="closeNotiModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
-        </div>
-        <div id="noti-list-container" style="max-height: 400px; overflow-y: auto;">
-            <p style="text-align: center; color: var(--gray); font-size: 12px; padding: 20px;">Memuat pesan...</p>
-        </div>
-        <button style="width:100%; padding:12px; border-radius:12px; border:none; background:var(--primary-light); color:var(--primary); font-weight:800; cursor:pointer; margin-top:15px;" onclick="closeNotiModal()">Tutup</button>
-    </div>
-</div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -1038,8 +1018,6 @@
 // Membuat ID unik untuk user ini jika belum ada
 let userUniqueId = localStorage.getItem('nox_user_id') || 'USER-' + Math.floor(Math.random() * 1000000);
 localStorage.setItem('nox_user_id', userUniqueId);
-
-
         // KONSTANTA & STATE
         const WHATSAPP_NUMBER = "6283129555763"; 
         const ADMIN_GAME_1 = "6283198721162"; 
@@ -1129,7 +1107,7 @@ localStorage.setItem('nox_user_id', userUniqueId);
             renderHistory();
         }
 
-            function kirimDataKeFirebase(data, orderID) {
+                function kirimDataKeFirebase(data, orderID) {
     let nomorAdminTujuan = WHATSAPP_NUMBER;
     let namaAdminTujuan = "NoxPay";
 
@@ -1298,24 +1276,25 @@ localStorage.setItem('nox_user_id', userUniqueId);
 
         function closeInvoice() { document.getElementById('invoiceModal').style.display = 'none'; }
 
-                function sendWhatsApp(data, orderID) {
+        function sendWhatsApp(data, orderID) {
             let targetWA = WHATSAPP_NUMBER;
             if (selectedCategory === 'game') {
                 targetWA = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
             }
-            
-            let msg = `Halo *NoxPay*, saya ingin order.\n\n` +
-                `*--- DETAIL PESANAN ---*\n` +
-                `*ID TRX:* ${orderID}\n` +
-                `*User ID:* ${userUniqueId}\n` +
-                `*Nama:* ${data.buyerName}\n` +
-                `*Produk:* ${data.product}\n` +
-                `*Nominal:* ${data.nominal}\n` +
-                `*ID/No:* ${data.target}\n` +
-                `*Metode Bayar:* ${data.payment}\n` +
-                `*Total Harga:* Rp ${data.price}\n\n` +
+            let closingMsg = (data.payment === 'DANA') ? 
+                `Saya akan segera mengirimkan Bukti Transfer. Mohon segera diproses ya, terima kasih!` : 
                 `Mohon segera diproses ya, terima kasih!`;
-    
+
+            let msg = `Halo *NoxPay*, saya ingin order.\n\n` +
+                      `*--- DETAIL PESANAN ---*\n` +
+                      `*ID TRX:* ${orderID}\n` +
+                      `*Nama:* ${data.buyerName}\n` +
+                      `*Produk:* ${data.product}\n` +
+                      `*Nominal:* ${data.nominal}\n` +
+                      `*ID/No:* ${data.target}\n` +
+                      `*Metode Bayar:* ${data.payment}\n` +
+                      `*Total Harga:* Rp ${data.price}\n\n` +
+                      closingMsg;
             window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -1386,9 +1365,6 @@ localStorage.setItem('nox_user_id', userUniqueId);
                     setTimeout(() => { document.getElementById('main-character').classList.add('animate'); }, 100);
                 }, 2500);
             }
-            pantauStatusAdmin();
-            muatNotifikasi();
-            updateCoinDisplay();
         });
 
         function applyTheme(themeKey) {
@@ -1590,49 +1566,7 @@ localStorage.setItem('nox_user_id', userUniqueId);
         };
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
-
-        function pantauStatusAdmin() {
-            db.ref('status_admin/3boi9bdsGeSRG6p0gVaR7vyPl1m1').on('value', (snapshot) => {
-                const status = snapshot.val();
-                const el = document.getElementById('status-wall');
-                if (el) {
-                    el.innerText = (status === 'online') ? '● ONLINE' : '○ OFFLINE';
-                    el.style.color = (status === 'online') ? '#22c55e' : '#8b949e';
-                }
-            });
-
-            db.ref('status_admin/bMWnTsLGj6Q4kiZZo5zQnXnmRpQ2').on('value', (snapshot) => {
-                const status = snapshot.val();
-                const el = document.getElementById('status-rizz');
-                if (el) {
-                    el.innerText = (status === 'online') ? '● ONLINE' : '○ OFFLINE';
-                    el.style.color = (status === 'online') ? '#22c55e' : '#8b949e';
-                }
-            });
-        }
-
-        function muatNotifikasi() {
-            const container = document.getElementById('noti-list-container');
-            db.ref('notifikasi').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    container.innerHTML = '';
-                    Object.values(data).reverse().forEach(item => {
-                        container.innerHTML += `
-                            <div style="padding: 12px; border-bottom: 1px solid #eee; margin-bottom: 8px; background: #fdfdfd; border-radius: 8px;">
-                                <p style="font-size: 14px; margin: 0; color: #333; line-height: 1.4;">${item.pesan}</p>
-                                <small style="color: #bbb; font-size: 10px;">${item.waktu}</small>
-                            </div>
-                        `;
-                    });
-                }
-            });
-        }
-
-        function openNotiModal() { document.getElementById('notiModal').style.display = 'flex'; }
-        function closeNotiModal() { document.getElementById('notiModal').style.display = 'none'; }
-
-        const notiBtn = document.getElementById('noti-btn');
+               const notiBtn = document.getElementById('noti-btn');
         if (notiBtn) { notiBtn.onclick = openNotiModal; }
 
         function updateCoinDisplay() {
