@@ -27,7 +27,6 @@
             line-height: 1.5;
         }
 
-        /* Login Styling */
         #login-form { 
             max-width: 400px; 
             margin: 100px auto; 
@@ -53,7 +52,6 @@
 
         #login-form input:focus { border-color: var(--nox-blue); outline: none; background: rgba(0,0,0,0.4); }
 
-        /* Dashboard Layout */
         .container { max-width: 1500px; margin: 0 auto; padding: 20px; }
         
         header {
@@ -67,7 +65,6 @@
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Stats Card */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -83,7 +80,6 @@
         .stat-card small { color: var(--text-muted); font-size: 0.75rem; }
         .stat-card h2 { margin: 5px 0 0; font-size: 1.5rem; color: var(--nox-blue); }
 
-        /* Table Styling */
         .table-card { 
             background: var(--card-bg); 
             border-radius: 20px; 
@@ -116,7 +112,6 @@
 
         tr:hover td { background: rgba(255,255,255,0.02); }
 
-        /* Badges & Buttons */
         .status-badge {
             padding: 5px 10px;
             border-radius: 8px;
@@ -138,7 +133,7 @@
             text-transform: uppercase;
         }
         .btn-confirm { background: var(--nox-blue); color: white; box-shadow: 0 4px 14px var(--nox-blue-glow); }
-        .btn-sync { background: #343b4d; color: #fff; border: 1px solid #444; }
+        .btn-coin { background: var(--success); color: white; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
         .btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
         code { 
@@ -205,7 +200,8 @@
                             <th>Metode</th>
                             <th>Admin</th>
                             <th>Status</th>
-                            <th>Aksi Cepat</th>
+                            <th>Aksi Pembayaran</th>
+                            <th>Aksi Koin</th>
                         </tr>
                     </thead>
                     <tbody id="order-rows"></tbody>
@@ -235,7 +231,8 @@
         const fs = firebase.firestore();
         const auth = firebase.auth();
 
-        let syncHistory = new Set();
+        // Variabel untuk melacak koin yang sudah dikirim di sesi ini
+        let coinSentHistory = new Set();
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -277,15 +274,21 @@
                     const isPaid = (data.status || '').toLowerCase() === 'success';
                     const statusBadge = isPaid ? '<span class="status-badge paid">SUCCESS</span>' : '<span class="status-badge unpaid">PENDING</span>';
                     
-                    let actionHtml = '';
-                    if (!isPaid) {
-                        actionHtml = `<button class="btn btn-confirm" onclick="proses('${data.key}', 'konfirmasi')">Konfirmasi</button>`;
-                    } else {
-                        if (!syncHistory.has(data.key)) {
-                            actionHtml = `<button class="btn btn-sync" onclick="proses('${data.key}', 'sync')">Sync Coin</button>`;
+                    // Kolom Aksi Pembayaran
+                    let payAction = isPaid ? 
+                        `<span style="color:var(--text-muted); font-size:0.7rem;">TERVALIDASI</span>` : 
+                        `<button class="btn btn-confirm" onclick="konfirmasiBayar('${data.key}')">Konfirmasi</button>`;
+
+                    // Kolom Aksi Koin
+                    let coinAction = '-';
+                    if (isPaid) {
+                        if (!coinSentHistory.has(data.key)) {
+                            coinAction = `<button class="btn btn-coin" onclick="kirimKoin('${data.key}')">Kirim Koin</button>`;
                         } else {
-                            actionHtml = `<span style="color:var(--text-muted); font-size:0.7rem; font-weight:bold;">COMPLETED</span>`;
+                            coinAction = `<b style="color:var(--success); font-size:0.7rem;">SENT ✓</b>`;
                         }
+                    } else {
+                        coinAction = `<span style="color:var(--text-muted); font-size:0.7rem;">Menunggu Bayar</span>`;
                     }
 
                     tbody.innerHTML += `<tr>
@@ -304,38 +307,48 @@
                         <td><span style="color:var(--text-muted)">${data.payment || '-'}</span></td>
                         <td><b style="color:var(--warning)">${data.admin_name || '-'}</b></td>
                         <td>${statusBadge}</td>
-                        <td>${actionHtml}</td>
+                        <td>${payAction}</td>
+                        <td>${coinAction}</td>
                     </tr>`;
                 });
             });
         }
 
-        async function proses(trxID, tipe) {
+        // FUNGSI 1: Hanya Konfirmasi Pembayaran
+        async function konfirmasiBayar(trxID) {
+            if(!confirm("Uang sudah masuk? Status akan diubah ke SUCCESS.")) return;
+            try {
+                await db.ref('orders/' + trxID).update({
+                    status: "Success",
+                    waktu_selesai: new Date().toLocaleString('id-ID')
+                });
+                alert("Pembayaran Berhasil Dikonfirmasi!");
+            } catch (err) {
+                alert("Gagal: " + err.message);
+            }
+        }
+
+        // FUNGSI 2: Hanya Kirim Koin ke User
+        async function kirimKoin(trxID) {
             try {
                 const snap = await db.ref('orders/' + trxID).once('value');
                 const order = snap.val();
                 const uid = order.userID;
 
-                if (!uid) return alert("userID tidak ditemukan!");
+                if (!uid) return alert("Error: UserID tidak ditemukan!");
 
+                // Proses tambah 1 koin ke Firestore
                 await fs.collection("users").doc(uid).update({
                     coins: firebase.firestore.FieldValue.increment(1)
                 });
 
-                if (tipe === 'konfirmasi') {
-                    await db.ref('orders/' + trxID).update({
-                        status: "Success",
-                        waktu_selesai: new Date().toLocaleString('id-ID')
-                    });
-                }
+                // Tandai agar tombol berubah jadi "SENT"
+                coinSentHistory.add(trxID);
+                loadOrders(); // Refresh table view
 
-                if (tipe === 'sync') {
-                    syncHistory.add(trxID);
-                }
-
-                alert("BERHASIL: Transaksi " + trxID + " telah diproses.");
+                alert("KOIN BERHASIL DIKIRIM ke " + uid);
             } catch (err) {
-                alert("Gagal: " + err.message);
+                alert("Gagal Kirim Koin: " + err.message);
             }
         }
 
@@ -343,4 +356,3 @@
     </script>
 </body>
 </html>
-
