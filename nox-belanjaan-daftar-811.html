@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NoxPay Admin - Full Database Control</title>
+    <title>NoxPay Admin - Logic Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -12,7 +12,6 @@
             --nox-blue: #007bff;
             --success: #00e676;
             --warning: #ffc107;
-            --accent-pink: #ff4d94;
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: #ffffff; margin: 0; padding: 10px; }
         .container { max-width: 100%; margin: 0 auto; }
@@ -20,16 +19,14 @@
         #login-form input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0b0f1a; border: 1px solid #333; border-radius: 8px; color: white; box-sizing: border-box; }
         .table-card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th { padding: 12px 8px; text-align: left; font-size: 0.6rem; color: var(--nox-blue); background: rgba(0, 123, 255, 0.05); text-transform: uppercase; white-space: nowrap; }
-        td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem; vertical-align: middle; }
+        th { padding: 12px 8px; text-align: left; font-size: 0.6rem; color: var(--nox-blue); background: rgba(0, 123, 255, 0.05); text-transform: uppercase; }
+        td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem; }
         
-        /* Button Styles */
-        .btn-group { display: flex; gap: 5px; }
-        .btn-confirm { background: var(--success); color: #000; border: none; padding: 6px 10px; border-radius: 4px; font-weight: 800; cursor: pointer; font-size: 0.65rem; }
-        .btn-sync { background: var(--warning); color: #000; border: none; padding: 6px 10px; border-radius: 4px; font-weight: 800; cursor: pointer; font-size: 0.65rem; }
-        .status-badge { padding: 3px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; }
-        .bg-success { border: 1px solid var(--success); color: var(--success); }
-        .bg-warning { border: 1px solid var(--warning); color: var(--warning); }
+        .btn-confirm { background: var(--success); color: #000; border: none; padding: 7px 12px; border-radius: 5px; font-weight: 800; cursor: pointer; font-size: 0.7rem; }
+        .btn-sync { background: var(--warning); color: #000; border: none; padding: 7px 12px; border-radius: 5px; font-weight: 800; cursor: pointer; font-size: 0.7rem; }
+        .status-badge { padding: 4px 8px; border-radius: 5px; font-size: 0.65rem; font-weight: bold; }
+        .paid { border: 1px solid var(--success); color: var(--success); }
+        .unpaid { border: 1px solid var(--warning); color: var(--warning); }
     </style>
 </head>
 <body>
@@ -38,12 +35,12 @@
         <h2 style="color:var(--nox-blue)">NoxPay Admin</h2>
         <input type="email" id="email" placeholder="Email Admin">
         <input type="password" id="password" placeholder="Password">
-        <button onclick="handleLogin()" style="width:100%; padding:12px; background:var(--nox-blue); border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">LOGIN</button>
+        <button onclick="handleLogin()" style="width:100%; padding:12px; background:var(--nox-blue); border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">MASUK</button>
     </div>
 
     <div id="admin-content" class="container" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h3>Database Transaksi Lengkap</h3>
+            <h3>Database Transaksi NoxPay</h3>
             <button onclick="logout()" style="background:none; color:red; border:1px solid red; padding:5px 10px; border-radius:5px; cursor:pointer; font-size: 0.7rem;">Logout</button>
         </div>
 
@@ -52,16 +49,13 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Waktu Masuk</th>
+                            <th>Waktu</th>
                             <th>ID Trx</th>
                             <th>Buyer</th>
-                            <th>UserID (Target)</th>
+                            <th>UserID</th>
                             <th>Produk</th>
                             <th>Nominal</th>
-                            <th>Target Game</th>
-                            <th>Harga</th>
-                            <th>Pembayaran</th>
-                            <th>Admin (Tujuan)</th>
+                            <th>Target</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -93,8 +87,8 @@
         const fs = firebase.firestore();
         const auth = firebase.auth();
 
-        // Variabel untuk menyimpan ID transaksi yang sudah diklik sync (agar tidak hilang saat refresh data otomatis)
-        let clickedSync = new Set();
+        // Set untuk menyimpan ID transaksi yang sudah diklik SYNC
+        let syncHistory = new Set();
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -121,70 +115,67 @@
                 snapshot.forEach(c => { let d = c.val(); d.key = c.key; orders.push(d); });
                 
                 orders.reverse().forEach((data) => {
-                    const isSuccess = (data.status || '').toLowerCase() === 'success';
-                    const statusClass = isSuccess ? 'bg-success' : 'bg-warning';
-                    const statusLabel = isSuccess ? 'SUDAH DIBAYAR' : 'BELUM DIBAYAR';
+                    const isPaid = (data.status || '').toLowerCase() === 'success';
+                    const statusBadge = isPaid ? '<span class="status-badge paid">SUDAH DIBAYAR</span>' : '<span class="status-badge unpaid">BELUM DIBAYAR</span>';
                     
-                    // Logika tombol Sync (hilangkan jika sudah diklik di sesi ini)
-                    const syncBtnHtml = !clickedSync.has(data.key) 
-                        ? `<button class="btn-sync" onclick="prosesKoin('${data.key}', true)">SYNC</button>` 
-                        : '';
+                    let actionHtml = '';
+                    if (!isPaid) {
+                        // Jika Belum Bayar -> Hanya tombol KONFIRMASI
+                        actionHtml = `<button class="btn-confirm" onclick="proses('${data.key}', 'konfirmasi')">KONFIRMASI</button>`;
+                    } else {
+                        // Jika Sudah Bayar -> Cek apakah sudah pernah klik SYNC di sesi ini
+                        if (!syncHistory.has(data.key)) {
+                            actionHtml = `<button class="btn-sync" onclick="proses('${data.key}', 'sync')">SYNC COIN</button>`;
+                        } else {
+                            actionHtml = `<span style="color:#8b949e; font-size:0.6rem;">SYNCED</span>`;
+                        }
+                    }
 
                     tbody.innerHTML += `<tr>
                         <td style="color:#8b949e; font-size:0.65rem;">${data.waktu_masuk || '-'}</td>
-                        <td><code style="color:var(--accent-pink)">${data.key}</code></td>
+                        <td><code>${data.key}</code></td>
                         <td><b>${data.buyerName || '-'}</b></td>
                         <td><b style="color:var(--nox-blue)">${data.userID || '-'}</b></td>
                         <td>${data.product || '-'}</td>
                         <td>${data.nominal || '-'}</td>
                         <td>${data.target || '-'}</td>
-                        <td>Rp ${data.price || '-'}</td>
-                        <td>${data.payment || '-'}</td>
-                        <td>${data.admin_name || '-'} (${data.admin_tujuan || '-'})</td>
-                        <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
-                        <td>
-                            <div class="btn-group">
-                                <button class="btn-confirm" onclick="prosesKoin('${data.key}', false)">KONFIRMASI</button>
-                                ${syncBtnHtml}
-                            </div>
-                        </td>
+                        <td>${statusBadge}</td>
+                        <td>${actionHtml}</td>
                     </tr>`;
                 });
             });
         }
 
-        async function prosesKoin(trxID, isSyncOnly) {
+        async function proses(trxID, tipe) {
             try {
                 const snap = await db.ref('orders/' + trxID).once('value');
                 const order = snap.val();
                 const uid = order.userID;
 
-                if (!uid) return alert("Gagal: userID tidak ditemukan!");
+                if (!uid) return alert("userID tidak ditemukan!");
 
-                // 1. TAMBAH KOIN DI FIRESTORE
-                const userRef = fs.collection("users").doc(uid);
-                await userRef.update({
+                // 1. Tambah Koin di Firestore
+                await fs.collection("users").doc(uid).update({
                     coins: firebase.firestore.FieldValue.increment(1)
                 });
 
-                // 2. UPDATE REALTIME DB (Hanya jika bukan sekedar Sync)
-                if (!isSyncOnly) {
+                // 2. Jika tipe Konfirmasi, ubah status di Realtime Database
+                if (tipe === 'konfirmasi') {
                     await db.ref('orders/' + trxID).update({
                         status: "Success",
                         waktu_selesai: new Date().toLocaleString('id-ID')
                     });
                 }
 
-                // Jika tombol sync diklik, masukkan ke daftar 'clicked' agar tombol hilang
-                if (isSyncOnly) {
-                    clickedSync.add(trxID);
-                    // Trigger refresh tampilan manual agar tombol langsung hilang tanpa nunggu db update
-                    loadOrders(); 
+                // 3. Jika tipe Sync, tandai agar tombol hilang
+                if (tipe === 'sync') {
+                    syncHistory.add(trxID);
+                    loadOrders(); // Refresh tampilan
                 }
 
-                alert("BERHASIL! Koin " + uid + " bertambah (+1).");
+                alert("SUKSES: Koin " + uid + " telah bertambah.");
             } catch (err) {
-                alert("Error: " + err.message);
+                alert("Gagal: " + err.message);
             }
         }
 
