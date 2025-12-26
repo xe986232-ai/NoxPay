@@ -1569,22 +1569,62 @@ localStorage.setItem('nox_user_id', userUniqueId);
                const notiBtn = document.getElementById('noti-btn');
         if (notiBtn) { notiBtn.onclick = openNotiModal; }
 
-        function updateCoinDisplay() {
-            fs.collection("users").doc(userUniqueId).onSnapshot((doc) => {
-                const coinElement = document.getElementById('user-coin-count');
-                if (doc.exists) {
-                    let coins = doc.data().coins || 0;
-                    if(coinElement) coinElement.innerText = coins;
-                    localStorage.setItem('nox_coins', coins);
-                } else {
-                    fs.collection("users").doc(userUniqueId).set({ 
-                        coins: 0,
-                        id: userUniqueId,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
+        // Deklarasi variabel agar bisa dipakai buat potong koin
+
+function updateCoinDisplay() {
+    if (!userUniqueId) return;
+
+    // Listener Real-time
+    fs.collection("users").doc(userUniqueId).onSnapshot((doc) => {
+        const coinElement = document.getElementById('user-coin-count');
+        
+        if (doc.exists) {
+            userCoins = doc.data().coins || 0;
+            
+            // Langsung update angka 5 jadi 7 tanpa refresh
+            if(coinElement) {
+                coinElement.innerText = userCoins;
+            }
+            
+            localStorage.setItem('nox_coins', userCoins);
+            console.log("Koin Sinkron: " + userCoins);
+        } else {
+            // Buat data jika user baru
+            fs.collection("users").doc(userUniqueId).set({ 
+                coins: 0,
+                id: userUniqueId,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
         }
+    });
+}
+
+// Fungsi Modal
+function openCoinModal() {
+    document.getElementById('coinModal').style.display = 'flex';
+}
+
+function closeCoinModal() {
+    document.getElementById('coinModal').style.display = 'none';
+}
+
+// Fungsi Potong Saldo
+function tukarKoin(harga, hadiah) {
+    if (userCoins < harga) {
+        alert("Koin tidak cukup!");
+        return;
+    }
+    
+    fs.collection("users").doc(userUniqueId).update({
+        coins: userCoins - harga
+    }).then(() => {
+        alert("Berhasil menukar " + hadiah);
+    });
+}
+
+// Jalankan fungsi saat web dibuka
+updateCoinDisplay();
+
     </script>
 </body>
 </html>
