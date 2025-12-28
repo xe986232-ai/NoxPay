@@ -313,13 +313,13 @@
         const rdb = firebase.database();
         const fs = firebase.firestore();
 
-        // DATA PROJECT DENGAN ITEM MASING-MASING
+        // DATA PRODUCT (LINK/ZIP DIHAPUS DARI SINI AGAR TIDAK BISA DIINTIP F12)
         const projectData = {
             "Dyon Yete": {
                 whatsapp: "6281211413521",
                 projects: [
-                    { id: "DY-01", name: "DJ MALAM TAHUN BARU STYLE VINKY", price: "70.000", audio: "DYONYETE/1.mp3", zip: "DYONYETE/DJ MALAM TAHUN BARU.zip", isNew: true, items: ["Project .Flm", "Vinky Style Samples", "Full Mixer Track", "No Watermark"] },
-                    { id: "DY-02", name: "DJ SLOW STYLE HUDA FVNKY", price: "50.000", audio: "DYONYETE/2.mp3", zip: "DYONYETE/DJ SLOW STYLE.zip", isNew: true, items: ["Project .Flm", "Huda Fvnky Bass", "Acapella Included"] }
+                    { id: "DY-01", name: "DJ MALAM TAHUN BARU STYLE VINKY", price: "70.000", audio: "DYONYETE/1.mp3", isNew: true, items: ["Project .Flm", "Vinky Style Samples", "Full Mixer Track", "No Watermark"] },
+                    { id: "DY-02", name: "DJ SLOW STYLE HUDA FVNKY", price: "50.000", audio: "DYONYETE/2.mp3", isNew: true, items: ["Project .Flm", "Huda Fvnky Bass", "Acapella Included"] }
                 ]
             },
             "Artist": {
@@ -329,14 +329,14 @@
             "Rizz_1": {
                 whatsapp: "6283129555763",
                 projects: [
-                    { id: "VK-01", name: "MAAFKAN AKU YANG DULU", price: "10.000", audio: "SALDO/maafkan.mp3", zip: "SALDO/MAAFKAN AKU YANG DULU.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-02", name: "DJ WENADEST LOST CONTHOLL", price: "10.000", audio: "SALDO/ILMUAN.mp3", zip: "SALDO/ILMUAN.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-03", name: "STYLE LAMBADAH", price: "11.000", audio: "SALDO/LAMBADA.mp3", zip: "SALDO/LAMBADA.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-03", name: "DJ TAKE AWAY", price: "10.000", audio: "SALDO/take away.mp3", zip: "SALDO/#TAKEAWAY.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-03", name: "UCIL OLD", price: "15.000", audio: "SALDO/UCIL.mp3", zip: "SALDO/#UCIL.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-03", name: "MAMAN FVNDY STYLE", price: "25.000", audio: "SALDO/MAMAN.mp3", zip: "SALDO/#MAMAN FNDY.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-03", name: "MELODY HABIBI", price: "13.000", audio: "SALDO/HABIBI.mp3", zip: "SALDO/#HABIBI.zip", isNew: true, items: ["Project .Flm", "Tidak ada Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-03", name: "TAPI BOONG GOKGOKGOK", price: "0.000/FREE", audio: "SALDO/AKEAK.mp3", zip: "SALDO/#AKEAK.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] }
+                    { id: "VK-01", name: "MAAFKAN AKU YANG DULU", price: "10.000", audio: "SALDO/maafkan.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-02", name: "DJ WENADEST LOST CONTHOLL", price: "10.000", audio: "SALDO/ILMUAN.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-03", name: "STYLE LAMBADAH", price: "11.000", audio: "SALDO/LAMBADA.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-04", name: "DJ TAKE AWAY", price: "10.000", audio: "SALDO/take away.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-05", name: "UCIL OLD", price: "15.000", audio: "SALDO/UCIL.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-06", name: "MAMAN FVNDY STYLE", price: "25.000", audio: "SALDO/MAMAN.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-07", name: "MELODY HABIBI", price: "13.000", audio: "SALDO/HABIBI.mp3", isNew: true, items: ["Project .Flm", "Tidak ada Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-08", name: "TAPI BOONG GOKGOKGOK", price: "0.000/FREE", audio: "SALDO/AKEAK.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] }
                 ]
             }
         };
@@ -368,13 +368,8 @@
             document.getElementById('project-section').classList.remove('hidden');
             document.getElementById('creator-name-display').innerText = name;
             
-            // LOGIKA HANYA TAMPILKAN TOMBOL BACA DI RIZZ_1
             const btnBaca = document.getElementById('btn-baca-info');
-            if(name === 'Rizz_1') {
-                btnBaca.style.display = 'block';
-            } else {
-                btnBaca.style.display = 'none';
-            }
+            if(name === 'Rizz_1') { btnBaca.style.display = 'block'; } else { btnBaca.style.display = 'none'; }
 
             const render = document.getElementById('project-render');
             render.innerHTML = '';
@@ -441,49 +436,29 @@
         function formatTime(sec) { let m = Math.floor(sec / 60); let s = Math.floor(sec % 60); return `${m}:${s < 10 ? '0' : ''}${s}`; }
         
         function openOrder(creator, name, price, id) { 
-            // Ambil data produk spesifik untuk item yang didapat
             const creatorData = projectData[creator];
             const product = creatorData.projects.find(p => p.id === id);
             selectedProduct = { creator, name, price, id, items: product.items }; 
-            
             document.getElementById('d-title').innerText = name; 
             document.getElementById('d-price').innerText = "Rp " + price; 
-            
-            // Render item list secara dinamis
             const itemRender = document.getElementById('d-items');
             itemRender.innerHTML = '';
-            product.items.forEach(item => {
-                itemRender.innerHTML += `<li>${item}</li>`;
-            });
-
+            product.items.forEach(item => { itemRender.innerHTML += `<li>${item}</li>`; });
             document.getElementById('modal-detail').style.display = 'flex'; 
         }
         
         async function pushOrderToFirebase() {
             const bName = document.getElementById('buyer-name').value;
             if(!bName) return alert("Isi nama dulu!");
-            
             const trxID = "TRX-" + Date.now();
             const now = new Date();
             const tanggalFull = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
             const waktuFull = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const waktuTimestamp = now.toISOString();
-
             const targetWA = projectData[selectedProduct.creator].whatsapp;
-            
-            // Push ke Firebase dengan detail waktu lengkap untuk Admin Panel
             await rdb.ref('orders/' + trxID).set({ 
-                userID: myID, 
-                buyerName: bName, 
-                product: selectedProduct.name, 
-                nominal: selectedProduct.price, 
-                status: "Pending", 
-                tanggal: tanggalFull,
-                jam: waktuFull,
-                timestamp: waktuTimestamp,
-                creatorName: selectedProduct.creator
+                userID: myID, buyerName: bName, product: selectedProduct.name, nominal: selectedProduct.price, status: "Pending", 
+                tanggal: tanggalFull, jam: waktuFull, creatorName: selectedProduct.creator
             });
-
             const pesanWA = `*INVOICE PESANAN - NOXPAY*%0A----------------------------------------%0A👤 *Nama:* ${bName}%0A🆔 *User ID:* ${myID}%0A📦 *Produk:* ${selectedProduct.name}%0A💰 *Harga:* Rp ${selectedProduct.price}%0A⏰ *Waktu:* ${tanggalFull} (${waktuFull})%0A----------------------------------------%0A_Mohon segera diproses Admin!_`;
             window.open(`https://wa.me/${targetWA}?text=${pesanWA}`, '_blank');
             closeModalGeneric('modal-detail');
@@ -493,15 +468,18 @@
             rdb.ref('orders').orderByChild('userID').equalTo(myID).on('value', (snap) => {
                 snap.forEach(child => {
                     const data = child.val();
-                    if(data.status === "Success") {
+                    if(data.status === "Success" && data.userID === myID) {
                         for(let c in projectData) {
                             const found = projectData[c].projects.find(p => p.name === data.product);
                             if(found) {
-                                const box = document.getElementById(`btn-box-${found.id}`);
-                                if(box) {
-                                    // Perbaikan: Pastikan link download memiliki target blank dan atribut download yang kuat
-                                    box.innerHTML = `<a href="${found.zip}" download="${found.zip.split('/').pop()}" target="_blank" class="btn-download-premium"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>`;
-                                }
+                                // KEAMANAN: Mengambil link dari database berdasarkan nama produk (Data tidak ada di F12)
+                                rdb.ref('secure_links/' + data.product.replace(/[.#$/[\]]/g, "_")).once('value').then((linkSnap) => {
+                                    const secureUrl = linkSnap.val();
+                                    const box = document.getElementById(`btn-box-${found.id}`);
+                                    if(box && secureUrl) {
+                                        box.innerHTML = `<a href="${secureUrl}" target="_blank" class="btn-download-premium"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>`;
+                                    }
+                                });
                             }
                         }
                     }
