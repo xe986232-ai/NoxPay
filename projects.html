@@ -218,8 +218,8 @@
                 <div class="badge-dot"></div>
                 <span>DARK PREMIUM SYSTEM</span>
             </div>
-            <h2>FL Studio <br><span style="color:var(--primary)">Marketplace</span></h2>
-            <p>Project remix eksklusif, aman & terpercaya.</p>
+            <h2>FL Studio <br><span style="color:var(--primary)">Mobile</span></h2>
+            <p>Beli woyyyyy apalah liat2 doang.</p>
         </div>
         <div class="hero-character">
         </div>
@@ -233,12 +233,12 @@
                     <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Dyon&backgroundColor=b6e3f4"></div>
                     <b style="color:white;">Dyon Yete</b>
                 </div>
-                <div class="creator-card" onclick="showProjects('Artist', 'https://api.dicebear.com/7.x/notionists/svg?seed=Budi&backgroundColor=ffdfbf')">
-                    <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Budi&backgroundColor=ffdfbf"></div>
+                <div class="creator-card" onclick="showProjects('Artist', 'https://api.dicebear.com/7.x/notionists/svg?seed=Loki&backgroundColor=ffd5dc')">
+                    <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Loki&backgroundColor=ffd5dc"></div>
                     <b style="color:white;">Artist</b>
                 </div>
-                <div class="creator-card" onclick="showProjects('Rizz_1', 'https://api.dicebear.com/7.x/notionists/svg?seed=Leo&backgroundColor=c0aede')">
-                    <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Leo&backgroundColor=c0aede"></div>
+                <div class="creator-card" onclick="showProjects('Rizz_1', 'https://api.dicebear.com/7.x/notionists/svg?seed=Jasper&backgroundColor=d1d4f9')">
+                    <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Jasper&backgroundColor=d1d4f9"></div>
                     <b style="color:white;">Rizz_1</b>
                 </div>
             </div>
@@ -314,6 +314,7 @@
         const fs = firebase.firestore();
 
         // DATA PRODUCT (LINK/ZIP DIHAPUS DARI SINI AGAR TIDAK BISA DIINTIP F12)
+        // UPDATE: NAMA DISESUAIKAN DENGAN KEY DI FIREBASE SECURE_LINKS
         const projectData = {
             "Dyon Yete": {
                 whatsapp: "6281211413521",
@@ -330,13 +331,13 @@
                 whatsapp: "6283129555763",
                 projects: [
                     { id: "VK-01", name: "MAAFKAN AKU YANG DULU", price: "10.000", audio: "SALDO/maafkan.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-02", name: "DJ WENADEST LOST CONTHOLL", price: "10.000", audio: "SALDO/ILMUAN.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-03", name: "STYLE LAMBADAH", price: "11.000", audio: "SALDO/LAMBADA.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-04", name: "DJ TAKE AWAY", price: "10.000", audio: "SALDO/take away.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-05", name: "UCIL OLD", price: "15.000", audio: "SALDO/UCIL.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-06", name: "MAMAN FVNDY STYLE", price: "25.000", audio: "SALDO/MAMAN.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-07", name: "MELODY HABIBI", price: "13.000", audio: "SALDO/HABIBI.mp3", isNew: true, items: ["Project .Flm", "Tidak ada Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
-                    { id: "VK-08", name: "TAPI BOONG GOKGOKGOK", price: "0.000/FREE", audio: "SALDO/AKEAK.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] }
+                    { id: "VK-02", name: "ILMUAN", price: "10.000", audio: "SALDO/ILMUAN.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-03", name: "LAMBADA", price: "11.000", audio: "SALDO/LAMBADA.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-04", name: "TAKEAWAY", price: "10.000", audio: "SALDO/take away.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-05", name: "UCIL", price: "15.000", audio: "SALDO/UCIL.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-06", name: "MAMAN", price: "25.000", audio: "SALDO/MAMAN.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-07", name: "HABIBI", price: "13.000", audio: "SALDO/HABIBI.mp3", isNew: true, items: ["Project .Flm", "Tidak ada Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-08", name: "AKEAK", price: "0.000/FREE", audio: "SALDO/AKEAK.mp3", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] }
                 ]
             }
         };
