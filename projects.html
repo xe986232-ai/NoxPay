@@ -6,46 +6,53 @@
     <title>NoxPay - Music Preview Marketplace</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* TEMA GELAP */
         :root {
             --primary: #8b5cf6;
-            --primary-light: #f5f3ff;
+            --primary-light: rgba(139, 92, 246, 0.1);
             --secondary: #d946ef;
-            --dark: #1e293b;
-            --light: #f1f5f9;
-            --white: #ffffff;
-            --gray: #64748b;
-            --hero-music: linear-gradient(135deg, #6d28d9 0%, #d946ef 100%);
-            --bg-gradient: linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%);
+            --dark: #ffffff;
+            --light: #080a12;
+            --white: #111625;
+            --gray: #8b949e;
+            --hero-music: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            --bg-gradient: linear-gradient(180deg, #080a12 0%, #111625 100%);
             --avatar-gradient: linear-gradient(45deg, #8b5cf6, #d946ef, #00d2ff);
             --btn-home-bg: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
             --btn-buy-bg: #1e293b; 
-            --btn-change-bg: #ffffff; 
             --accent-new: #ff3e3e;
-            --whatsapp-green: #25d366;
-            --dana-blue: #008ced;
         }
+
+        /* --- SPLASH SCREEN ANIMATION --- */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #080a12; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        .splash-logo {
+            width: 80px; height: 80px; background: var(--hero-music);
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 35px; font-weight: 800;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+            animation: pulseLogo 1.5s infinite ease-in-out;
+        }
+        @keyframes pulseLogo {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .splash-text { margin-top: 20px; color: white; font-weight: 800; letter-spacing: 2px; font-size: 14px; opacity: 0.8; }
+        .hide-splash { opacity: 0; visibility: hidden; }
 
         /* Base Reset */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
         
-        body { 
-            background: var(--bg-gradient); 
-            min-height: 100vh; 
-            color: var(--dark); 
-            overflow-x: hidden;
-            animation: pageFadeIn 0.8s ease-out;
-        }
-
-        @keyframes pageFadeIn { from { opacity: 0; } to { opacity: 1; } }
-
+        body { background: var(--bg-gradient); min-height: 100vh; color: var(--dark); overflow-x: hidden; }
         .container { padding: 0 16px; width: 100%; max-width: 500px; margin: 0 auto; position: relative; }
 
-        /* --- HEADER & SIDEBAR --- */
         header { 
-            background: rgba(255, 255, 255, 0.7); 
-            backdrop-filter: blur(15px); 
-            padding: 12px 0; 
-            border-bottom: 1px solid rgba(139, 92, 246, 0.1); 
+            background: rgba(17, 22, 37, 0.8); backdrop-filter: blur(15px); 
+            padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
             position: sticky; top: 0; z-index: 1000; 
         }
         .header-flex { display: flex; justify-content: space-between; align-items: center; }
@@ -54,196 +61,129 @@
 
         #creator-sidebar {
             position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
-            background: var(--white); z-index: 5001;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
-            padding: 30px 20px;
+            background: var(--white); z-index: 5001; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5); padding: 30px 20px;
         }
         #creator-sidebar.active { left: 0; }
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
             z-index: 5000; display: none; opacity: 0; transition: 0.3s;
         }
 
         .btn-upload-prominent {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px;
-            border-radius: 18px;
-            margin-top: 20px;
-            cursor: pointer;
-            background: var(--hero-music);
-            color: white !important;
-            font-weight: 800;
-            font-size: 13px;
-            letter-spacing: 0.2px;
-            box-shadow: 0 8px 15px rgba(139, 92, 246, 0.25);
-            transition: all 0.3s ease;
-            border: none;
-        }
-        
-        .btn-upload-prominent:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 20px rgba(139, 92, 246, 0.35);
+            display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 18px; margin-top: 20px; cursor: pointer; background: var(--hero-music); color: white !important; font-weight: 800; font-size: 13px; letter-spacing: 0.2px; box-shadow: 0 8px 15px rgba(0,0,0,0.3); transition: all 0.3s ease; border: none;
         }
 
-        .btn-upload-prominent .icon-bg {
-            background: rgba(255, 255, 255, 0.2);
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            font-size: 16px;
-        }
+        .btn-home-header { background: var(--btn-home-bg); color: white; text-decoration: none; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; }
+        .btn-guide-header { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); text-decoration: none; padding: 5px 10px; border-radius: 10px; font-size: 11px; font-weight: 800; margin-right: 6px; cursor: pointer; }
 
-        .btn-home-header {
-            background: var(--btn-home-bg); color: white; text-decoration: none;
-            padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 800;
-            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
-        }
-
-        .btn-guide-header {
-            background: white; color: var(--primary); border: 1.5px solid var(--primary); 
-            text-decoration: none; padding: 5px 10px; border-radius: 10px; font-size: 11px; 
-            font-weight: 800; margin-right: 6px; cursor: pointer;
-        }
-
-        /* --- HERO --- */
+        /* --- HERO SECTION RAMPING --- */
         .hero { 
-            position: relative; background: var(--hero-music); color: white; 
-            padding: 40px 0 70px; border-radius: 0 0 40px 40px; 
-            overflow: hidden; margin-bottom: 10px; 
-            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.2); 
+            position: relative; 
+            background: #111827; 
+            color: white; 
+            padding: 35px 0 45px; 
+            border-radius: 0 0 40px 40px; 
+            overflow: hidden; 
+            margin-bottom: 20px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
         }
-        .music-float-1 { position: absolute; top: 12%; right: 10%; width: 40px; opacity: 0.3; animation: floating 4s infinite ease-in-out; }
-        .music-float-2 { position: absolute; bottom: 20%; right: 45%; width: 30px; opacity: 0.2; animation: floating 3s infinite ease-in-out reverse; }
-        .hero-character { position: absolute; right: -10px; bottom: -5px; width: 170px; z-index: 5; pointer-events: none; }
-        .hero-character img { width: 100%; height: auto; animation: floating 3.5s ease-in-out infinite; }
-        @keyframes floating { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+        .hero-glow-1 { position: absolute; top: -50px; right: -30px; width: 180px; height: 180px; background: var(--primary); filter: blur(80px); opacity: 0.4; border-radius: 50%; }
+        .hero-glow-2 { position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: var(--secondary); filter: blur(70px); opacity: 0.3; border-radius: 50%; }
 
-        /* --- PROJECT LIST & CARDS --- */
+        .hero-content { position: relative; z-index: 10; }
+        .badge-premium { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); padding: 5px 12px; border-radius: 100px; font-size: 9px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px; }
+        .badge-dot { width: 5px; height: 5px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .hero h2 { font-size: 28px; font-weight: 800; line-height: 1.1; letter-spacing: -0.5px; }
+        .hero p { font-size: 12px; opacity: 0.7; width: 70%; margin-top: 8px; line-height: 1.4; }
+
+        .hero-character { position: absolute; right: -10px; bottom: -5px; width: 140px; z-index: 5; pointer-events: none; }
+        .hero-character img { width: 100%; height: auto; animation: floating 4s ease-in-out infinite; filter: drop-shadow(0 0 15px rgba(139,92,246,0.3)); }
+        
+        @keyframes floating { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
+
         .section-header { margin: 20px 0 12px; display: flex; justify-content: space-between; align-items: center; }
-        .section-header h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--dark); }
+        .section-header h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: white; }
         .section-header h2::before { content: ''; width: 5px; height: 15px; background: var(--primary); border-radius: 10px; }
         
         .project-card { 
-            background: var(--white); padding: 12px; border-radius: 24px; display: flex; 
-            flex-direction: column; gap: 8px; margin-bottom: 16px; 
-            border: 1px solid rgba(139, 92, 246, 0.05); box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-            position: relative; overflow: hidden;
+            background: var(--white); padding: 16px; border-radius: 24px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 8px 20px rgba(0,0,0,0.2); position: relative; overflow: hidden; animation: cardEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
+        @keyframes cardEntrance { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         .card-main-info { display: flex; align-items: center; gap: 12px; width: 100%; }
-
         .new-badge { position: absolute; top: 0; right: 0; background: var(--accent-new); color: white; font-size: 8px; font-weight: 900; padding: 4px 10px; border-radius: 0 0 0 15px; z-index: 2; }
         .project-img-container { position: relative; width: 65px; height: 65px; flex-shrink: 0; cursor: pointer; }
-        .project-img-box { width: 100%; height: 100%; border-radius: 16px; background: #e2e8f0; overflow: hidden; }
+        .project-img-box { width: 100%; height: 100%; border-radius: 16px; background: #1e293b; overflow: hidden; }
         .project-img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .play-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.25); border-radius: 16px; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .play-icon { width: 32px; height: 32px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .play-icon svg { width: 14px; height: 14px; fill: var(--primary); transition: 0.2s; }
+        
+        /* Tombol Play Baru di Controls */
+        .play-btn-mini { width: 32px; height: 32px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; flex-shrink: 0; }
+        .play-btn-mini svg { width: 16px; height: 16px; fill: white; }
 
         .project-info { flex: 1; }
-        .project-info b { font-size: 13px; display: block; margin-bottom: 2px; color: var(--dark); padding-right: 20px; line-height: 1.2; }
+        .project-info b { font-size: 13px; display: block; margin-bottom: 2px; color: white; padding-right: 20px; line-height: 1.2; }
         .project-info span { font-size: 14px; color: var(--primary); font-weight: 800; }
-        .btn-buy { background: var(--btn-buy-bg); color: white; border: none; padding: 10px 16px; border-radius: 14px; font-weight: 700; font-size: 10px; cursor: pointer; align-self: center; }
-
-        .player-controls { 
-            background: #f8fafc; padding: 8px 12px; border-radius: 12px; 
-            display: flex; align-items: center; gap: 10px; margin-top: 4px;
-            opacity: 0.5; transition: 0.3s; pointer-events: none;
-        }
-        .player-controls.active { opacity: 1; pointer-events: all; }
         
-        .progress-container { flex: 1; position: relative; display: flex; align-items: center; }
-        .progress-bar { 
-            width: 100%; height: 4px; background: #e2e8f0; border-radius: 10px; 
-            cursor: pointer; appearance: none; outline: none;
-        }
-        .progress-bar::-webkit-slider-thumb {
-            appearance: none; width: 12px; height: 12px; background: var(--primary); 
-            border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .time-display { font-size: 9px; font-weight: 800; color: var(--gray); min-width: 30px; }
+        .btn-buy { background: var(--btn-buy-bg); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 10px 16px; border-radius: 14px; font-weight: 700; font-size: 10px; cursor: pointer; transition: 0.3s; }
+        .btn-download-premium { background: #10b981; color: white; text-decoration: none; padding: 10px; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); border: none; cursor: pointer; }
 
-        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 5px; }
-        .creator-card { background: white; padding: 20px 10px; border-radius: 24px; text-align: center; border: 1px solid rgba(139, 92, 246, 0.08); cursor: pointer; }
+        .player-controls { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 16px; display: flex; align-items: center; gap: 12px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.05); }
+        .waveform-container { flex: 1; height: 24px; display: flex; align-items: center; gap: 3px; cursor: pointer; position: relative; }
+        .wave-bar { flex: 1; height: 40%; background: rgba(255, 255, 255, 0.2); border-radius: 10px; transition: height 0.2s ease, background 0.3s ease; }
+        .wave-bar.active { background: var(--primary); }
+        .playing .wave-bar { animation: waveAnimation 1s ease-in-out infinite; }
+        @keyframes waveAnimation { 0%, 100% { height: 40%; } 50% { height: 100%; } }
+        .time-display { font-size: 9px; color: var(--gray); font-weight: 700; min-width: 30px; text-align: right; }
+
+        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .creator-card { background: var(--white); padding: 20px 10px; border-radius: 24px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .avatar-wrapper { width: 70px; height: 70px; margin: 0 auto 10px; background: var(--avatar-gradient); padding: 2px; border-radius: 50%; }
-        .creator-card img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid white; object-fit: cover; }
+        .creator-card img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #111625; object-fit: cover; }
 
-        /* --- MODAL SYSTEM --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: none; align-items: flex-end; z-index: 2000; }
-        .modal-content { background: white; width: 100%; max-width: 500px; margin: 0 auto; border-radius: 30px 30px 0 0; padding: 24px; max-height: 90vh; overflow-y: auto; }
-        .modal-drag { width: 40px; height: 4px; background: #e2e8f0; border-radius: 10px; margin: -10px auto 20px; }
-        .form-label { display: block; font-size: 11px; font-weight: 800; color: var(--gray); margin-bottom: 6px; text-transform: uppercase; }
-        .form-control { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9; background: #f8fafc; font-size: 13px; font-weight: 700; margin-bottom: 15px; outline: none; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; align-items: flex-end; z-index: 2000; }
         
-        .guide-step { display: flex; gap: 12px; margin-bottom: 15px; }
-        .step-num { width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
-        .step-text { font-size: 12px; font-weight: 600; color: var(--dark); line-height: 1.5; }
+        /* Modal tengah untuk informasi */
+        #modal-info { align-items: center; justify-content: center; } 
+        #modal-info .modal-content { border-radius: 30px; margin: 0 16px; width: calc(100% - 32px); }
 
-        .info-box-wa {
-            background: var(--primary-light);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px dashed var(--primary);
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .fee-section {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        .fee-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .btn-show-qris {
-            background: var(--dana-blue);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 800;
-            width: 100%;
-            cursor: pointer;
-        }
-        #qris-container {
-            display: none;
-            text-align: center;
-            margin-top: 10px;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-        }
-        #qris-container img {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 8px;
-        }
-
+        .modal-content { background: #111625; width: 100%; max-width: 500px; margin: 0 auto; border-radius: 30px 30px 0 0; padding: 24px; border: 1px solid rgba(255,255,255,0.1); }
+        .form-control { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #333; background: #080a12; color: white; font-weight: 700; margin-bottom: 15px; outline: none; }
         .hidden { display: none !important; }
-        footer { text-align: center; padding: 30px; font-size: 10px; color: var(--gray); font-weight: 700; }
+
+        /* Style Baru Untuk Item List */
+        .item-get-box { background: rgba(139, 92, 246, 0.05); border: 1px dashed var(--primary); padding: 12px; border-radius: 15px; margin-bottom: 20px; }
+        .item-get-title { font-size: 10px; color: var(--primary); font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        .item-list { list-style: none; }
+        .item-list li { font-size: 11px; color: var(--gray); display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .item-list li::before { content: '✓'; color: #10b981; font-weight: 900; }
+
+        /* CSS UNTUK PAYMENT DANA */
+        .payment-dana-box { background: #1d4ed8; padding: 15px; border-radius: 18px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .dana-logo { background: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #1d4ed8; font-size: 10px; flex-shrink: 0; }
+        .dana-info { flex: 1; }
+        .dana-info p { font-size: 8px; color: rgba(255,255,255,0.7); font-weight: 700; letter-spacing: 0.5px; }
+        .dana-info b { font-size: 13px; color: white; letter-spacing: 1px; }
+
+        /* CSS BARU UNTUK TOMBOL & MODAL INFORMASI */
+        .btn-baca { background: var(--hero-music); color: white; border: none; padding: 6px 15px; border-radius: 10px; font-size: 10px; font-weight: 800; cursor: pointer; margin-right: 8px; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); transition: transform 0.2s; display: none; }
+        .btn-baca:active { transform: scale(0.95); }
+        .info-box-content { background: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.2); padding: 15px; border-radius: 15px; color: var(--gray); font-size: 12px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
+    <div id="splash-screen">
+        <div class="splash-logo">N</div>
+        <div class="splash-text">NOXPAY MUSIC</div>
+    </div>
+
     <div id="sidebar-overlay-creator" class="sidebar-overlay" onclick="toggleSidebarCreator()"></div>
     <div id="creator-sidebar">
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px; color: white;">
             <div class="logo-box">N</div>
             <b style="font-size: 16px;">Creator Hub</b>
         </div>
@@ -251,31 +191,37 @@
             <div class="icon-bg">📤</div>
             <span>UPLOAD PROJECT</span>
         </div>
+        <div style="margin-top:30px; padding:15px; background:rgba(255,255,255,0.03); border-radius:15px; border:1px solid rgba(255,255,255,0.05);">
+            <p style="font-size:9px; color:var(--gray); letter-spacing:1px;">UNIQUE USER ID</p>
+            <b id="user-id-display" style="font-size:14px; color:var(--primary);">Loading...</b>
+        </div>
     </div>
 
     <header>
         <div class="container header-flex">
             <div class="logo-nav" onclick="toggleSidebarCreator()">
                 <div class="logo-box">N</div>
-                <div style="font-weight: 800; font-size: 16px; letter-spacing: -0.5px;">Nox<span style="color:var(--primary)">Pay Music</span></div>
+                <div style="font-weight: 800; font-size: 16px; color:white;">Nox<span style="color:var(--primary)">Music</span></div>
             </div>
             <div>
-                <button class="btn-guide-header" onclick="document.getElementById('modal-guide').style.display='flex'">Cara Upload</button>
-                <a href="index.html?fromProject=true" class="btn-home-header">Beranda</a>
+                <button class="btn-guide-header" onclick="alert('Tutorial Upload sedang disiapkan!')">Cara Upload</button>
+                <a href="index.html" class="btn-home-header">Beranda</a>
             </div>
         </div>
     </header>
 
     <section class="hero">
-        <img src="https://img.icons8.com/fluency/96/headphone.png" class="music-float-1">
-        <img src="https://img.icons8.com/fluency/96/musical-notes.png" class="music-float-2">
+        <div class="hero-glow-1"></div>
+        <div class="hero-glow-2"></div>
         <div class="container hero-content">
-            <div style="background: rgba(255, 255, 255, 0.15); padding: 5px 12px; border-radius: 100px; font-size: 9px; font-weight: 800; display: inline-flex; margin-bottom: 12px;">✨ Music Marketplace</div>
-            <h2 style="font-size:28px; font-weight:800; line-height:1.1; letter-spacing: -1px;">Project Fl Studio Mobile<br>& Asset Music</h2>
-            <p style="font-size:12px; opacity:0.85; width:65%; margin-top:10px;">Dapatkan project terbaik dari artis pilihan.</p>
+            <div class="badge-premium">
+                <div class="badge-dot"></div>
+                <span>DARK PREMIUM SYSTEM</span>
+            </div>
+            <h2>FL Studio <br><span style="color:var(--primary)">Marketplace</span></h2>
+            <p>Project remix eksklusif, aman & terpercaya.</p>
         </div>
         <div class="hero-character">
-            <img src="https://img.icons8.com/illustrations/external-faticon-flat-faticon/256/external-music-producer-recording-studio-faticon-flat-faticon.png">
         </div>
     </section>
 
@@ -285,16 +231,15 @@
             <div class="category-grid">
                 <div class="creator-card" onclick="showProjects('Dyon Yete', 'https://api.dicebear.com/7.x/notionists/svg?seed=Dyon&backgroundColor=b6e3f4')">
                     <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Dyon&backgroundColor=b6e3f4"></div>
-                    <b>Dyon Yete</b>
+                    <b style="color:white;">Dyon Yete</b>
                 </div>
-                <div class="creator-card" onclick="showProjects('AriMarshelloFromJapanese', 'https://api.dicebear.com/7.x/notionists/svg?seed=Budi&backgroundColor=ffdfbf')">
+                <div class="creator-card" onclick="showProjects('Artist', 'https://api.dicebear.com/7.x/notionists/svg?seed=Budi&backgroundColor=ffdfbf')">
                     <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Budi&backgroundColor=ffdfbf"></div>
-                    <b>AriMarshello
-                    FromJapanese</b>
+                    <b style="color:white;">Artist</b>
                 </div>
-                <div class="creator-card" onclick="showProjects('Artist', 'https://api.dicebear.com/7.x/notionists/svg?seed=Artist&backgroundColor=c0aede')">
-                    <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Artist&backgroundColor=c0aede"></div>
-                    <b>Artist</b>
+                <div class="creator-card" onclick="showProjects('Rizz_1', 'https://api.dicebear.com/7.x/notionists/svg?seed=Leo&backgroundColor=c0aede')">
+                    <div class="avatar-wrapper"><img src="https://api.dicebear.com/7.x/notionists/svg?seed=Leo&backgroundColor=c0aede"></div>
+                    <b style="color:white;">Rizz_1</b>
                 </div>
             </div>
         </div>
@@ -302,192 +247,117 @@
         <div id="project-section" class="hidden">
             <div class="section-header">
                 <h2>Karya <span id="creator-name-display" style="color:var(--primary)"></span></h2>
-                <button onclick="showCreators()" style="background:white; border:1px solid var(--primary); color:var(--primary); padding:6px 12px; border-radius:10px; font-size:10px; font-weight:800;">Ganti</button>
+                <div style="display: flex; align-items: center;">
+                    <button id="btn-baca-info" class="btn-baca" onclick="openInfoBox()">BACA</button>
+                    <button onclick="showCreators()" style="background:transparent; border:1.5px solid var(--primary); color:var(--primary); padding:6px 12px; border-radius:10px; font-size:10px; font-weight:800; cursor:pointer;">GANTI</button>
+                </div>
             </div>
             <div id="project-render"></div>
         </div>
     </main>
 
-    <div id="modal-guide" class="modal-overlay">
+    <div id="modal-info" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-drag"></div>
-            <h3 style="margin-bottom:20px; font-weight:800;">Panduan Upload Project</h3>
-            <div class="guide-step">
-                <div class="step-num">1</div>
-                <div class="step-text">Klik <b>Logo N (Kiri Atas)</b> untuk membuka Sidebar Creator.</div>
+            <h3 style="margin-bottom:18px; font-weight:800; color:white;">Informasi Marketplace</h3>
+            <div class="info-box-content">
+                Pilih project favoritmu, dengarkan preview musiknya melalui player yang tersedia, dan dapatkan file .FLM berkualitas premium langsung dari kreator terpercaya kami. Transaksi aman via WhatsApp Admin.
             </div>
-            <div class="guide-step">
-                <div class="step-num">2</div>
-                <div class="step-text">Klik tombol ungu <b>UPLOAD PROJECT</b>.</div>
-            </div>
-            <div class="guide-step">
-                <div class="step-num">3</div>
-                <div class="step-text">Masukkan <b>Username & Password</b> Creator Anda.</div>
-            </div>
-            <div class="guide-step">
-                <div class="step-num">4</div>
-                <div class="step-text">Isi data project dan kirim audio preview via WhatsApp admin.</div>
-            </div>
-            <button onclick="closeModalGeneric('modal-guide')" style="background:var(--primary); color:white; width:100%; border:none; padding:16px; border-radius:15px; font-weight:800; margin-top:10px;">Saya Mengerti</button>
-        </div>
-    </div>
-
-    <div id="modal-login-creator" class="modal-overlay">
-        <div class="modal-content" style="border-radius: 30px; margin-bottom: auto; margin-top: 30%;">
-            <h3 style="text-align:center; margin-bottom:20px; font-weight:800;">Login Creator</h3>
-            <label class="form-label">Username</label>
-            <input type="text" id="login-user" class="form-control" placeholder="Username">
-            <label class="form-label">Password</label>
-            <input type="password" id="login-pass" class="form-control" placeholder="Password">
-            <button onclick="checkLoginCreator()" style="background:var(--primary); color:white; width:100%; border:none; padding:16px; border-radius:15px; font-weight:800;">Masuk</button>
-            <button onclick="closeModalGeneric('modal-login-creator')" style="width:100%; border:none; background:none; margin-top:10px; color:var(--gray); font-size:12px;">Batal</button>
-        </div>
-    </div>
-
-    <div id="modal-upload-project" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-drag"></div>
-            <h3 style="margin-bottom:20px; font-weight:800;">Upload Project Baru</h3>
-            <label class="form-label">Judul Project</label>
-            <input type="text" id="up-title" class="form-control" placeholder="Judul">
-            <label class="form-label">Genre</label>
-            <input type="text" id="up-genre" class="form-control" placeholder="Genre">
-            <label class="form-label">Harga (Rp)</label>
-            <input type="number" id="up-price" class="form-control" placeholder="Contoh: 50000">
-            
-            <div class="fee-section">
-                <div class="fee-info">
-                    <span style="font-size: 11px; font-weight: 800; color: var(--gray);">BIAYA UPLOAD</span>
-                    <span style="font-size: 13px; font-weight: 800; color: var(--secondary);">Rp 5.000 / Produk</span>
-                </div>
-                <button class="btn-show-qris" onclick="toggleQrisUpload()">📱 Lihat QRIS Pembayaran (DANA)</button>
-                <div id="qris-container">
-                    <p style="font-size: 9px; font-weight: 700; color: var(--gray); margin-bottom: 5px;">Silakan Scan & Bayar Rp 5.000</p>
-                    <img src="HERO/qrisdana.jpg" alt="QRIS DANA">
-                </div>
-            </div>
-
-            <label class="form-label">Audio Preview</label>
-            <div class="info-box-wa">
-                <span style="font-size: 20px;">ℹ️</span>
-                <p style="font-size: 11px; font-weight: 700; color: var(--primary); line-height: 1.4;">
-                    File Audio (.mp3) & Bukti Bayar dikirim via WA setelah menekan tombol di bawah.
-                </p>
-            </div>
-            
-            <button onclick="submitToAdmin()" style="background:var(--whatsapp-green); color:white; width:100%; border:none; padding:16px; border-radius:15px; font-weight:800;">Kirim ke Admin</button>
-            <button onclick="closeModalGeneric('modal-upload-project')" style="width:100%; border:none; background:none; margin-top:10px; color:var(--gray);">Batal</button>
-        </div>
-    </div>
-
-    <div onclick="openClaimModal()" style="position: fixed; bottom: 25px; right: 20px; background: #000; color: white; padding: 12px 20px; border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer; z-index: 1500;">
-        🔑 Klaim Download
-    </div>
-
-    <div id="modal-claim" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-drag"></div>
-            <h3 style="margin-bottom:15px; font-weight:800;">Klaim Project</h3>
-            <input type="text" id="license-key" class="form-control" placeholder="MASUKKAN KODE LISENSI">
-            <div id="download-area" class="hidden" style="background:#f0fdf4; padding:15px; border-radius:20px; text-align:center; border: 1px solid #dcfce7; margin-bottom: 10px;">
-                <p style="font-size: 10px; color: #16a34a; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;">Project Siap Diunduh:</p>
-                <h4 id="claim-project-name" style="font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 15px; line-height: 1.2;"></h4>
-                <a id="download-link" href="#" target="_blank" style="display:block; background:#22c55e; color:white; padding:14px; border-radius:12px; text-decoration:none; font-weight: 800; font-size: 13px;">📥 Download File Project</a>
-            </div>
-            <button onclick="verifyCode()" id="btn-verify" style="background:var(--primary); color:white; width:100%; border:none; padding:15px; border-radius:12px; font-weight:800;">Verifikasi Kode</button>
-            <button onclick="closeModalGeneric('modal-claim')" style="width:100%; background:none; border:none; color:var(--gray); margin-top:10px;">Tutup</button>
+            <button onclick="closeModalGeneric('modal-info')" style="background:var(--primary); color:white; width:100%; padding:16px; border-radius:18px; border:none; font-weight:800; margin-top:20px;">Tutup</button>
         </div>
     </div>
 
     <div id="modal-detail" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-drag"></div>
-            <h3 style="margin-bottom:18px; font-weight:800;">Detail Project</h3>
-            <div id="modal-body-content" style="background:#f9f7ff; padding:15px; border-radius:20px;">
-                <p style="font-size:12px; margin-bottom:5px;">Pembuat: <b id="d-creator"></b></p>
-                <p style="font-size:12px; margin-bottom:5px;">Judul: <b id="d-title"></b></p>
-                <p style="font-size:14px; color:var(--primary);">Harga: <b id="d-price"></b></p>
+            <h3 style="margin-bottom:18px; font-weight:800; color:white;">Konfirmasi Beli</h3>
+            <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:20px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.05);">
+                <p style="font-size:12px; color:var(--gray);">Produk: <b id="d-title" style="color:white;"></b></p>
+                <p style="font-size:14px; color:var(--primary); margin-top:5px;">Harga: <b id="d-price"></b></p>
             </div>
-            <button onclick="confirmPurchase()" style="background:#000; color:white; width:100%; padding:16px; border-radius:18px; margin-top:20px; border:none; font-weight:800;">Beli via WhatsApp</button>
-            <button onclick="closeModalGeneric('modal-detail')" style="width:100%; background:none; border:none; color:var(--gray); margin-top:10px;">Kembali</button>
+
+            <div class="item-get-box">
+                <span class="item-get-title">ITEM YANG DI DAPAT:</span>
+                <ul class="item-list" id="d-items">
+                    </ul>
+            </div>
+
+            <input type="text" id="buyer-name" class="form-control" placeholder="Nama Lengkap Pembeli">
+            
+            <div class="payment-dana-box">
+                <div class="dana-logo">DANA</div>
+                <div class="dana-info">
+                    <p>TRANSFER KE DANA:</p>
+                    <b>0831-2955-5763</b>
+                </div>
+            </div>
+
+            <button onclick="pushOrderToFirebase()" style="background:var(--primary); color:white; width:100%; padding:16px; border-radius:18px; border:none; font-weight:800;">Beli via WhatsApp</button>
+            <button onclick="closeModalGeneric('modal-detail')" style="width:100%; background:none; border:none; color:var(--gray); margin-top:15px;">Kembali</button>
         </div>
     </div>
 
-    <footer>&copy; 2025 NoxPay Marketplace</footer>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
     <script>
-        const creatorDatabase = { 
-            "DyonYte": { pass: "DIONYETE234", wa: "6281211413521", name: "Dyon Yete" },
-            "arimarshello": { pass: "28052001", wa: "6281234567890", name: "AriMarshelloFromJapanese" },
-            "artist": { pass: "artist123", wa: "6281234567891", name: "Artist" } 
-        };
-        
-        const licenseDatabase = {
-            "NOX-KANE-2025": { title: "DJ MALAM TAHUN BARU STYLE VINKY", link: "#" },
-            "DEMO-FREE": { title: "Project Sample Free", link: "#" }
-        };
+        window.addEventListener('load', () => { setTimeout(() => { document.getElementById('splash-screen').classList.add('hide-splash'); }, 1800); });
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const rdb = firebase.database();
+        const fs = firebase.firestore();
+
+        // DATA PROJECT DENGAN ITEM MASING-MASING
         const projectData = {
-            "Dyon Yete": [
-                { name: "DJ MALAM TAHUN BARU STYLE VINKY", price: "70.000", audio: "DYONYETE/1.mp3", isNew: true },
-                { name: "DJ SLOW STYLE HUDA FVNKY", price: "50.000", audio: "DYONYETE/2.mp3", isNew: true }
-            ],
-            "AriMarshelloFromJapanese": [],
-            "Artist": []
+            "Dyon Yete": {
+                whatsapp: "6281211413521",
+                projects: [
+                    { id: "DY-01", name: "DJ MALAM TAHUN BARU STYLE VINKY", price: "70.000", audio: "DYONYETE/1.mp3", zip: "DYONYETE/DJ MALAM TAHUN BARU.zip", isNew: true, items: ["Project .Flm", "Vinky Style Samples", "Full Mixer Track", "No Watermark"] },
+                    { id: "DY-02", name: "DJ SLOW STYLE HUDA FVNKY", price: "50.000", audio: "DYONYETE/2.mp3", zip: "DYONYETE/DJ SLOW STYLE.zip", isNew: true, items: ["Project .Flm", "Huda Fvnky Bass", "Acapella Included"] }
+                ]
+            },
+            "Artist": {
+                whatsapp: "6281234567890",
+                projects: []
+            },
+            "Rizz_1": {
+                whatsapp: "6283129555763",
+                projects: [
+                    { id: "VK-01", name: "MAAFKAN AKU YANG DULU", price: "10.000", audio: "RIZZ/maafkan.mp3", zip: "RIZZ/P/MAAFKAN AKU YANG DULU.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-02", name: "DJ WENADEST LOST CONTHOLL", price: "10.000", audio: "RIZZ/ILMUAN.mp3", zip: "RIZZ/P/ILMUAN.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-03", name: "STYLE LAMBADAH", price: "11.000", audio: "RIZZ/LAMBADA.mp3", zip: "RIZZ/P/LAMBADA.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-03", name: "DJ TAKE AWAY", price: "10.000", audio: "RIZZ/take away.mp3", zip: "RIZZ/P/#TAKEAWAY.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-03", name: "UCIL OLD", price: "15.000", audio: "RIZZ/UCIL.mp3", zip: "RIZZ/P/#UCIL.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-03", name: "MAMAN FVNDY STYLE", price: "25.000", audio: "RIZZ/MAMAN.mp3", zip: "RIZZ/P/#MAMAN FNDY.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-03", name: "MELODY HABIBI", price: "13.000", audio: "RIZZ/HABIBI.mp3", zip: "RIZZ/P/#HABIBI.zip", isNew: true, items: ["Project .Flm", "Tidak ada Acapella Didalam nya", "Full sample di dalam nya", "Dll"] },
+                    { id: "VK-03", name: "TAPI BOONG GOKGOKGOK", price: "0.000/FREE", audio: "RIZZ/AKEAK.mp3", zip: "RIZZ/P/#AKEAK.zip", isNew: true, items: ["Project .Flm", "Acapella Didalam nya", "Full sample di dalam nya", "Dll"] }
+                ]
+            }
         };
 
-        let currentAudio = null;
-        let currentPlayBtn = null;
-        let currentProgress = null;
-        let currentTimeText = null;
+        let myID = "";
         let selectedProduct = null;
-        let loggedInCreator = null; 
+        let currentAudio = null;
+        let currentIdx = null;
 
-        function toggleSidebarCreator() {
-            const sb = document.getElementById('creator-sidebar');
-            const overlay = document.getElementById('sidebar-overlay-creator');
-            if(sb.classList.contains('active')) {
-                sb.classList.remove('active');
-                overlay.style.opacity = '0';
-                setTimeout(() => overlay.style.display = 'none', 300);
-            } else {
-                overlay.style.display = 'block';
-                setTimeout(() => { sb.classList.add('active'); overlay.style.opacity = '1'; }, 10);
-            }
-        }
-
-        function handleMenuUpload() { toggleSidebarCreator(); document.getElementById('modal-login-creator').style.display = 'flex'; }
-        
-        function checkLoginCreator() {
-            const user = document.getElementById('login-user').value;
-            const pass = document.getElementById('login-pass').value;
-            if(creatorDatabase[user] && creatorDatabase[user].pass === pass) {
-                loggedInCreator = creatorDatabase[user];
-                closeModalGeneric('modal-login-creator');
-                document.getElementById('modal-upload-project').style.display = 'flex';
-            } else { alert("Creator Tidak Ditemukan!"); }
-        }
-
-        function verifyCode() {
-            const codeInput = document.getElementById('license-key').value.trim().toUpperCase();
-            const result = licenseDatabase[codeInput];
-            if(result) {
-                document.getElementById('claim-project-name').innerText = result.title;
-                document.getElementById('download-link').href = result.link;
-                document.getElementById('download-area').classList.remove('hidden');
-                document.getElementById('btn-verify').classList.add('hidden');
-            } else { alert("KODE LISENSI TIDAK VALID!"); }
-        }
-
-        function openClaimModal() { 
-            document.getElementById('license-key').value = "";
-            document.getElementById('download-area').classList.add('hidden');
-            document.getElementById('btn-verify').classList.remove('hidden');
-            document.getElementById('modal-claim').style.display = 'flex'; 
+        async function syncUser() {
+            let localID = localStorage.getItem('uID');
+            if (!localID) {
+                myID = "USER-" + Math.floor(100000 + Math.random() * 900000);
+                localStorage.setItem('uID', myID);
+                await fs.collection("users").doc(myID).set({ id: myID, createdAt: new Date().toISOString() });
+            } else { myID = localID; }
+            document.getElementById('user-id-display').innerText = myID;
+            monitorStatus();
         }
 
         function showCreators() {
-            if(currentAudio) { currentAudio.pause(); }
+            if(currentAudio) { currentAudio.pause(); currentAudio = null; }
             document.getElementById('project-section').classList.add('hidden');
             document.getElementById('creator-section').classList.remove('hidden');
         }
@@ -496,153 +366,154 @@
             document.getElementById('creator-section').classList.add('hidden');
             document.getElementById('project-section').classList.remove('hidden');
             document.getElementById('creator-name-display').innerText = name;
-            const render = document.getElementById('project-render');
-            render.innerHTML = '';
-
-            if (!projectData[name] || projectData[name].length === 0) {
-                render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project tersedia.</p>';
-                return;
+            
+            // LOGIKA HANYA TAMPILKAN TOMBOL BACA DI RIZZ_1
+            const btnBaca = document.getElementById('btn-baca-info');
+            if(name === 'Rizz_1') {
+                btnBaca.style.display = 'block';
+            } else {
+                btnBaca.style.display = 'none';
             }
 
-            projectData[name].forEach((p, i) => {
+            const render = document.getElementById('project-render');
+            render.innerHTML = '';
+            
+            const data = projectData[name];
+            if (!data || data.projects.length === 0) {
+                render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project.</p>';
+                return;
+            }
+            
+            data.projects.forEach((p, i) => {
+                let bars = '';
+                for(let b=0; b<25; b++) { bars += `<div class="wave-bar bar-${i}"></div>`; }
                 render.innerHTML += `
-                <div class="project-card" id="card-${i}">
+                <div class="project-card" style="animation-delay: ${i * 0.15}s">
                     ${p.isNew ? '<div class="new-badge">NEW</div>':''}
                     <div class="card-main-info">
-                        <div class="project-img-container" onclick="playPreview(this, '${p.audio}', ${i})">
+                        <div class="project-img-container">
                             <div class="project-img-box"><img src="${avatarUrl}"></div>
-                            <div class="play-overlay">
-                                <div class="play-icon" id="play-icon-${i}">
-                                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
-                            </div>
                         </div>
-                        <div class="project-info">
-                            <b>${p.name}</b>
-                            <span>Rp ${p.price}</span>
-                        </div>
-                        <button class="btn-buy" onclick="openModalDetail('${name}', ${i})">Beli</button>
+                        <div class="project-info"><b>${p.name}</b><span>Rp ${p.price}</span></div>
+                        <div id="btn-box-${p.id}"><button class="btn-buy" onclick="openOrder('${name}', '${p.name}', '${p.price}', '${p.id}')">Beli</button></div>
                     </div>
-                    
-                    <div class="player-controls" id="controls-${i}">
-                        <div class="time-display" id="current-${i}">0:00</div>
-                        <div class="progress-container">
-                            <input type="range" class="progress-bar" id="progress-${i}" value="0" min="0" max="100" oninput="seekAudio(this)">
-                        </div>
-                        <div class="time-display" id="duration-${i}">0:00</div>
+                    <div class="player-controls" id="player-container-${i}">
+                        <button class="play-btn-mini" onclick="playPreview('${p.audio}', ${i})" id="play-icon-${i}">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <div class="waveform-container" id="waveform-${i}" onclick="seekAudioFromWave(event, ${i})">${bars}</div>
+                        <span class="time-display" id="time-${i}">0:00</span>
                     </div>
                 </div>`;
             });
+            monitorStatus();
         }
 
-        function playPreview(el, src, index) {
-            const playIcon = document.getElementById(`play-icon-${index}`);
-            const controls = document.getElementById(`controls-${index}`);
-            const progress = document.getElementById(`progress-${index}`);
-            const currText = document.getElementById(`current-${index}`);
-            const durText = document.getElementById(`duration-${index}`);
-
-            if (currentAudio && currentAudio.src.includes(src)) {
-                if (currentAudio.paused) {
-                    currentAudio.play();
-                    playIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-                } else {
-                    currentAudio.pause();
-                    playIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-                }
+        function playPreview(src, index) {
+            if (currentIdx === index && currentAudio) {
+                if (currentAudio.paused) { currentAudio.play(); updateIcon(index, true); document.getElementById(`player-container-${index}`).classList.add('playing'); }
+                else { currentAudio.pause(); updateIcon(index, false); document.getElementById(`player-container-${index}`).classList.remove('playing'); }
                 return;
             }
-
-            if (currentAudio) {
-                currentAudio.pause();
-                if (currentPlayBtn) currentPlayBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-                document.querySelectorAll('.player-controls').forEach(c => c.classList.remove('active'));
-            }
-
+            if (currentAudio) { currentAudio.pause(); updateIcon(currentIdx, false); document.getElementById(`player-container-${currentIdx}`).classList.remove('playing'); }
             currentAudio = new Audio(src);
-            currentPlayBtn = playIcon;
-            currentProgress = progress;
-            currentTimeText = currText;
-            
-            controls.classList.add('active');
-            playIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-
-            currentAudio.addEventListener('timeupdate', () => {
-                const pos = (currentAudio.currentTime / currentAudio.duration) * 100;
-                currentProgress.value = pos || 0;
-                currentTimeText.innerText = formatTime(currentAudio.currentTime);
-                if(!isNaN(currentAudio.duration)) durText.innerText = formatTime(currentAudio.duration);
-            });
-
-            currentAudio.addEventListener('ended', () => {
-                playIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-                currentProgress.value = 0;
-            });
-
+            currentIdx = index;
             currentAudio.play();
+            updateIcon(index, true);
+            document.getElementById(`player-container-${index}`).classList.add('playing');
+            currentAudio.ontimeupdate = () => {
+                const time = document.getElementById(`time-${index}`);
+                if(time) time.innerText = formatTime(currentAudio.currentTime);
+                const bars = document.querySelectorAll(`.bar-${index}`);
+                const progress = (currentAudio.currentTime / currentAudio.duration) * bars.length;
+                bars.forEach((bar, bIdx) => {
+                    if(bIdx < progress) bar.classList.add('active');
+                    else bar.classList.remove('active');
+                    if(!currentAudio.paused) bar.style.animationDelay = `${bIdx * 0.05}s`;
+                });
+            };
+            currentAudio.onended = () => { updateIcon(index, false); document.getElementById(`player-container-${index}`).classList.remove('playing'); };
         }
 
-        function seekAudio(el) {
-            if(!currentAudio) return;
-            const time = (el.value / 100) * currentAudio.duration;
-            currentAudio.currentTime = time;
+        function seekAudioFromWave(e, index) { if (currentIdx !== index || !currentAudio) return; const container = document.getElementById(`waveform-${index}`); const rect = container.getBoundingClientRect(); const x = e.clientX - rect.left; currentAudio.currentTime = (x / rect.width) * currentAudio.duration; }
+        function updateIcon(idx, isPlaying) { const icon = document.getElementById('play-icon-' + idx); if(!icon) return; icon.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'; }
+        function formatTime(sec) { let m = Math.floor(sec / 60); let s = Math.floor(sec % 60); return `${m}:${s < 10 ? '0' : ''}${s}`; }
+        
+        function openOrder(creator, name, price, id) { 
+            // Ambil data produk spesifik untuk item yang didapat
+            const creatorData = projectData[creator];
+            const product = creatorData.projects.find(p => p.id === id);
+            selectedProduct = { creator, name, price, id, items: product.items }; 
+            
+            document.getElementById('d-title').innerText = name; 
+            document.getElementById('d-price').innerText = "Rp " + price; 
+            
+            // Render item list secara dinamis
+            const itemRender = document.getElementById('d-items');
+            itemRender.innerHTML = '';
+            product.items.forEach(item => {
+                itemRender.innerHTML += `<li>${item}</li>`;
+            });
+
+            document.getElementById('modal-detail').style.display = 'flex'; 
+        }
+        
+        async function pushOrderToFirebase() {
+            const bName = document.getElementById('buyer-name').value;
+            if(!bName) return alert("Isi nama dulu!");
+            
+            const trxID = "TRX-" + Date.now();
+            const now = new Date();
+            const tanggalFull = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+            const waktuFull = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const waktuTimestamp = now.toISOString();
+
+            const targetWA = projectData[selectedProduct.creator].whatsapp;
+            
+            // Push ke Firebase dengan detail waktu lengkap untuk Admin Panel
+            await rdb.ref('orders/' + trxID).set({ 
+                userID: myID, 
+                buyerName: bName, 
+                product: selectedProduct.name, 
+                nominal: selectedProduct.price, 
+                status: "Pending", 
+                tanggal: tanggalFull,
+                jam: waktuFull,
+                timestamp: waktuTimestamp,
+                creatorName: selectedProduct.creator
+            });
+
+            const pesanWA = `*INVOICE PESANAN - NOXPAY*%0A----------------------------------------%0A👤 *Nama:* ${bName}%0A🆔 *User ID:* ${myID}%0A📦 *Produk:* ${selectedProduct.name}%0A💰 *Harga:* Rp ${selectedProduct.price}%0A⏰ *Waktu:* ${tanggalFull} (${waktuFull})%0A----------------------------------------%0A_Mohon segera diproses Admin!_`;
+            window.open(`https://wa.me/${targetWA}?text=${pesanWA}`, '_blank');
+            closeModalGeneric('modal-detail');
         }
 
-        function formatTime(secs) {
-            let min = Math.floor(secs / 60);
-            let sec = Math.floor(secs % 60);
-            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        function monitorStatus() {
+            rdb.ref('orders').orderByChild('userID').equalTo(myID).on('value', (snap) => {
+                snap.forEach(child => {
+                    const data = child.val();
+                    if(data.status === "Success") {
+                        for(let c in projectData) {
+                            const found = projectData[c].projects.find(p => p.name === data.product);
+                            if(found) {
+                                const box = document.getElementById(`btn-box-${found.id}`);
+                                if(box) {
+                                    // Perbaikan: Pastikan link download memiliki target blank dan atribut download yang kuat
+                                    box.innerHTML = `<a href="${found.zip}" download="${found.zip.split('/').pop()}" target="_blank" class="btn-download-premium"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>`;
+                                }
+                            }
+                        }
+                    }
+                });
+            });
         }
 
-        function openModalDetail(creator, i) {
-            const p = projectData[creator][i];
-            selectedProduct = { ...p, creator };
-            document.getElementById('d-creator').innerText = creator;
-            document.getElementById('d-title').innerText = p.name;
-            document.getElementById('d-price').innerText = "Rp " + p.price;
-            document.getElementById('modal-detail').style.display = 'flex';
-        }
-
+        function toggleSidebarCreator() { const sb = document.getElementById('creator-sidebar'); const overlay = document.getElementById('sidebar-overlay-creator'); if(sb.classList.contains('active')) { sb.classList.remove('active'); overlay.style.opacity = '0'; setTimeout(() => overlay.style.display = 'none', 300); } else { overlay.style.display = 'block'; setTimeout(() => { sb.classList.add('active'); overlay.style.opacity = '1'; }, 10); } }
         function closeModalGeneric(id) { document.getElementById(id).style.display = 'none'; }
+        function openInfoBox() { document.getElementById('modal-info').style.display = 'flex'; }
+        function handleMenuUpload() { alert("Fitur Upload Khusus Creator Terverifikasi!"); }
 
-        function confirmPurchase() {
-            let creatorData = Object.values(creatorDatabase).find(c => c.name === selectedProduct.creator);
-            let targetWA = creatorData ? creatorData.wa : "6281211413521"; 
-
-            const msg = `Halo *${selectedProduct.creator}*,\n\n` +
-                        `Saya tertarik untuk membeli project Anda melalui *NoxPay*:\n\n` +
-                        `🎵 *Judul:* ${selectedProduct.name}\n` +
-                        `💰 *Harga:* Rp ${selectedProduct.price}\n\n` +
-                        `Mohon info instruksi pembayarannya. Terima kasih!`;
-
-            window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function toggleQrisUpload() {
-            const q = document.getElementById('qris-container');
-            q.style.display = q.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function submitToAdmin() {
-            const title = document.getElementById('up-title').value;
-            const genre = document.getElementById('up-genre').value;
-            const price = document.getElementById('up-price').value;
-
-            if(!title || !price) return alert("Harap isi Judul dan Harga!");
-            const targetWA = "6283129555763"; 
-
-            const msg = `🚀 *UPLOAD PRODUK BARU - NOXPAY*\n\n` +
-                        `👤 *Creator:* ${loggedInCreator.name}\n` +
-                        `🎵 *Judul:* ${title}\n` +
-                        `🎹 *Genre:* ${genre}\n` +
-                        `💰 *Harga Jual:* Rp ${price}\n` +
-                        `💳 *Status Biaya:* Rp 5.000 (Menunggu Bukti)\n\n` +
-                        `_Mohon diverifikasi. Saya melampirkan file audio & bukti transfer setelah ini._`;
-
-            window.open(`https://wa.me/${targetWA}?text=${encodeURIComponent(msg)}`, '_blank');
-            closeModalGeneric('modal-upload-project');
-            document.getElementById('qris-container').style.display = 'none';
-        }
+        syncUser();
     </script>
 </body>
 </html>
