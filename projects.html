@@ -22,6 +22,71 @@
             --btn-buy-bg: #1e293b; 
             --accent-new: #ff3e3e;
             --gold: #ffd700;
+            --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+        }
+
+        /* --- UPDATE: STYLE UNTUK EXCLUSIVE BOX (ELEGAN & LUXURY) --- */
+        .card-exclusive {
+            border: 1px solid rgba(255, 215, 0, 0.3) !important;
+            background: linear-gradient(165deg, #111625 0%, #1a1a1a 100%) !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-exclusive::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: var(--gold-gradient);
+            z-index: 3;
+        }
+        .card-exclusive .new-badge {
+            background: var(--gold-gradient) !important;
+            color: #4a3701 !important;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            box-shadow: -2px 2px 10px rgba(0,0,0,0.5);
+        }
+        .card-exclusive .project-info b {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        .card-exclusive .project-info span {
+            color: #fcf6ba !important;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+        }
+        .card-exclusive .play-btn-mini {
+            background: var(--gold-gradient) !important;
+            box-shadow: 0 4px 15px rgba(191, 149, 63, 0.4);
+        }
+        .card-exclusive .play-btn-mini svg {
+            fill: #4a3701 !important;
+        }
+        .card-exclusive .wave-bar.active {
+            background: #bf953f !important;
+        }
+        .card-exclusive .btn-buy {
+            border: 1px solid #bf953f !important;
+            background: rgba(191, 149, 63, 0.1) !important;
+            color: #fcf6ba !important;
+        }
+
+        /* STYLE UNTUK SOLD OUT */
+        .is-sold-out {
+            filter: grayscale(0.8);
+            opacity: 0.8;
+            pointer-events: none; /* Mencegah klik tapi preview audio tetap bisa lewat ID */
+        }
+        .is-sold-out .play-btn-mini {
+            pointer-events: auto !important; /* Supaya preview audio tetap bisa diputar */
+        }
+        .btn-sold-out {
+            background: #334155 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed !important;
+            border: none !important;
         }
 
         /* --- SPLASH SCREEN ANIMATION --- */
@@ -383,53 +448,76 @@
             if(name === 'Rizz_1') { btnBaca.style.display = 'block'; } else { btnBaca.style.display = 'none'; }
             const render = document.getElementById('project-render');
             render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Memuat project...</p>';
+            
             try {
-                fs.collection("projects").where("creatorName", "==", name).onSnapshot((snapshot) => {
-                    if (snapshot.empty) { render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project.</p>'; return; }
-                    render.innerHTML = '';
-                    let i = 0;
-                    snapshot.forEach(doc => {
-                        const p = doc.data();
-                        const pID = doc.id;
-                        const displayTitle = p.productName || p.name;
-                        
-                        let bars = '';
-                        for(let b=0; b<25; b++) { bars += `<div class="wave-bar bar-${i}"></div>`; }
-                        
-                        render.innerHTML += `
-                        <div class="project-card" data-product-id="${pID}" data-product-name="${displayTitle}" style="animation-delay: ${i * 0.1}s">
-                            <div class="new-badge">PROJECT</div>
-                            <div class="card-main-info">
-                                <div class="project-img-container">
-                                    <div class="project-img-box"><img src="${avatarUrl}"></div>
+                rdb.ref('orders').on('value', (allOrdersSnap) => {
+                    const allOrders = allOrdersSnap.val() || {};
+
+                    fs.collection("projects").where("creatorName", "==", name).onSnapshot((snapshot) => {
+                        if (snapshot.empty) { render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project.</p>'; return; }
+                        render.innerHTML = '';
+                        let i = 0;
+                        snapshot.forEach(doc => {
+                            const p = doc.data();
+                            const pID = doc.id;
+                            const type = p.productType || 'reguler'; 
+                            const displayTitle = p.productName || p.name;
+                            
+                            let btnLabel = "Beli";
+                            let cardExtraClass = "";
+                            let isSold = false;
+
+                            if(type === 'free') {
+                                btnLabel = "Free";
+                            } else if(type === 'exclusive') {
+                                cardExtraClass = "card-exclusive";
+                                Object.values(allOrders).forEach(order => {
+                                    if(order.productID === pID && (order.status === "Success" || order.status === "Selesai")) {
+                                        isSold = true;
+                                    }
+                                });
+                            }
+
+                            let bars = '';
+                            for(let b=0; b<25; b++) { bars += `<div class="wave-bar bar-${i}"></div>`; }
+                            
+                            render.innerHTML += `
+                            <div class="project-card ${cardExtraClass} ${isSold ? 'is-sold-out' : ''}" id="card-${pID}" style="animation-delay: ${i * 0.1}s">
+                                <div class="new-badge">${type.toUpperCase()}</div>
+                                <div class="card-main-info">
+                                    <div class="project-img-container">
+                                        <div class="project-img-box"><img src="${avatarUrl}"></div>
+                                    </div>
+                                    <div class="project-info">
+                                        <b>${displayTitle}</b>
+                                        <span>${type === 'free' ? 'GRATIS' : 'Rp ' + p.price}</span>
+                                    </div>
+                                    <div id="btn-box-${pID}">
+                                        ${isSold ? 
+                                            `<button class="btn-buy btn-sold-out">Sold Out</button>` : 
+                                            `<button class="btn-buy" onclick="openOrder('${name}', '${displayTitle}', '${p.price}', '${pID}', '${JSON.stringify(p.items || [])}', '${p.walletType || 'DANA'}', '${p.walletNumber || ''}')">${btnLabel}</button>`
+                                        }
+                                    </div>
                                 </div>
-                                <div class="project-info">
-                                    <b>${displayTitle}</b>
-                                    <span>Rp ${p.price}</span>
+                                <div class="player-controls" id="player-container-${i}">
+                                    <button class="play-btn-mini" onclick="playPreview('${p.audio}', ${i})" id="play-icon-${i}">
+                                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    </button>
+                                    <div class="waveform-container" id="waveform-${i}" onclick="seekAudioFromWave(event, ${i})">${bars}</div>
+                                    <span class="time-display" id="time-${i}">0:00</span>
                                 </div>
-                                <div id="btn-box-${pID}">
-                                    <button class="btn-buy" onclick="openOrder('${name}', '${displayTitle}', '${p.price}', '${pID}', '${JSON.stringify(p.items || [])}', '${p.walletType || 'DANA'}', '${p.walletNumber || ''}')">Beli</button>
-                                </div>
-                            </div>
-                            <div class="player-controls" id="player-container-${i}">
-                                <button class="play-btn-mini" onclick="playPreview('${p.audio}', ${i})" id="play-icon-${i}">
-                                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </button>
-                                <div class="waveform-container" id="waveform-${i}" onclick="seekAudioFromWave(event, ${i})">${bars}</div>
-                                <span class="time-display" id="time-${i}">0:00</span>
-                            </div>
-                        </div>`;
-                        
-                        rdb.ref('orders').orderByChild('userID').equalTo(myID).once('value', (oSnap) => {
-                            oSnap.forEach(oChild => {
-                                const o = oChild.val();
-                                if(o.productID === pID && (o.status === "Success" || o.status === "Selesai")) {
-                                    setDownloadButton(pID);
-                                }
-                            });
+                            </div>`;
+                            
+                            if(!isSold) {
+                                Object.values(allOrders).forEach(order => {
+                                    if(order.userID === myID && order.productID === pID && (order.status === "Success" || order.status === "Selesai")) {
+                                        setDownloadButton(pID);
+                                    }
+                                });
+                            }
+                            
+                            i++;
                         });
-                        
-                        i++;
                     });
                 });
             } catch (e) { render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--accent-new); margin-top:20px;">Gagal memuat data.</p>'; }
@@ -451,6 +539,13 @@
                                     <line x1="12" y1="15" x2="12" y2="3"></line>
                                 </svg>
                             </a>`;
+                        const card = document.getElementById(`card-${pID}`);
+                        if(card) {
+                            card.classList.remove('is-sold-out');
+                            card.style.filter = "none";
+                            card.style.opacity = "1";
+                            card.style.pointerEvents = "auto";
+                        }
                     }
                 }
             });
@@ -526,7 +621,7 @@
             const items = JSON.parse(itemsJson || "[]");
             selectedProduct = { creator, name, price, id, items }; 
             document.getElementById('d-title').innerText = name; 
-            document.getElementById('d-price').innerText = "Rp " + price; 
+            document.getElementById('d-price').innerText = price == 0 ? "GRATIS" : "Rp " + price; 
             const finalWalletNum = wNum || (creatorsList[creator]?.whatsapp || "083129555763").replace('62', '0');
             const finalWalletType = wType || "DANA";
             document.getElementById('d-wallet-label').innerText = finalWalletType;
@@ -535,7 +630,7 @@
             const itemRender = document.getElementById('d-items');
             itemRender.innerHTML = '';
             if(items.length > 0) { items.forEach(item => { itemRender.innerHTML += `<li>${item}</li>`; }); }
-            else { itemRender.innerHTML = '<li>Project .Flm</li><li>Full Sample</li>'; }
+            else { itemRender.innerHTML = '<li>Project .Flm</li><li>High Quality Audio</li>'; }
             document.getElementById('modal-detail').style.display = 'flex'; 
         }
         
@@ -566,7 +661,7 @@
                 creatorName: selectedProduct.creator 
             });
 
-            const pesanWA = `*INVOICE PESANAN - NOXPAY*%0A----------------------------------------%0A👤 *Nama:* ${bName}%0A🆔 *User ID:* ${myID}%0A📦 *Produk:* ${selectedProduct.name}%0A💰 *Harga:* Rp ${selectedProduct.price}%0A⏰ *Waktu:* ${tanggalFull} (${waktuFull})%0A----------------------------------------%0A_Mohon segera diproses Creator!_`;
+            const pesanWA = `*INVOICE PESANAN - NOXPAY*%0A----------------------------------------%0A👤 *Nama:* ${bName}%0A🆔 *User ID:* ${myID}%0A📦 *Produk:* ${selectedProduct.name}%0A💰 *Harga:* ${selectedProduct.price == 0 ? 'GRATIS' : 'Rp ' + selectedProduct.price}%0A⏰ *Waktu:* ${tanggalFull} (${waktuFull})%0A----------------------------------------%0A_Mohon segera diproses Creator!_`;
             window.open(`https://wa.me/${targetWA}?text=${pesanWA}`, '_blank');
             closeModalGeneric('modal-detail');
         }
@@ -584,7 +679,6 @@
             });
         }
 
-        /* --- FITUR MONITOR PESANAN UNTUK CREATOR (TITIK MERAH) --- */
         function monitorIncomingOrders(creatorUID) {
             rdb.ref('orders').orderByChild('creatorID').equalTo(creatorUID).on('value', (snap) => {
                 let hasPending = false;
@@ -645,7 +739,6 @@
                             if(ui.btnUpload) ui.btnUpload.style.display = 'block';
                             if(ui.menuDashboard) ui.menuDashboard.style.display = 'flex';
                             
-                            // MULAI MONITOR PESANAN MASUK JIKA USER ADALAH CREATOR
                             monitorIncomingOrders(user.uid);
                         } else {
                             if(ui.role) ui.role.innerText = "PENDING CREATOR";
