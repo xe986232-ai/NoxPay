@@ -57,8 +57,16 @@
             position: sticky; top: 0; z-index: 1000; 
         }
         .header-flex { display: flex; justify-content: space-between; align-items: center; }
-        .logo-nav { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .logo-box { width: 32px; height: 32px; background: var(--hero-music); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 14px; }
+        .logo-nav { display: flex; align-items: center; gap: 8px; cursor: pointer; position: relative; }
+        .logo-box { width: 32px; height: 32px; background: var(--hero-music); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 14px; position: relative; }
+
+        /* NOTIFIKASI TITIK MERAH */
+        .notif-dot { 
+            position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; 
+            background: #ff3e3e; border: 2px solid #111625; border-radius: 50%; 
+            display: none; z-index: 10; animation: pulseRed 1.5s infinite;
+        }
+        @keyframes pulseRed { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 62, 62, 0.7); } 70% { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(255, 62, 62, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 62, 62, 0); } }
 
         #creator-sidebar {
             position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
@@ -87,7 +95,7 @@
 
         /* Menu Sidebar Baru */
         .sidebar-menu-list { list-style: none; margin-top: 20px; }
-        .menu-item { display: flex; align-items: center; gap: 12px; padding: 14px; color: var(--gray); text-decoration: none; font-weight: 700; font-size: 13px; border-radius: 14px; transition: 0.3s; margin-bottom: 5px; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 14px; color: var(--gray); text-decoration: none; font-weight: 700; font-size: 13px; border-radius: 14px; transition: 0.3s; margin-bottom: 5px; position: relative; }
         .menu-item:hover { background: rgba(255,255,255,0.05); color: white; }
         .menu-item svg { width: 18px; height: 18px; opacity: 0.7; }
 
@@ -201,6 +209,7 @@
             <a href="dasbor.html" id="menu-dashboard" class="menu-item" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                 Dashboard Creator
+                <div id="dot-dashboard" class="notif-dot" style="top: 12px; right: 12px;"></div>
             </a>
         </div>
 
@@ -214,7 +223,10 @@
     <header>
         <div class="container header-flex">
             <div class="logo-nav" onclick="toggleSidebarCreator()">
-                <div class="logo-box">N</div>
+                <div class="logo-box">
+                    N
+                    <div id="dot-header" class="notif-dot"></div>
+                </div>
                 <div style="font-weight: 800; font-size: 16px; color:white;">Nox<span style="color:var(--primary)">Music</span></div>
             </div>
             <div>
@@ -329,13 +341,12 @@
             monitorStatus();
         }
 
-        // PERBAIKAN: Menambahkan filter .where("isApproved", "==", true) agar kreator yang belum dikonfirmasi tidak muncul
         async function loadCreatorsFromFirebase() {
             const listRender = document.getElementById('creator-list-render');
             try {
                 fs.collection("users")
                   .where("role", "==", "creator")
-                  .where("isApproved", "==", true) // Filter ini krusial agar sinkron dengan Panel Master
+                  .where("isApproved", "==", true) 
                   .onSnapshot((snapshot) => {
                     if (snapshot.empty) {
                         listRender.innerHTML = '<p style="color:var(--gray); font-size:12px; text-align:center; grid-column: span 2;">Belum ada creator terverifikasi.</p>';
@@ -573,6 +584,31 @@
             });
         }
 
+        /* --- FITUR MONITOR PESANAN UNTUK CREATOR (TITIK MERAH) --- */
+        function monitorIncomingOrders(creatorUID) {
+            rdb.ref('orders').orderByChild('creatorID').equalTo(creatorUID).on('value', (snap) => {
+                let hasPending = false;
+                if(snap.exists()){
+                    snap.forEach(child => {
+                        if(child.val().status === "Pending") {
+                            hasPending = true;
+                        }
+                    });
+                }
+                
+                const dotHeader = document.getElementById('dot-header');
+                const dotDashboard = document.getElementById('dot-dashboard');
+                
+                if(hasPending) {
+                    if(dotHeader) dotHeader.style.display = 'block';
+                    if(dotDashboard) dotDashboard.style.display = 'block';
+                } else {
+                    if(dotHeader) dotHeader.style.display = 'none';
+                    if(dotDashboard) dotDashboard.style.display = 'none';
+                }
+            });
+        }
+
         function toggleSidebarCreator() { const sb = document.getElementById('creator-sidebar'); const overlay = document.getElementById('sidebar-overlay-creator'); if(sb.classList.contains('active')) { sb.classList.remove('active'); overlay.style.opacity = '0'; setTimeout(() => overlay.style.display = 'none', 300); } else { overlay.style.display = 'block'; setTimeout(() => { sb.classList.add('active'); overlay.style.opacity = '1'; }, 10); } }
         function closeModalGeneric(id) { document.getElementById(id).style.display = 'none'; }
         function openInfoBox() { document.getElementById('modal-info').style.display = 'flex'; }
@@ -608,6 +644,9 @@
                             if(ui.btnDaftar) ui.btnDaftar.style.display = 'none';
                             if(ui.btnUpload) ui.btnUpload.style.display = 'block';
                             if(ui.menuDashboard) ui.menuDashboard.style.display = 'flex';
+                            
+                            // MULAI MONITOR PESANAN MASUK JIKA USER ADALAH CREATOR
+                            monitorIncomingOrders(user.uid);
                         } else {
                             if(ui.role) ui.role.innerText = "PENDING CREATOR";
                             if(ui.btnDaftar) ui.btnDaftar.style.display = 'block';
@@ -630,3 +669,4 @@
     </script>
 </body>
 </html>
+
