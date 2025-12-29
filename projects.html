@@ -449,7 +449,11 @@
             const render = document.getElementById('project-render');
             render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Memuat project...</p>';
             
+            // Cek status user saat ini (apakah login auth atau guest)
+            const currentUID = auth.currentUser ? auth.currentUser.uid : myID;
+
             try {
+                // Monitor order secara realtime agar tombol update otomatis
                 rdb.ref('orders').on('value', (allOrdersSnap) => {
                     const allOrders = allOrdersSnap.val() || {};
 
@@ -463,31 +467,24 @@
                             const type = p.productType || 'reguler'; 
                             const displayTitle = p.productName || p.name;
                             
-                            let btnLabel = "Beli";
-                            let cardExtraClass = "";
                             let isSold = false;
                             let belongsToMe = false;
 
-                            // Cek apakah user adalah pembeli project ini yang statusnya Success
+                            // Cek database pesanan
                             Object.values(allOrders).forEach(order => {
                                 if(order.productID === pID && (order.status === "Success" || order.status === "Selesai")) {
                                     if(type === 'exclusive') isSold = true;
-                                    if(order.userID === myID) belongsToMe = true;
+                                    // Cek apakah order ini milik user saat ini
+                                    if(order.userID === currentUID || order.userID === myID) belongsToMe = true;
                                 }
                             });
 
-                            if(type === 'free') {
-                                btnLabel = "Free";
-                            } else if(type === 'exclusive') {
-                                cardExtraClass = "card-exclusive";
-                            }
+                            const cardExtraClass = (type === 'exclusive') ? "card-exclusive" : "";
+                            const finalSoldClass = (isSold && !belongsToMe) ? 'is-sold-out' : '';
 
                             let bars = '';
                             for(let b=0; b<25; b++) { bars += `<div class="wave-bar bar-${i}"></div>`; }
                             
-                            // Jika sudah milik saya, jangan tampilkan redup/Sold Out (khusus tampilan saya)
-                            const finalSoldClass = (isSold && !belongsToMe) ? 'is-sold-out' : '';
-
                             render.innerHTML += `
                             <div class="project-card ${cardExtraClass} ${finalSoldClass}" id="card-${pID}" style="animation-delay: ${i * 0.1}s">
                                 <div class="new-badge">${type.toUpperCase()}</div>
@@ -502,7 +499,7 @@
                                     <div id="btn-box-${pID}">
                                         ${(isSold && !belongsToMe) ? 
                                             `<button class="btn-buy btn-sold-out">Sold Out</button>` : 
-                                            `<button class="btn-buy" onclick="openOrder('${name}', '${displayTitle}', '${p.price}', '${pID}', '${JSON.stringify(p.items || [])}', '${p.walletType || 'DANA'}', '${p.walletNumber || ''}')">${btnLabel}</button>`
+                                            `<button class="btn-buy" onclick="openOrder('${name}', '${displayTitle}', '${p.price}', '${pID}', '${JSON.stringify(p.items || [])}', '${p.walletType || 'DANA'}', '${p.walletNumber || ''}')">${type === 'free' ? 'Free' : 'Beli'}</button>`
                                         }
                                     </div>
                                 </div>
@@ -515,7 +512,7 @@
                                 </div>
                             </div>`;
                             
-                            // Jika user adalah pemiliknya, langsung ubah ke tombol download
+                            // Eksekusi perubahan tombol jika memenuhi syarat
                             if(belongsToMe || type === 'free') {
                                 setDownloadButton(pID);
                             }
@@ -544,7 +541,7 @@
                                 </svg>
                             </a>`;
                         
-                        // HAPUS EFEK REDUP KHUSUS PEMBELI (Jika sebelumnya terdeteksi sold out)
+                        // Kembalikan visual jika sebelumnya tertutup grayscale/sold out
                         const card = document.getElementById(`card-${pID}`);
                         if(card) {
                             card.classList.remove('is-sold-out');
@@ -644,6 +641,7 @@
             const bName = document.getElementById('buyer-name').value;
             if(!bName) return alert("Isi nama dulu!");
             
+            const currentUID = auth.currentUser ? auth.currentUser.uid : myID;
             const trxID = "TRX-" + Date.now();
             const now = new Date();
             const tanggalFull = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -655,7 +653,7 @@
 
             await rdb.ref('orders/' + trxID).set({ 
                 orderID: trxID,
-                userID: myID,            
+                userID: currentUID,            
                 creatorID: cID,          
                 buyerName: bName, 
                 product: selectedProduct.name, 
@@ -667,18 +665,20 @@
                 creatorName: selectedProduct.creator 
             });
 
-            const pesanWA = `*INVOICE PESANAN - NOXPAY*%0A----------------------------------------%0A👤 *Nama:* ${bName}%0A🆔 *User ID:* ${myID}%0A📦 *Produk:* ${selectedProduct.name}%0A💰 *Harga:* ${selectedProduct.price == 0 ? 'GRATIS' : 'Rp ' + selectedProduct.price}%0A⏰ *Waktu:* ${tanggalFull} (${waktuFull})%0A----------------------------------------%0A_Mohon segera diproses Creator!_`;
+            const pesanWA = `*INVOICE PESANAN - NOXPAY*%0A----------------------------------------%0A👤 *Nama:* ${bName}%0A🆔 *User ID:* ${currentUID}%0A📦 *Produk:* ${selectedProduct.name}%0A💰 *Harga:* ${selectedProduct.price == 0 ? 'GRATIS' : 'Rp ' + selectedProduct.price}%0A⏰ *Waktu:* ${tanggalFull} (${waktuFull})%0A----------------------------------------%0A_Mohon segera diproses Creator!_`;
             window.open(`https://wa.me/${targetWA}?text=${pesanWA}`, '_blank');
             closeModalGeneric('modal-detail');
         }
 
         function monitorStatus() {
-            rdb.ref('orders').orderByChild('userID').equalTo(myID).on('value', (snap) => {
+            // Kita monitor perubahan secara realtime untuk semua order milik user
+            rdb.ref('orders').on('value', (snap) => {
                 if(!snap.exists()) return;
+                const currentUID = auth.currentUser ? auth.currentUser.uid : myID;
                 
                 snap.forEach(child => {
                     const orderData = child.val();
-                    if(orderData.status === "Success" || orderData.status === "Selesai") {
+                    if(orderData.userID === currentUID && (orderData.status === "Success" || orderData.status === "Selesai")) {
                         setDownloadButton(orderData.productID);
                     }
                 });
@@ -754,6 +754,8 @@
                         }
                     }
                 });
+                // Update monitor status dengan ID login
+                monitorStatus();
             } else {
                 if(ui.displayID) ui.displayID.innerText = myID; 
                 if(ui.name) ui.name.innerText = "Guest User";
