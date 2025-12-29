@@ -184,14 +184,13 @@
             } catch (e) { console.error(e); }
         }
 
-        // PERBAIKAN: Fungsi konfirmasi agar kreator benar-benar terdaftar di sistem login
         async function approveArtist(uid) {
             if(confirm("Aktifkan artist ini? Mereka akan bisa mulai login dan upload.")) {
                 try {
                     await fs.collection("users").doc(uid).set({ 
                         isApproved: true,
-                        status: "active",  // Sinkronisasi status
-                        role: "creator"    // Memastikan role tetap creator
+                        status: "active",
+                        role: "creator"
                     }, { merge: true });
                     alert("Artist Berhasil Diaktifkan!");
                 } catch (err) {
@@ -200,69 +199,75 @@
             }
         }
 
+        // PERBAIKAN: Menggunakan Real-time Listener (onSnapshot) ganda untuk User dan Projects
         async function loadActiveData() {
             const container = document.getElementById('master-render');
-            fs.collection("users").where("role", "==", "creator").where("isApproved", "==", true).onSnapshot(async (uSnap) => {
-                const pSnap = await fs.collection("projects").get();
-                const prods = [];
-                pSnap.forEach(d => prods.push({ id: d.id, ...d.data() }));
-                prods.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            
+            // Listener untuk User Aktif
+            fs.collection("users").where("role", "==", "creator").where("isApproved", "==", true).onSnapshot(uSnap => {
+                
+                // Listener untuk Project secara real-time
+                fs.collection("projects").onSnapshot(pSnap => {
+                    const prods = [];
+                    pSnap.forEach(d => prods.push({ id: d.id, ...d.data() }));
+                    prods.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-                if(uSnap.empty) {
-                    container.innerHTML = "<p style='text-align:center; padding:30px; color:var(--text-muted);'>Belum ada creator aktif.</p>";
-                    return;
-                }
+                    if(uSnap.empty) {
+                        container.innerHTML = "<p style='text-align:center; padding:30px; color:var(--text-muted);'>Belum ada creator aktif.</p>";
+                        return;
+                    }
 
-                container.innerHTML = "";
-                uSnap.forEach(uDoc => {
-                    const u = uDoc.data();
-                    const myProds = prods.filter(p => p.creatorName === u.artistName);
+                    container.innerHTML = "";
+                    uSnap.forEach(uDoc => {
+                        const u = uDoc.data();
+                        const myProds = prods.filter(p => p.creatorName === u.artistName);
 
-                    container.innerHTML += `
-                        <div class="artist-container">
-                            <div class="artist-header-sleek">
-                                <div class="artist-title-area">
-                                    <h2>${u.artistName}</h2>
-                                    <div class="horizontal-info">
-                                        <div class="info-pill">EMAIL: <b>${u.email}</b></div>
-                                        <div class="info-pill">PASS: <b>${u.password || 'N/A'}</b></div>
-                                        <div class="info-pill">WA: <a href="https://wa.me/${u.whatsapp}" target="_blank" class="wa-link">${u.whatsapp}</a></div>
-                                        <div class="info-pill">USER ID: <b class="uid-text">${uDoc.id}</b></div>
-                                        <div class="info-pill">PRODUK: <b>${myProds.length}</b></div>
+                        container.innerHTML += `
+                            <div class="artist-container">
+                                <div class="artist-header-sleek">
+                                    <div class="artist-title-area">
+                                        <h2>${u.artistName}</h2>
+                                        <div class="horizontal-info">
+                                            <div class="info-pill">EMAIL: <b>${u.email}</b></div>
+                                            <div class="info-pill">PASS: <b>${u.password || 'N/A'}</b></div>
+                                            <div class="info-pill">WA: <a href="https://wa.me/${u.whatsapp}" target="_blank" class="wa-link">${u.whatsapp}</a></div>
+                                            <div class="info-pill">USER ID: <b class="uid-text">${uDoc.id}</b></div>
+                                            <div class="info-pill">PRODUK: <b>${myProds.length}</b></div>
+                                        </div>
                                     </div>
+                                    <button class="btn-del-a" onclick="wipe('${uDoc.id}', '${u.artistName}')">HAPUS ARTIST</button>
                                 </div>
-                                <button class="btn-del-a" onclick="wipe('${uDoc.id}', '${u.artistName}')">HAPUS ARTIST</button>
-                            </div>
 
-                            <div class="table-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Upload</th>
-                                            <th>Project</th>
-                                            <th>Harga</th>
-                                            <th>Audio</th>
-                                            <th>File</th>
-                                            <th>ID</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${myProds.length === 0 ? '<tr><td colspan="7" style="text-align:center;">Belum ada produk.</td></tr>' : 
-                                          myProds.map(p => `
+                                <div class="table-wrapper">
+                                    <table>
+                                        <thead>
                                             <tr>
-                                                <td class="date-text">${p.createdAt ? new Date(p.createdAt).toLocaleDateString('id-ID') : '-'}</td>
-                                                <td><b>${p.name}</b></td>
-                                                <td><span class="price-tag">Rp ${Number(p.price).toLocaleString()}</span></td>
-                                                <td><a href="${p.audio}" target="_blank" class="link-btn">Audio</a></td>
-                                                <td><a href="${p.fileLink}" target="_blank" class="link-btn">File</a></td>
-                                                <td><small class="uid-text">${p.id}</small></td>
-                                                <td><button class="btn-del-p" onclick="delP('${p.id}', '${p.name}')">Hapus</button></td>
-                                            </tr>`).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>`;
+                                                <th>Upload</th>
+                                                <th>Project</th>
+                                                <th>Harga</th>
+                                                <th>Audio</th>
+                                                <th>File</th>
+                                                <th>ID</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${myProds.length === 0 ? '<tr><td colspan="7" style="text-align:center; color: #666;">Belum ada produk.</td></tr>' : 
+                                              myProds.map(p => `
+                                                <tr>
+                                                    <td class="date-text">${p.createdAt ? new Date(p.createdAt).toLocaleDateString('id-ID') : '-'}</td>
+                                                    <td><b>${p.name}</b></td>
+                                                    <td><span class="price-tag">Rp ${Number(p.price).toLocaleString()}</span></td>
+                                                    <td><a href="${p.audio}" target="_blank" class="link-btn">Audio</a></td>
+                                                    <td><a href="${p.fileLink}" target="_blank" class="link-btn">File</a></td>
+                                                    <td><small class="uid-text">${p.id}</small></td>
+                                                    <td><button class="btn-del-p" onclick="delP('${p.id}', '${p.name}')">Hapus</button></td>
+                                                </tr>`).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>`;
+                    });
                 });
             });
         }
@@ -274,10 +279,14 @@
         async function delP(id, name) {
             if(confirm("Hapus " + name + "?")) {
                 try {
+                    // Menghapus dari Firestore
                     await fs.collection("projects").doc(id).delete();
+                    // Menghapus link aman dari Realtime Database
                     await db.ref('secure_links/' + cleanPath(name)).remove();
+                    // Tabel akan otomatis update karena onSnapshot di loadActiveData
                 } catch (err) {
                     console.error("Error:", err);
+                    alert("Gagal menghapus produk.");
                 }
             }
         }
@@ -295,9 +304,11 @@
                     await Promise.all(promises);
                 } catch (err) {
                     console.error("Error wiping:", err);
+                    alert("Gagal menghapus artist.");
                 }
             }
         }
     </script>
 </body>
 </html>
+
