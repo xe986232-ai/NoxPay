@@ -36,26 +36,38 @@
             background: var(--white); padding: 16px; border-radius: 22px; margin-bottom: 12px; 
             border: 1px solid rgba(255,255,255,0.05); animation: slideUp 0.5s ease forwards;
             position: relative; overflow: hidden;
+            transition: 0.3s;
         }
 
-        /* STYLE KHUSUS EXCLUSIVE (GOLD TEMA) */
+        /* UPDATE: STYLE KHUSUS EXCLUSIVE SUPER GOLD */
         .order-card.exclusive-order {
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            background: linear-gradient(145deg, #111625 0%, #1a1508 100%);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 2px solid var(--gold) !important;
+            background: linear-gradient(145deg, #1a1508 0%, #080a12 100%) !important;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
         }
-        .order-card.exclusive-order .price-tag { color: var(--gold); }
+        
+        .order-card.exclusive-order .price-tag { 
+            color: var(--gold) !important; 
+            font-size: 15px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .order-card.exclusive-order b {
+            color: var(--gold) !important;
+        }
+
         .order-card.exclusive-order::after {
-            content: 'EXCLUSIVE';
+            content: 'PREMIUM';
             position: absolute;
-            top: 10px;
-            right: -20px;
+            top: 12px;
+            right: -25px;
             background: var(--gold);
             color: #000;
-            font-size: 7px;
+            font-size: 8px;
             font-weight: 900;
-            padding: 2px 25px;
+            padding: 4px 30px;
             transform: rotate(45deg);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -75,6 +87,7 @@
         .exclusive-order .btn-confirm {
             background: linear-gradient(90deg, #f59e0b, #ffd700);
             color: #000;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
 
         .btn-confirm:active { transform: scale(0.98); }
@@ -185,8 +198,10 @@
                     }
 
                     const isPending = order.status === "Pending";
-                    // DETEKSI LOGIKA EXCLUSIVE
-                    const isExclusive = order.productType === "exclusive";
+                    
+                    // UPDATE LOGIKA: Cek berdasarkan productType ATAU nama produk yang mengandung kata "Exclusive"
+                    const productName = (order.product || "").toLowerCase();
+                    const isExclusive = (order.productType === "exclusive") || productName.includes("exclusive");
 
                     listHTML = `
                     <div class="order-card ${isExclusive ? 'exclusive-order' : ''}">
@@ -212,7 +227,6 @@
         async function confirmOrder(orderKey) {
             if(confirm("Pastikan uang sudah masuk ke e-wallet Anda sebelum konfirmasi! Lanjutkan?")) {
                 try {
-                    // Update status ke Success agar terdeteksi oleh sistem pembeli
                     await rdb.ref('orders/' + orderKey).update({ 
                         status: "Success" 
                     });
