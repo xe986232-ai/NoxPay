@@ -403,7 +403,7 @@
             } else { myID = localID; }
             document.getElementById('user-id-display').innerText = myID;
             loadCreatorsFromFirebase();
-            monitorStatus();
+            monitorStatus(); // PENTING: Jalankan monitor status saat start
         }
 
         async function loadCreatorsFromFirebase() {
@@ -449,18 +449,19 @@
             const render = document.getElementById('project-render');
             render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Memuat project...</p>';
             
-            // Cek status user saat ini (apakah login auth atau guest)
             const currentUID = auth.currentUser ? auth.currentUser.uid : myID;
 
             try {
-                // Monitor order secara realtime agar tombol update otomatis
-                rdb.ref('orders').on('value', (allOrdersSnap) => {
-                    const allOrders = allOrdersSnap.val() || {};
-
-                    fs.collection("projects").where("creatorName", "==", name).onSnapshot((snapshot) => {
-                        if (snapshot.empty) { render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project.</p>'; return; }
+                // Gunakan .on agar perubahan data di Firebase langsung update tampilan
+                fs.collection("projects").where("creatorName", "==", name).onSnapshot((snapshot) => {
+                    if (snapshot.empty) { render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project.</p>'; return; }
+                    
+                    // Kita ambil data orders terbaru dulu sebelum render ulang project
+                    rdb.ref('orders').once('value', (allOrdersSnap) => {
+                        const allOrders = allOrdersSnap.val() || {};
                         render.innerHTML = '';
                         let i = 0;
+
                         snapshot.forEach(doc => {
                             const p = doc.data();
                             const pID = doc.id;
@@ -470,12 +471,11 @@
                             let isSold = false;
                             let belongsToMe = false;
 
-                            // Cek database pesanan
+                            // Cek di tabel orders apakah product ini sudah sukses/selesai
                             Object.values(allOrders).forEach(order => {
                                 if(order.productID === pID && (order.status === "Success" || order.status === "Selesai")) {
                                     if(type === 'exclusive') isSold = true;
-                                    // Cek apakah order ini milik user saat ini
-                                    if(order.userID === currentUID || order.userID === myID) belongsToMe = true;
+                                    if(order.userID === currentUID) belongsToMe = true;
                                 }
                             });
 
@@ -512,11 +512,10 @@
                                 </div>
                             </div>`;
                             
-                            // Eksekusi perubahan tombol jika memenuhi syarat
+                            // Jika memang milik saya, ganti ke tombol download
                             if(belongsToMe || type === 'free') {
                                 setDownloadButton(pID);
                             }
-                            
                             i++;
                         });
                     });
@@ -541,7 +540,6 @@
                                 </svg>
                             </a>`;
                         
-                        // Kembalikan visual jika sebelumnya tertutup grayscale/sold out
                         const card = document.getElementById(`card-${pID}`);
                         if(card) {
                             card.classList.remove('is-sold-out');
@@ -651,6 +649,7 @@
             const targetWA = creatorData?.whatsapp || "6283129555763";
             const cID = creatorData?.creatorID || "ADMIN";
 
+            // PENTING: ID USER disimpan dengan benar agar monitorStatus bisa membaca
             await rdb.ref('orders/' + trxID).set({ 
                 orderID: trxID,
                 userID: currentUID,            
@@ -670,15 +669,17 @@
             closeModalGeneric('modal-detail');
         }
 
+        // FUNGSI UTAMA MONITORING REAL-TIME
         function monitorStatus() {
-            // Kita monitor perubahan secara realtime untuk semua order milik user
             rdb.ref('orders').on('value', (snap) => {
                 if(!snap.exists()) return;
                 const currentUID = auth.currentUser ? auth.currentUser.uid : myID;
                 
                 snap.forEach(child => {
                     const orderData = child.val();
+                    // Jika ada order atas nama User ini yang statusnya baru saja diubah jadi Success
                     if(orderData.userID === currentUID && (orderData.status === "Success" || orderData.status === "Selesai")) {
+                        // Langsung panggil fungsi ganti tombol di tampilan
                         setDownloadButton(orderData.productID);
                     }
                 });
@@ -754,8 +755,7 @@
                         }
                     }
                 });
-                // Update monitor status dengan ID login
-                monitorStatus();
+                monitorStatus(); // Panggil ulang untuk user login
             } else {
                 if(ui.displayID) ui.displayID.innerText = myID; 
                 if(ui.name) ui.name.innerText = "Guest User";
