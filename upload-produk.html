@@ -16,9 +16,20 @@
             --gold: #ffd700;
             --glass: rgba(255, 255, 255, 0.03);
             --bg-gradient: linear-gradient(180deg, #080a12 0%, #111625 100%); 
+            --border-color: rgba(139, 92, 246, 0.2);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        /* TEMA DINAMIS */
+        body.theme-free { --primary: #64748b; --accent: #94a3b8; }
+        body.theme-reguler { --primary: #8b5cf6; --accent: #d946ef; }
+        body.theme-exclusive { 
+            --primary: #f59e0b; 
+            --accent: #ffd700; 
+            --card-bg: #0f121d;
+            --border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.4s ease; }
         
         body { 
             background: var(--bg-gradient); 
@@ -37,8 +48,24 @@
             max-width: 480px; 
             padding: 40px 30px; 
             border-radius: 32px; 
-            border: 1px solid rgba(139, 92, 246, 0.2); 
+            border: 1px solid var(--border-color); 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Dekorasi Exclusive */
+        .theme-exclusive .dashboard-card::before {
+            content: "PREMIUM GOLD";
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: var(--gold);
+            color: black;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 5px 40px;
+            transform: rotate(45deg);
         }
 
         h2 { 
@@ -116,12 +143,13 @@
         input[type="file"] { 
             padding: 15px; 
             background: var(--glass); 
-            border: 2px dashed rgba(139, 92, 246, 0.3); 
+            border: 2px dashed var(--primary); 
             border-radius: 16px;
             cursor: pointer;
             width: 100%;
             font-size: 12px;
             color: var(--gray);
+            opacity: 0.7;
         }
 
         /* UPDATE: Progress Bar Premium */
@@ -131,10 +159,10 @@
             background: rgba(0,0,0,0.5); 
             border-radius: 20px; 
             padding: 20px; 
-            border: 1px solid rgba(139, 92, 246, 0.3); 
+            border: 1px solid var(--border-color); 
         }
         
-        .progress-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 10px; color: #fbbf24; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 10px; color: var(--accent); }
         .progress-bar-bg { background: #1e293b; height: 10px; border-radius: 20px; overflow: hidden; }
         #progress-fill { background: linear-gradient(90deg, var(--primary), var(--accent)); width: 0%; height: 100%; transition: width 0.3s ease; }
 
@@ -149,7 +177,7 @@
             font-weight: 800; 
             cursor: pointer; 
             font-size: 14px; 
-            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             transition: 0.3s;
             display: none; /* MODIFIKASI: Muncul di akhir */
         }
@@ -158,7 +186,7 @@
         .btn-next {
             width: 100%; 
             padding: 16px;
-            background: rgba(139, 92, 246, 0.1);
+            background: rgba(255, 255, 255, 0.03);
             color: var(--primary);
             border: 1px solid var(--primary);
             border-radius: 18px;
@@ -201,7 +229,7 @@
             border-top: 1px solid rgba(255,255,255,0.05); 
         }
         
-        .katalog-header { font-size: 10px; color: var(--gold); letter-spacing: 2px; font-weight: 800; margin-bottom: 20px; text-align: center; text-transform: uppercase; opacity: 0.8; }
+        .katalog-header { font-size: 10px; color: var(--accent); letter-spacing: 2px; font-weight: 800; margin-bottom: 20px; text-align: center; text-transform: uppercase; opacity: 0.8; }
         
         .product-item { 
             background: var(--glass); 
@@ -215,7 +243,7 @@
             transition: 0.3s;
         }
 
-        .product-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(139, 92, 246, 0.2); }
+        .product-item:hover { background: rgba(255,255,255,0.05); border-color: var(--primary); }
         
         .product-item span { font-weight: 700; font-size: 13px; color: #fff; }
         .product-item b { color: var(--primary); font-size: 13px; }
@@ -235,7 +263,7 @@
         }
     </style>
 </head>
-<body>
+<body class="theme-reguler">
 
     <div class="dashboard-card">
         <h2 id="display-name">NoxPay Sync</h2>
@@ -354,6 +382,11 @@
         function togglePriceField() {
             const type = document.getElementById('p-product-type').value;
             const priceInput = document.getElementById('p-price');
+            
+            // LOGIKA GANTI TEMA VISUAL
+            document.body.className = ''; // reset
+            document.body.classList.add('theme-' + type);
+
             if(type === 'free') {
                 priceInput.value = 0;
                 priceInput.readOnly = true;
