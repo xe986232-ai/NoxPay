@@ -466,23 +466,30 @@
                             let btnLabel = "Beli";
                             let cardExtraClass = "";
                             let isSold = false;
+                            let belongsToMe = false;
+
+                            // Cek apakah user adalah pembeli project ini yang statusnya Success
+                            Object.values(allOrders).forEach(order => {
+                                if(order.productID === pID && (order.status === "Success" || order.status === "Selesai")) {
+                                    if(type === 'exclusive') isSold = true;
+                                    if(order.userID === myID) belongsToMe = true;
+                                }
+                            });
 
                             if(type === 'free') {
                                 btnLabel = "Free";
                             } else if(type === 'exclusive') {
                                 cardExtraClass = "card-exclusive";
-                                Object.values(allOrders).forEach(order => {
-                                    if(order.productID === pID && (order.status === "Success" || order.status === "Selesai")) {
-                                        isSold = true;
-                                    }
-                                });
                             }
 
                             let bars = '';
                             for(let b=0; b<25; b++) { bars += `<div class="wave-bar bar-${i}"></div>`; }
                             
+                            // Jika sudah milik saya, jangan tampilkan redup/Sold Out (khusus tampilan saya)
+                            const finalSoldClass = (isSold && !belongsToMe) ? 'is-sold-out' : '';
+
                             render.innerHTML += `
-                            <div class="project-card ${cardExtraClass} ${isSold ? 'is-sold-out' : ''}" id="card-${pID}" style="animation-delay: ${i * 0.1}s">
+                            <div class="project-card ${cardExtraClass} ${finalSoldClass}" id="card-${pID}" style="animation-delay: ${i * 0.1}s">
                                 <div class="new-badge">${type.toUpperCase()}</div>
                                 <div class="card-main-info">
                                     <div class="project-img-container">
@@ -493,7 +500,7 @@
                                         <span>${type === 'free' ? 'GRATIS' : 'Rp ' + p.price}</span>
                                     </div>
                                     <div id="btn-box-${pID}">
-                                        ${isSold ? 
+                                        ${(isSold && !belongsToMe) ? 
                                             `<button class="btn-buy btn-sold-out">Sold Out</button>` : 
                                             `<button class="btn-buy" onclick="openOrder('${name}', '${displayTitle}', '${p.price}', '${pID}', '${JSON.stringify(p.items || [])}', '${p.walletType || 'DANA'}', '${p.walletNumber || ''}')">${btnLabel}</button>`
                                         }
@@ -508,12 +515,9 @@
                                 </div>
                             </div>`;
                             
-                            if(!isSold) {
-                                Object.values(allOrders).forEach(order => {
-                                    if(order.userID === myID && order.productID === pID && (order.status === "Success" || order.status === "Selesai")) {
-                                        setDownloadButton(pID);
-                                    }
-                                });
+                            // Jika user adalah pemiliknya, langsung ubah ke tombol download
+                            if(belongsToMe || type === 'free') {
+                                setDownloadButton(pID);
                             }
                             
                             i++;
@@ -539,6 +543,8 @@
                                     <line x1="12" y1="15" x2="12" y2="3"></line>
                                 </svg>
                             </a>`;
+                        
+                        // HAPUS EFEK REDUP KHUSUS PEMBELI (Jika sebelumnya terdeteksi sold out)
                         const card = document.getElementById(`card-${pID}`);
                         if(card) {
                             card.classList.remove('is-sold-out');
