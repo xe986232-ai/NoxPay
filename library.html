@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koleksi Saya - NoxMusic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --dark: #080a12;
+            --white: #111625;
+            --gray: #8b949e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--dark); color: white; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .title { font-size: 24px; font-weight: 800; }
+        .back-btn { color: var(--primary); text-decoration: none; font-size: 14px; font-weight: 700; }
+
+        .grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .item-card { 
+            background: var(--white); border-radius: 20px; padding: 15px; 
+            display: flex; align-items: center; gap: 15px; 
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .item-icon { 
+            width: 60px; height: 60px; background: linear-gradient(45deg, var(--primary), #6366f1);
+            border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+        .item-info { flex: 1; }
+        .item-info h4 { font-size: 15px; margin-bottom: 4px; }
+        .item-info p { font-size: 11px; color: var(--gray); }
+
+        .btn-download {
+            background: rgba(139, 92, 246, 0.1); color: var(--primary); 
+            border: none; padding: 10px 15px; border-radius: 10px; 
+            font-size: 11px; font-weight: 800; text-decoration: none; cursor: pointer;
+        }
+
+        .empty { text-align: center; margin-top: 100px; color: var(--gray); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Koleksi Saya</h1>
+            <a href="projects.html" class="back-btn">Kembali</a>
+        </div>
+
+        <div id="library-list" class="grid">
+            <div class="empty">Mengecek koleksi kamu...</div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const rdb = firebase.database();
+        const auth = firebase.auth();
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                loadMyLibrary(user.uid);
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        function loadMyLibrary(uid) {
+            // Filter: Hanya ambil pesanan milik user yang login DAN statusnya Success
+            rdb.ref('orders').orderByChild('uid').equalTo(uid).on('value', (snapshot) => {
+                const list = document.getElementById('library-list');
+                if (!snapshot.exists()) {
+                    list.innerHTML = '<div class="empty">Kamu belum punya koleksi apa pun.</div>';
+                    return;
+                }
+
+                let html = '';
+                let hasItems = false;
+
+                snapshot.forEach((child) => {
+                    const order = child.val();
+                    if (order.status === "Success") {
+                        hasItems = true;
+                        html += `
+                        <div class="item-card">
+                            <div class="item-icon">🎵</div>
+                            <div class="item-info">
+                                <h4>${order.product}</h4>
+                                <p>Dari: ${order.creatorName || 'Creator'}</p>
+                            </div>
+                            <a href="${order.linkDownload || '#'}" target="_blank" class="btn-download">DOWNLOAD</a>
+                        </div>`;
+                    }
+                });
+
+                if (!hasItems) {
+                    list.innerHTML = '<div class="empty">Belum ada pesanan yang dikonfirmasi.</div>';
+                } else {
+                    list.innerHTML = html;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

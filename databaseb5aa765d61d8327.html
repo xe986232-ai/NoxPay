@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Control NoxPay - Ultra Detail & Moderation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #8b5cf6; --bg: #030712; --card: #111827; 
+            --danger: #ef4444; --warning: #fbbf24; --success: #10b981;
+            --text-main: #f3f4f6; --text-muted: #9ca3af;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text-main); min-height: 100vh; padding: 15px; }
+
+        /* LOGIN GATE */
+        #login-gate { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .login-box { background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid var(--primary); width: 100%; max-width: 380px; text-align: center; }
+        .form-control { width: 100%; padding: 14px; background: #000; border: 1px solid #1e293b; border-radius: 12px; color: white; margin: 10px 0; outline: none; }
+        .btn-login { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
+
+        /* PANEL KONTROL */
+        #admin-panel { display: none; max-width: 1400px; margin: 0 auto; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 15px; background: var(--card); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        
+        .section-title { font-size: 16px; font-weight: 800; color: var(--primary); margin: 30px 0 15px; display: flex; align-items: center; gap: 10px; }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(139, 92, 246, 0.2); }
+
+        /* MODERATION TABLE (PENDAFTAR BARU) */
+        .moderation-box { background: #1e1b4b; border-radius: 20px; padding: 20px; margin-bottom: 30px; border: 1px solid var(--primary); }
+        .mod-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .mod-table th { text-align: left; padding: 12px; color: var(--warning); border-bottom: 1px solid rgba(251,191,36,0.2); }
+        .mod-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* ARTIST CARD */
+        .artist-container { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .artist-header-sleek { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .artist-title-area h2 { font-size: 22px; color: var(--warning); font-weight: 800; margin-bottom: 8px; }
+        
+        /* INFO PILLS */
+        .horizontal-info { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .info-pill { font-size: 10px; display: flex; align-items: center; gap: 5px; color: var(--text-muted); background: rgba(255,255,255,0.02); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); }
+        .info-pill b { color: var(--text-main); font-weight: 600; }
+        .wa-link { color: var(--success); text-decoration: none; font-weight: 800; }
+        .uid-text { font-family: monospace; font-size: 10px; color: #6366f1; }
+
+        /* TABLE STYLES */
+        .table-wrapper { width: 100%; overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { text-align: left; font-size: 10px; text-transform: uppercase; color: var(--primary); padding: 12px; letter-spacing: 1px; border-bottom: 1px solid rgba(139, 92, 246, 0.2); }
+        td { padding: 12px; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+        .price-tag { color: var(--success); font-weight: 800; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px; }
+        .link-btn { color: #60a5fa; text-decoration: none; font-weight: 700; font-size: 11px; background: rgba(59, 130, 246, 0.1); padding: 4px 8px; border-radius: 6px; }
+        
+        .btn-approve { background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 10px; }
+        .btn-del-p { color: var(--danger); background: none; border: none; cursor: pointer; font-weight: 700; font-size: 11px; }
+        .btn-del-a { background: var(--danger); color: white; padding: 8px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; }
+        
+        .badge-pending { color: var(--warning); border: 1px solid var(--warning); padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <div id="login-gate">
+        <div class="login-box">
+            <h2 style="color: var(--primary); font-weight: 800; margin-bottom: 20px;">MASTER LOGIN</h2>
+            <input type="email" id="email" class="form-control" placeholder="Email Admin">
+            <input type="password" id="password" class="form-control" placeholder="Password">
+            <button class="btn-login" onclick="handleLogin()">ACCESS DATABASE</button>
+            <p id="err-msg" style="color: var(--danger); font-size: 11px; margin-top: 15px; display: none;"></p>
+        </div>
+    </div>
+
+    <div id="admin-panel">
+        <div class="top-bar">
+            <div>
+                <h1 style="font-size: 20px; font-weight: 800;">COMMAND CENTER <span style="color:var(--primary)">NOXPAY</span></h1>
+                <p id="active-user" style="font-size: 10px; color: var(--text-muted);"></p>
+            </div>
+            <button onclick="handleLogout()" style="background:none; border:1px solid rgba(255,255,255,0.1); color:white; padding:8px 15px; border-radius:10px; cursor:pointer; font-weight:700;">LOGOUT</button>
+        </div>
+
+        <div class="section-title">PENDAFTARAN BARU (WAITING)</div>
+        <div class="moderation-box">
+            <div class="table-wrapper" style="min-width: 100%; margin-top:0;">
+                <table class="mod-table">
+                    <thead>
+                        <tr>
+                            <th>Tgl Daftar</th>
+                            <th>Nama Artist</th>
+                            <th>Email Akun</th>
+                            <th>No. WhatsApp</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="render-moderasi">
+                        <tr><td colspan="5" style="text-align:center;">Memuat data pendaftar...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section-title">CREATOR AKTIF & DATABASE PRODUK</div>
+        <div id="master-render"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin",
+            storageBucket: "noxpay-admin.appspot.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const fs = firebase.firestore();
+        const db = firebase.database();
+
+        const ADMIN_UTAMA = "tokonoxpay@gmail.com"; 
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                if (user.email === ADMIN_UTAMA) {
+                    document.getElementById('login-gate').style.display = 'none';
+                    document.getElementById('admin-panel').style.display = 'block';
+                    document.getElementById('active-user').innerText = "Logged in: " + user.email;
+                    loadAllData();
+                } else {
+                    alert("Akses Ditolak! Bukan Super Admin.");
+                    auth.signOut();
+                }
+            } else {
+                document.getElementById('login-gate').style.display = 'flex';
+                document.getElementById('admin-panel').style.display = 'none';
+            }
+        });
+
+        async function handleLogin() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            const msg = document.getElementById('err-msg');
+            try { await auth.signInWithEmailAndPassword(e, p); } 
+            catch (err) { msg.innerText = err.message; msg.style.display = 'block'; }
+        }
+
+        function handleLogout() { auth.signOut(); }
+
+        function loadAllData() {
+            loadModerasi();
+            loadActiveData();
+        }
+
+        async function loadModerasi() {
+            const render = document.getElementById('render-moderasi');
+            try {
+                fs.collection("users").where("role", "==", "creator").where("isApproved", "==", false).onSnapshot(snap => {
+                    if(snap.empty) {
+                        render.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada pendaftar baru.</td></tr>';
+                        return;
+                    }
+                    render.innerHTML = "";
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        const date = d.createdAt ? new Date(d.createdAt).toLocaleDateString('id-ID') : '-';
+                        render.innerHTML += `
+                            <tr>
+                                <td>${date}</td>
+                                <td><b>${d.artistName}</b></td>
+                                <td>${d.email}</td>
+                                <td><a href="https://wa.me/${d.whatsapp}" target="_blank" class="wa-link">${d.whatsapp}</a></td>
+                                <td><button class="btn-approve" onclick="approveArtist('${doc.id}')">KONFIRMASI / AKTIFKAN</button></td>
+                            </tr>
+                        `;
+                    });
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        // PERBAIKAN: Fungsi konfirmasi agar kreator benar-benar terdaftar di sistem login
+        async function approveArtist(uid) {
+            if(confirm("Aktifkan artist ini? Mereka akan bisa mulai login dan upload.")) {
+                try {
+                    await fs.collection("users").doc(uid).set({ 
+                        isApproved: true,
+                        status: "active",  // Sinkronisasi status
+                        role: "creator"    // Memastikan role tetap creator
+                    }, { merge: true });
+                    alert("Artist Berhasil Diaktifkan!");
+                } catch (err) {
+                    alert("Error: " + err.message);
+                }
+            }
+        }
+
+        async function loadActiveData() {
+            const container = document.getElementById('master-render');
+            fs.collection("users").where("role", "==", "creator").where("isApproved", "==", true).onSnapshot(async (uSnap) => {
+                const pSnap = await fs.collection("projects").get();
+                const prods = [];
+                pSnap.forEach(d => prods.push({ id: d.id, ...d.data() }));
+                prods.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                if(uSnap.empty) {
+                    container.innerHTML = "<p style='text-align:center; padding:30px; color:var(--text-muted);'>Belum ada creator aktif.</p>";
+                    return;
+                }
+
+                container.innerHTML = "";
+                uSnap.forEach(uDoc => {
+                    const u = uDoc.data();
+                    const myProds = prods.filter(p => p.creatorName === u.artistName);
+
+                    container.innerHTML += `
+                        <div class="artist-container">
+                            <div class="artist-header-sleek">
+                                <div class="artist-title-area">
+                                    <h2>${u.artistName}</h2>
+                                    <div class="horizontal-info">
+                                        <div class="info-pill">EMAIL: <b>${u.email}</b></div>
+                                        <div class="info-pill">PASS: <b>${u.password || 'N/A'}</b></div>
+                                        <div class="info-pill">WA: <a href="https://wa.me/${u.whatsapp}" target="_blank" class="wa-link">${u.whatsapp}</a></div>
+                                        <div class="info-pill">USER ID: <b class="uid-text">${uDoc.id}</b></div>
+                                        <div class="info-pill">PRODUK: <b>${myProds.length}</b></div>
+                                    </div>
+                                </div>
+                                <button class="btn-del-a" onclick="wipe('${uDoc.id}', '${u.artistName}')">HAPUS ARTIST</button>
+                            </div>
+
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Upload</th>
+                                            <th>Project</th>
+                                            <th>Harga</th>
+                                            <th>Audio</th>
+                                            <th>File</th>
+                                            <th>ID</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${myProds.length === 0 ? '<tr><td colspan="7" style="text-align:center;">Belum ada produk.</td></tr>' : 
+                                          myProds.map(p => `
+                                            <tr>
+                                                <td class="date-text">${p.createdAt ? new Date(p.createdAt).toLocaleDateString('id-ID') : '-'}</td>
+                                                <td><b>${p.name}</b></td>
+                                                <td><span class="price-tag">Rp ${Number(p.price).toLocaleString()}</span></td>
+                                                <td><a href="${p.audio}" target="_blank" class="link-btn">Audio</a></td>
+                                                <td><a href="${p.fileLink}" target="_blank" class="link-btn">File</a></td>
+                                                <td><small class="uid-text">${p.id}</small></td>
+                                                <td><button class="btn-del-p" onclick="delP('${p.id}', '${p.name}')">Hapus</button></td>
+                                            </tr>`).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        function cleanPath(str) {
+            return str.replace(/[.#$\[\]]/g, "_");
+        }
+
+        async function delP(id, name) {
+            if(confirm("Hapus " + name + "?")) {
+                try {
+                    await fs.collection("projects").doc(id).delete();
+                    await db.ref('secure_links/' + cleanPath(name)).remove();
+                } catch (err) {
+                    console.error("Error:", err);
+                }
+            }
+        }
+
+        async function wipe(uid, name) {
+            if(confirm("HAPUS TOTAL Artist " + name + "? Semua produknya juga akan hilang.")) {
+                try {
+                    await fs.collection("users").doc(uid).delete();
+                    const snap = await fs.collection("projects").where("creatorName", "==", name).get();
+                    const promises = snap.docs.map(async (doc) => {
+                        const pData = doc.data();
+                        await fs.collection("projects").doc(doc.id).delete();
+                        await db.ref('secure_links/' + cleanPath(pData.name)).remove();
+                    });
+                    await Promise.all(promises);
+                } catch (err) {
+                    console.error("Error wiping:", err);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

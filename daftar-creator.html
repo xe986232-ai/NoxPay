@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoxPay - Join Creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --dark: #080a12;
+            --white: #111625;
+            --gray: #8b949e;
+            --bg-gradient: linear-gradient(180deg, #080a12 0%, #111625 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: var(--bg-gradient); 
+            color: white; 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .logo-box {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 24px; font-weight: 800;
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+        p { font-size: 13px; color: var(--gray); margin-bottom: 25px; }
+
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--primary); margin-bottom: 8px; letter-spacing: 1px; }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            background: #080a12;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-control:focus { border-color: var(--primary); }
+
+        .btn-auth {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .switch-auth { margin-top: 20px; font-size: 13px; color: var(--gray); }
+        .switch-auth span { color: var(--primary); font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+        #loading-overlay {
+            position: fixed; inset: 0; background: rgba(8,10,18,0.9);
+            display: none; align-items: center; justify-content: center; z-index: 100; font-weight: 800;
+        }
+        
+        /* Notif Pending */
+        .pending-box {
+            display: none;
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid #fbbf24;
+            padding: 15px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            color: #fbbf24;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">MEMPROSES...</div>
+
+    <div class="auth-card" id="register-view">
+        <div class="logo-box">N</div>
+        <h2>Creator Registration</h2>
+        <p>Daftar untuk mulai berjualan karya Anda.</p>
+
+        <div class="form-group">
+            <label>NAMA ARTIS / CREATOR</label>
+            <input type="text" id="reg-name" class="form-control" placeholder="Contoh: Dyon Yete">
+        </div>
+
+        <div class="form-group">
+            <label>ALAMAT EMAIL</label>
+            <input type="email" id="reg-email" class="form-control" placeholder="email@gmail.com">
+        </div>
+
+        <div class="form-group">
+            <label>PASSWORD</label>
+            <input type="password" id="reg-pass" class="form-control" placeholder="••••••••">
+        </div>
+
+        <div class="form-group">
+            <label>NOMOR WHATSAPP</label>
+            <input type="number" id="reg-wa" class="form-control" placeholder="628123456789">
+        </div>
+
+        <button class="btn-auth" onclick="handleRegister()">DAFTAR SEKARANG</button>
+
+        <div class="switch-auth">
+            Sudah punya akun? <span onclick="toggleView()">Login Disini</span>
+        </div>
+    </div>
+
+    <div class="auth-card" style="display: none;" id="login-view">
+        <div class="logo-box">N</div>
+        <h2>Creator Login</h2>
+        <p>Masuk ke akun Creator Anda.</p>
+
+        <div id="pending-msg" class="pending-box">
+            ⚠️ Akun Anda sedang menunggu konfirmasi Admin. Silahkan hubungi Admin untuk aktivasi.
+        </div>
+
+        <div class="form-group">
+            <label>ALAMAT EMAIL</label>
+            <input type="email" id="login-email" class="form-control" placeholder="email@gmail.com">
+        </div>
+
+        <div class="form-group">
+            <label>PASSWORD</label>
+            <input type="password" id="login-pass" class="form-control" placeholder="••••••••">
+        </div>
+
+        <button class="btn-auth" onclick="handleLogin()">MASUK KE DASHBOARD</button>
+
+        <div class="switch-auth">
+            Belum terdaftar? <span onclick="toggleView()">Daftar Disini</span>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const fs = firebase.firestore();
+
+        function toggleView() {
+            const reg = document.getElementById('register-view');
+            const log = document.getElementById('login-view');
+            document.getElementById('pending-msg').style.display = 'none';
+            reg.style.display = reg.style.display === 'none' ? 'block' : 'none';
+            log.style.display = log.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
+        }
+
+        async function handleRegister() {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const wa = document.getElementById('reg-wa').value;
+
+            if(!name || !email || !pass || !wa) return alert("Lengkapi semua field!");
+
+            showLoading(true);
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
+                const user = userCredential.user;
+
+                // Memastikan field 'whatsapp' masuk ke database user
+                await fs.collection("users").doc(user.uid).set({
+                    id: user.uid,
+                    artistName: name,
+                    email: email,
+                    whatsapp: wa, // Data ini yang akan ditarik oleh projects.html
+                    role: "creator",
+                    isApproved: false, 
+                    createdAt: new Date().toISOString()
+                });
+
+                alert("Pendaftaran Berhasil! Akun Anda sedang ditinjau Admin. Silahkan Login untuk cek status.");
+                toggleView();
+            } catch (e) {
+                alert("Error: " + e.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+
+            if(!email || !pass) return alert("Masukkan Email & Password!");
+
+            showLoading(true);
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, pass);
+                const user = userCredential.user;
+
+                const doc = await fs.collection("users").doc(user.uid).get();
+                
+                if(doc.exists) {
+                    const userData = doc.data();
+                    
+                    if(userData.isApproved === true) {
+                        localStorage.setItem('uID', user.uid);
+                        alert("Login Berhasil! Halo " + userData.artistName);
+                        window.location.href = "index.html"; 
+                    } else {
+                        document.getElementById('pending-msg').style.display = 'block';
+                        await auth.signOut(); 
+                    }
+                } else {
+                    alert("Data user tidak ditemukan.");
+                }
+            } catch (e) {
+                alert("Login Gagal: " + e.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+    </script>
+</body>
+</html>

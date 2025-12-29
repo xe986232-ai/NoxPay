@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Dashboard - NoxPay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* UPDATE: Warna & Tema diselaraskan dengan projects.html */
+        :root { 
+            --primary: #8b5cf6; 
+            --accent: #d946ef;
+            --dark-bg: #080a12; 
+            --card-bg: #111625; 
+            --gray: #8b949e; 
+            --gold: #ffd700;
+            --glass: rgba(255, 255, 255, 0.03);
+            --bg-gradient: linear-gradient(180deg, #080a12 0%, #111625 100%); 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: var(--bg-gradient); 
+            color: white; 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+        }
+
+        /* UPDATE: Card dibuat lebih modern & elegan */
+        .dashboard-card { 
+            background: var(--card-bg); 
+            width: 100%; 
+            max-width: 480px; 
+            padding: 40px 30px; 
+            border-radius: 32px; 
+            border: 1px solid rgba(139, 92, 246, 0.2); 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+        }
+
+        h2 { 
+            font-size: 22px; 
+            font-weight: 800; 
+            margin-bottom: 30px; 
+            text-align: center; 
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* UPDATE: Form styling premium */
+        .form-group { 
+            margin-bottom: 20px; 
+            display: none; /* MODIFIKASI: Default disembunyikan untuk tahap-tahap */
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group.active { display: block; } /* MODIFIKASI: Hanya yang aktif muncul */
+
+        .form-group label { 
+            display: block; 
+            font-size: 10px; 
+            font-weight: 800; 
+            color: var(--gray); 
+            margin-bottom: 10px; 
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .form-control { 
+            width: 100%; 
+            padding: 16px; 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 16px; 
+            color: white; 
+            font-size: 14px; 
+            outline: none; 
+            transition: 0.3s;
+        }
+
+        .form-control:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        /* Styling Select Dropdown */
+        select.form-control {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        /* UPDATE: Custom File Input Style */
+        input[type="file"] { 
+            padding: 15px; 
+            background: var(--glass); 
+            border: 2px dashed rgba(139, 92, 246, 0.3); 
+            border-radius: 16px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* UPDATE: Progress Bar Premium */
+        #progress-container { 
+            display: none; 
+            margin-bottom: 25px; 
+            background: rgba(0,0,0,0.5); 
+            border-radius: 20px; 
+            padding: 20px; 
+            border: 1px solid rgba(139, 92, 246, 0.3); 
+        }
+        
+        .progress-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 10px; color: #fbbf24; }
+        .progress-bar-bg { background: #1e293b; height: 10px; border-radius: 20px; overflow: hidden; }
+        #progress-fill { background: linear-gradient(90deg, var(--primary), var(--accent)); width: 0%; height: 100%; transition: width 0.3s ease; }
+
+        /* UPDATE: Button diselaraskan dengan sidebar projects.html */
+        .btn-publis { 
+            width: 100%; 
+            padding: 18px; 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 18px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 14px; 
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            transition: 0.3s;
+            display: none; /* MODIFIKASI: Muncul di akhir */
+        }
+
+        /* MODIFIKASI: Tombol Lanjut Tahap */
+        .btn-next {
+            width: 100%; 
+            padding: 16px;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            border-radius: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .btn-next:hover { background: var(--primary); color: white; }
+
+        .btn-publis:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .btn-publis:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        
+        .btn-cancel { 
+            width: 100%; 
+            padding: 15px; 
+            background: transparent; 
+            color: #ef4444; 
+            border: 1px solid rgba(239, 68, 68, 0.3); 
+            border-radius: 18px; 
+            font-weight: 700; 
+            margin-top: 15px; 
+            font-size: 13px; 
+            transition: 0.3s; 
+        }
+
+        .btn-cancel:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
+
+        /* UPDATE: Katalog Area Premium */
+        #render-produk { 
+            margin-top: 35px; 
+            padding-top: 25px; 
+            border-top: 1px solid rgba(255,255,255,0.05); 
+        }
+        
+        .katalog-header { font-size: 10px; color: var(--gold); letter-spacing: 2px; font-weight: 800; margin-bottom: 20px; text-align: center; text-transform: uppercase; opacity: 0.8; }
+        
+        .product-item { 
+            background: var(--glass); 
+            padding: 16px 20px; 
+            border-radius: 18px; 
+            margin-bottom: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.03); 
+            transition: 0.3s;
+        }
+
+        .product-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(139, 92, 246, 0.2); }
+        
+        .product-item span { font-weight: 700; font-size: 13px; color: #fff; }
+        .product-item b { color: var(--primary); font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-card">
+        <h2 id="display-name">NoxPay Sync</h2>
+
+        <div id="progress-container">
+            <div class="progress-label">
+                <span id="status-text">Mengunggah Audio...</span>
+                <span id="percent-text">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="form-group active" id="step-1">
+            <label>NAMA PRODUK (Tampilan di Halaman)</label>
+            <input type="text" id="p-display-name" class="form-control" placeholder="Contoh: Viral Bass Kane">
+            <button class="btn-next" onclick="nextStep(2, 'p-display-name')">LANJUTKAN</button>
+        </div>
+
+        <div class="form-group" id="step-2">
+            <label>NAMA PROJECT ZIP (Sesuai File)</label>
+            <input type="text" id="p-name" class="form-control" placeholder="Contoh: MEMEW">
+            <button class="btn-next" onclick="nextStep(3, 'p-name')">LANJUTKAN</button>
+        </div>
+        
+        <div class="form-group" id="step-3">
+            <label>HARGA (RP)</label>
+            <input type="number" id="p-price" class="form-control" placeholder="15000">
+            <button class="btn-next" onclick="nextStep(4, 'p-price')">LANJUTKAN</button>
+        </div>
+
+        <div class="form-group" id="step-4">
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label>METODE E-WALLET</label>
+                    <select id="p-wallet-type" class="form-control">
+                        <option value="DANA">DANA</option>
+                        <option value="OVO">OVO</option>
+                        <option value="GOPAY">GOPAY</option>
+                        <option value="SHOPEEPAY">SHOPEEPAY</option>
+                    </select>
+                </div>
+                <div style="flex: 2;">
+                    <label>NOMOR E-WALLET</label>
+                    <input type="number" id="p-wallet-num" class="form-control" placeholder="08xxxx">
+                </div>
+            </div>
+            <button class="btn-next" onclick="nextStep(5, 'p-wallet-num')">LANJUTKAN</button>
+        </div>
+
+        <div class="form-group" id="step-5">
+            <label>PREVIEW AUDIO</label>
+            <input type="file" id="p-audio" accept="audio/*">
+            <button class="btn-next" onclick="nextStep(6, 'p-audio')">LANJUTKAN</button>
+        </div>
+
+        <div class="form-group" id="step-6">
+            <label>LINK FILE ASLI (Link MediaFire/G-Drive)</label>
+            <input type="text" id="p-link" class="form-control" placeholder="https://www.mediafire.com/...">
+        </div>
+
+        <button class="btn-publis" id="btn-submit" onclick="handlePublish()">PUBLIKASIKAN & SYNC</button>
+        <button class="btn-cancel" onclick="window.location.href='projects.html'">BATALKAN UPLOAD</button>
+
+        <div id="render-produk"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin",
+            storageBucket: "noxpay-admin.appspot.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        
+        const auth = firebase.auth();
+        const fs = firebase.firestore();
+        const db = firebase.database();
+
+        const cloudName = "djzrkkbmk";
+        const uploadPreset = "noxpay_upload";
+
+        let currentCreator = "";
+
+        // MODIFIKASI: Fungsi navigasi step-by-step
+        function nextStep(step, inputId) {
+            const input = document.getElementById(inputId);
+            if(input.type === 'file') {
+                if(!input.files[0]) return alert("Pilih file audio dulu!");
+            } else {
+                if(!input.value) return alert("Isi dulu kolom ini!");
+            }
+
+            // Sembunyikan tombol "Lanjut" yang baru diklik
+            event.target.style.display = 'none';
+            
+            // Munculkan tahap berikutnya
+            const nextEl = document.getElementById('step-' + step);
+            if(nextEl) {
+                nextEl.classList.add('active');
+            }
+
+            // Jika sampai tahap terakhir (Tahap 6), munculkan tombol submit
+            if(step === 6) {
+                document.getElementById('btn-submit').style.display = 'block';
+            }
+        }
+
+        async function initArtistDetection() {
+            const savedUID = localStorage.getItem('uID');
+            
+            auth.onAuthStateChanged(async (user) => {
+                let targetID = user ? user.uid : savedUID;
+
+                if (targetID) {
+                    try {
+                        const doc = await fs.collection("users").doc(targetID).get();
+                        if (doc.exists) {
+                            currentCreator = doc.data().artistName;
+                            document.getElementById('display-name').innerText = "Halo, " + currentCreator;
+                            loadProducts();
+                        } else {
+                            document.getElementById('display-name').innerText = "Data Artist Tak Ditemukan";
+                        }
+                    } catch (e) {
+                        console.error("Gagal ambil data:", e);
+                    }
+                } else {
+                    document.getElementById('display-name').innerText = "Silakan Login/Daftar Dulu";
+                }
+            });
+        }
+        initArtistDetection();
+
+        function uploadAudio(file) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('upload_preset', uploadPreset);
+
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/upload`, true);
+
+                xhr.upload.onprogress = (e) => {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    document.getElementById('percent-text').innerText = percent + "%";
+                    document.getElementById('progress-fill').style.width = percent + "%";
+                };
+
+                xhr.onload = () => {
+                    const res = JSON.parse(xhr.responseText);
+                    if (xhr.status === 200) resolve(res.secure_url);
+                    else reject(res.error ? res.error.message : "Gagal upload audio");
+                };
+                xhr.send(fd);
+            });
+        }
+
+        async function handlePublish() {
+            const displayName = document.getElementById('p-display-name').value; // MODIFIKASI: Ambil Nama Produk Display
+            const name = document.getElementById('p-name').value.toUpperCase();
+            const price = document.getElementById('p-price').value;
+            const walletType = document.getElementById('p-wallet-type').value;
+            const walletNum = document.getElementById('p-wallet-num').value;
+            const audioFile = document.getElementById('p-audio').files[0];
+            const linkFile = document.getElementById('p-link').value;
+
+            if(!displayName || !name || !price || !audioFile || !linkFile || !walletNum) return alert("Lengkapi semua data!");
+            if(!currentCreator) return alert("Nama Artist belum terdeteksi.");
+
+            document.getElementById('progress-container').style.display = 'block';
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+
+            try {
+                const audioUrl = await uploadAudio(audioFile);
+
+                // UPDATE: Simpan displayName ke Firestore agar bisa dibaca projects.html
+                await fs.collection("projects").add({
+                    productName: displayName, 
+                    name: name,
+                    price: price,
+                    walletType: walletType,
+                    walletNumber: walletNum,
+                    audio: audioUrl,
+                    fileLink: linkFile,
+                    creatorName: currentCreator,
+                    createdAt: new Date().toISOString()
+                });
+
+                await db.ref('secure_links/' + name).set(linkFile);
+
+                alert("BERHASIL! Produk tayang.");
+                window.location.href = "projects.html";
+            } catch (e) {
+                alert("Kesalahan: " + e.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function loadProducts() {
+            if(!currentCreator) return;
+            const snap = await fs.collection("projects").where("creatorName", "==", currentCreator).get();
+            const container = document.getElementById('render-produk');
+            container.innerHTML = "<div class='katalog-header'>Katalog Anda</div>";
+            snap.forEach(doc => {
+                const p = doc.data();
+                // Tampilkan productName di katalog biar sinkron
+                container.innerHTML += `<div class="product-item"><span>${p.productName || p.name}</span><b>Rp ${p.price}</b></div>`;
+            });
+        }
+    </script>
+</body>
+</html>

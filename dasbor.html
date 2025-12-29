@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Dashboard - NoxMusic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --dark: #080a12;
+            --white: #111625;
+            --gray: #8b949e;
+            --success: #10b981;
+            --pending: #f59e0b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--dark); color: white; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .creator-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 45px; height: 45px; border-radius: 12px; background: var(--primary); }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--white); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-card small { color: var(--gray); font-size: 10px; font-weight: 700; }
+        .stat-card h3 { font-size: 20px; margin-top: 5px; }
+
+        .section-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .section-title::before { content: ''; width: 4px; height: 16px; background: var(--primary); border-radius: 10px; }
+
+        .order-card { 
+            background: var(--white); padding: 16px; border-radius: 22px; margin-bottom: 12px; 
+            border: 1px solid rgba(255,255,255,0.05); animation: slideUp 0.5s ease forwards;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .order-flex { display: flex; justify-content: space-between; align-items: flex-start; }
+        .order-info b { font-size: 14px; display: block; color: #fff; }
+        .order-info span { font-size: 11px; color: var(--gray); }
+        .price-tag { font-size: 13px; color: var(--primary); font-weight: 800; }
+
+        .btn-confirm { 
+            width: 100%; margin-top: 15px; padding: 12px; border-radius: 12px; 
+            border: none; background: var(--primary); color: white; font-weight: 800; 
+            font-size: 12px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-confirm:disabled { background: #334155; cursor: not-allowed; opacity: 0.6; }
+        
+        .status-badge { 
+            font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 6px; 
+            text-transform: uppercase; margin-top: 8px; display: inline-block;
+        }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--pending); }
+        .status-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+        .empty-state { text-align: center; padding: 40px 0; color: var(--gray); font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="creator-info">
+                <img id="c-avatar" class="avatar" src="">
+                <div>
+                    <h2 id="c-name" style="font-size: 16px;">Memuat...</h2>
+                    <p style="font-size: 10px; color: var(--gray);">Creator Mode Active</p>
+                </div>
+            </div>
+            <a href="projects.html" style="color: var(--primary); font-size: 12px; font-weight: 700; text-decoration: none;">Kembali</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <small>PESANAN MASUK</small>
+                <h3 id="stat-total">0</h3>
+            </div>
+            <div class="stat-card">
+                <small>PENDAPATAN</small>
+                <h3 id="stat-income">Rp 0</h3>
+            </div>
+        </div>
+
+        <div class="section-title">Konfirmasi Pesanan</div>
+        <div id="order-render">
+            <div class="empty-state">Mengecek pesanan baru...</div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const rdb = firebase.database();
+        const fs = firebase.firestore();
+        const auth = firebase.auth();
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                loadCreatorData(user.uid);
+            } else {
+                alert("Silakan login sebagai Creator dulu!");
+                window.location.href = "index.html";
+            }
+        });
+
+        async function loadCreatorData(uid) {
+            const doc = await fs.collection("users").doc(uid).get();
+            if (doc.exists && doc.data().isApproved) {
+                const data = doc.data();
+                document.getElementById('c-name').innerText = data.artistName;
+                document.getElementById('c-avatar').src = `https://api.dicebear.com/7.x/notionists/svg?seed=${data.artistName}&backgroundColor=b6e3f4`;
+                
+                // Mulai dengerin pesanan khusus untuk Creator ini
+                listenOrders(uid);
+            } else {
+                alert("Akses Ditolak! Anda bukan Creator resmi.");
+                window.location.href = "projects.html";
+            }
+        }
+
+        function listenOrders(creatorID) {
+            // Filter: Hanya ambil pesanan yang memiliki creatorID sesuai user yang login
+            rdb.ref('orders').orderByChild('creatorID').equalTo(creatorID).on('value', (snapshot) => {
+                const render = document.getElementById('order-render');
+                if (!snapshot.exists()) {
+                    render.innerHTML = '<div class="empty-state">Belum ada pesanan untuk produk Anda.</div>';
+                    return;
+                }
+
+                let listHTML = '';
+                let totalIncome = 0;
+                let totalOrder = 0;
+
+                snapshot.forEach((child) => {
+                    const order = child.val();
+                    totalOrder++;
+                    if(order.status === "Success") {
+                        // Hilangkan titik/koma agar bisa dijumlahkan
+                        totalIncome += parseInt(order.nominal.replace(/[^0-9]/g, '')) || 0;
+                    }
+
+                    const isPending = order.status === "Pending";
+                    listHTML = `
+                    <div class="order-card">
+                        <div class="order-flex">
+                            <div class="order-info">
+                                <b>${order.product}</b>
+                                <span>Pembeli: ${order.buyerName}</span><br>
+                                <span>${order.tanggal} | ${order.jam}</span>
+                                <div class="status-badge ${isPending ? 'status-pending' : 'status-success'}">${order.status}</div>
+                            </div>
+                            <div class="price-tag">Rp ${order.nominal}</div>
+                        </div>
+                        ${isPending ? `<button class="btn-confirm" onclick="confirmOrder('${child.key}')">KONFIRMASI PEMBAYARAN</button>` : ''}
+                    </div>` + listHTML;
+                });
+
+                render.innerHTML = listHTML;
+                document.getElementById('stat-total').innerText = totalOrder;
+                document.getElementById('stat-income').innerText = "Rp " + totalIncome.toLocaleString('id-ID');
+            });
+        }
+
+        async function confirmOrder(orderKey) {
+            if(confirm("Pastikan uang sudah masuk ke e-wallet Anda sebelum konfirmasi! Lanjutkan?")) {
+                try {
+                    await rdb.ref('orders/' + orderKey).update({ status: "Success" });
+                    alert("Berhasil! Tombol download sudah muncul di pembeli.");
+                } catch (e) {
+                    alert("Gagal update: " + e.message);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
