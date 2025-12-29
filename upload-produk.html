@@ -75,16 +75,20 @@
             text-transform: uppercase;
         }
 
+        /* MODIFIKASI: Perbaikan Select Dropdown agar tidak muncul di tengah layar */
         .form-control { 
             width: 100%; 
             padding: 16px; 
-            background: rgba(0,0,0,0.3); 
+            background: rgba(0,0,0,0.5); 
             border: 1px solid rgba(255,255,255,0.1); 
             border-radius: 16px; 
             color: white; 
             font-size: 14px; 
             outline: none; 
             transition: 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
         }
 
         .form-control:focus { 
@@ -93,10 +97,19 @@
             background: rgba(139, 92, 246, 0.05);
         }
 
-        /* Styling Select Dropdown */
+        /* Styling Khusus Dropdown di dalam Box */
         select.form-control {
-            appearance: none;
-            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238b5cf6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 18px;
+            padding-right: 40px; /* Diperkecil sedikit agar teks tidak tertabrak */
+        }
+
+        select option {
+            background: #111625; /* Sesuai warna card agar tidak putih */
+            color: white;
+            padding: 15px;
         }
 
         /* UPDATE: Custom File Input Style */
@@ -155,8 +168,13 @@
             margin-top: 5px;
             margin-bottom: 20px;
             transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
         .btn-next:hover { background: var(--primary); color: white; }
+        .btn-next span { font-size: 18px; line-height: 0; }
 
         .btn-publis:hover { transform: translateY(-3px); filter: brightness(1.1); }
         .btn-publis:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
@@ -201,6 +219,20 @@
         
         .product-item span { font-weight: 700; font-size: 13px; color: #fff; }
         .product-item b { color: var(--primary); font-size: 13px; }
+
+        /* FIX: Perbaikan Layout Flexbox untuk E-Wallet */
+        .wallet-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end; /* Memastikan label sejajar atas, input sejajar bawah */
+        }
+        .wallet-col-1 { flex: 1.2; min-width: 0; } /* Select Box */
+        .wallet-col-2 { flex: 1.8; min-width: 0; } /* Input Box */
+        
+        /* Mencegah teks kepotong pada option */
+        .form-control option {
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -219,49 +251,72 @@
         </div>
 
         <div class="form-group active" id="step-1">
-            <label>NAMA PRODUK (Tampilan di Halaman)</label>
-            <input type="text" id="p-display-name" class="form-control" placeholder="Contoh: Viral Bass Kane">
-            <button class="btn-next" onclick="nextStep(2, 'p-display-name')">LANJUTKAN</button>
+            <label>PILIH JENIS PRODUK</label>
+            <select id="p-product-type" class="form-control" onchange="togglePriceField()">
+                <option value="" disabled selected>--- Pilih Kategori Produk ---</option>
+                <option value="reguler">REGULER (Bisa dibeli berkali-kali)</option>
+                <option value="free">GRATIS (Download Langsung)</option>
+                <option value="exclusive">EXCLUSIVE (Hanya 1 Pembeli)</option>
+            </select>
+            <button class="btn-next" style="margin-top: 15px;" onclick="nextStep(2, 'p-product-type')">
+                LANJUTKAN <span>&rarr;</span>
+            </button>
         </div>
 
         <div class="form-group" id="step-2">
-            <label>NAMA PROJECT ZIP (Sesuai File)</label>
-            <input type="text" id="p-name" class="form-control" placeholder="Contoh: MEMEW">
-            <button class="btn-next" onclick="nextStep(3, 'p-name')">LANJUTKAN</button>
-        </div>
-        
-        <div class="form-group" id="step-3">
-            <label>HARGA (RP)</label>
-            <input type="number" id="p-price" class="form-control" placeholder="15000">
-            <button class="btn-next" onclick="nextStep(4, 'p-price')">LANJUTKAN</button>
+            <label>NAMA PRODUK (Tampilan di Halaman)</label>
+            <input type="text" id="p-display-name" class="form-control" placeholder="Contoh: Viral Bass Kane">
+            <button class="btn-next" onclick="nextStep(3, 'p-display-name')">
+                LANJUTKAN <span>&rarr;</span>
+            </button>
         </div>
 
+        <div class="form-group" id="step-3">
+            <label>NAMA PROJECT ZIP (Sesuai File)</label>
+            <input type="text" id="p-name" class="form-control" placeholder="Contoh: MEMEW">
+            <button class="btn-next" onclick="nextStep(4, 'p-name')">
+                LANJUTKAN <span>&rarr;</span>
+            </button>
+        </div>
+        
         <div class="form-group" id="step-4">
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label>METODE E-WALLET</label>
+            <label id="label-price">HARGA (RP)</label>
+            <input type="number" id="p-price" class="form-control" placeholder="15000">
+            <button class="btn-next" onclick="nextStep(5, 'p-price')">
+                LANJUTKAN <span>&rarr;</span>
+            </button>
+        </div>
+
+        <div class="form-group" id="step-5">
+            <div class="wallet-row">
+                <div class="wallet-col-1">
+                    <label>E-WALLET</label>
                     <select id="p-wallet-type" class="form-control">
                         <option value="DANA">DANA</option>
                         <option value="OVO">OVO</option>
                         <option value="GOPAY">GOPAY</option>
-                        <option value="SHOPEEPAY">SHOPEEPAY</option>
+                        <option value="SHOPEEPAY">SPAY</option>
                     </select>
                 </div>
-                <div style="flex: 2;">
-                    <label>NOMOR E-WALLET</label>
+                <div class="wallet-col-2">
+                    <label>NOMOR TUJUAN</label>
                     <input type="number" id="p-wallet-num" class="form-control" placeholder="08xxxx">
                 </div>
             </div>
-            <button class="btn-next" onclick="nextStep(5, 'p-wallet-num')">LANJUTKAN</button>
-        </div>
-
-        <div class="form-group" id="step-5">
-            <label>PREVIEW AUDIO</label>
-            <input type="file" id="p-audio" accept="audio/*">
-            <button class="btn-next" onclick="nextStep(6, 'p-audio')">LANJUTKAN</button>
+            <button class="btn-next" style="margin-top: 15px;" onclick="nextStep(6, 'p-wallet-num')">
+                LANJUTKAN <span>&rarr;</span>
+            </button>
         </div>
 
         <div class="form-group" id="step-6">
+            <label>PREVIEW AUDIO</label>
+            <input type="file" id="p-audio" accept="audio/*">
+            <button class="btn-next" onclick="nextStep(7, 'p-audio')">
+                LANJUTKAN <span>&rarr;</span>
+            </button>
+        </div>
+
+        <div class="form-group" id="step-7">
             <label>LINK FILE ASLI (Link MediaFire/G-Drive)</label>
             <input type="text" id="p-link" class="form-control" placeholder="https://www.mediafire.com/...">
         </div>
@@ -296,36 +351,44 @@
 
         let currentCreator = "";
 
-        // MODIFIKASI: Fungsi navigasi step-by-step
+        function togglePriceField() {
+            const type = document.getElementById('p-product-type').value;
+            const priceInput = document.getElementById('p-price');
+            if(type === 'free') {
+                priceInput.value = 0;
+                priceInput.readOnly = true;
+                priceInput.style.opacity = "0.5";
+            } else {
+                priceInput.value = "";
+                priceInput.readOnly = false;
+                priceInput.style.opacity = "1";
+            }
+        }
+
         function nextStep(step, inputId) {
             const input = document.getElementById(inputId);
-            if(input.type === 'file') {
+            if(input.tagName === 'SELECT') {
+                if(!input.value) return alert("Pilih kategori jualan dulu!");
+            } else if(input.type === 'file') {
                 if(!input.files[0]) return alert("Pilih file audio dulu!");
             } else {
-                if(!input.value) return alert("Isi dulu kolom ini!");
+                if(!input.value && input.value !== "0") return alert("Isi dulu kolom ini!");
             }
 
-            // Sembunyikan tombol "Lanjut" yang baru diklik
             event.target.style.display = 'none';
-            
-            // Munculkan tahap berikutnya
             const nextEl = document.getElementById('step-' + step);
             if(nextEl) {
                 nextEl.classList.add('active');
             }
-
-            // Jika sampai tahap terakhir (Tahap 6), munculkan tombol submit
-            if(step === 6) {
+            if(step === 7) {
                 document.getElementById('btn-submit').style.display = 'block';
             }
         }
 
         async function initArtistDetection() {
             const savedUID = localStorage.getItem('uID');
-            
             auth.onAuthStateChanged(async (user) => {
                 let targetID = user ? user.uid : savedUID;
-
                 if (targetID) {
                     try {
                         const doc = await fs.collection("users").doc(targetID).get();
@@ -336,9 +399,7 @@
                         } else {
                             document.getElementById('display-name').innerText = "Data Artist Tak Ditemukan";
                         }
-                    } catch (e) {
-                        console.error("Gagal ambil data:", e);
-                    }
+                    } catch (e) { console.error("Gagal ambil data:", e); }
                 } else {
                     document.getElementById('display-name').innerText = "Silakan Login/Daftar Dulu";
                 }
@@ -352,15 +413,12 @@
                 const fd = new FormData();
                 fd.append('file', file);
                 fd.append('upload_preset', uploadPreset);
-
                 xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/upload`, true);
-
                 xhr.upload.onprogress = (e) => {
                     const percent = Math.round((e.loaded / e.total) * 100);
                     document.getElementById('percent-text').innerText = percent + "%";
                     document.getElementById('progress-fill').style.width = percent + "%";
                 };
-
                 xhr.onload = () => {
                     const res = JSON.parse(xhr.responseText);
                     if (xhr.status === 200) resolve(res.secure_url);
@@ -371,7 +429,8 @@
         }
 
         async function handlePublish() {
-            const displayName = document.getElementById('p-display-name').value; // MODIFIKASI: Ambil Nama Produk Display
+            const productType = document.getElementById('p-product-type').value;
+            const displayName = document.getElementById('p-display-name').value;
             const name = document.getElementById('p-name').value.toUpperCase();
             const price = document.getElementById('p-price').value;
             const walletType = document.getElementById('p-wallet-type').value;
@@ -379,7 +438,7 @@
             const audioFile = document.getElementById('p-audio').files[0];
             const linkFile = document.getElementById('p-link').value;
 
-            if(!displayName || !name || !price || !audioFile || !linkFile || !walletNum) return alert("Lengkapi semua data!");
+            if(!productType || !displayName || !name || price === "" || !audioFile || !linkFile || !walletNum) return alert("Lengkapi semua data!");
             if(!currentCreator) return alert("Nama Artist belum terdeteksi.");
 
             document.getElementById('progress-container').style.display = 'block';
@@ -388,9 +447,8 @@
 
             try {
                 const audioUrl = await uploadAudio(audioFile);
-
-                // UPDATE: Simpan displayName ke Firestore agar bisa dibaca projects.html
                 await fs.collection("projects").add({
+                    productType: productType,
                     productName: displayName, 
                     name: name,
                     price: price,
@@ -401,16 +459,12 @@
                     creatorName: currentCreator,
                     createdAt: new Date().toISOString()
                 });
-
                 await db.ref('secure_links/' + name).set(linkFile);
-
                 alert("BERHASIL! Produk tayang.");
                 window.location.href = "projects.html";
             } catch (e) {
                 alert("Kesalahan: " + e.message);
-            } finally {
-                btn.disabled = false;
-            }
+            } finally { btn.disabled = false; }
         }
 
         async function loadProducts() {
@@ -420,10 +474,10 @@
             container.innerHTML = "<div class='katalog-header'>Katalog Anda</div>";
             snap.forEach(doc => {
                 const p = doc.data();
-                // Tampilkan productName di katalog biar sinkron
-                container.innerHTML += `<div class="product-item"><span>${p.productName || p.name}</span><b>Rp ${p.price}</b></div>`;
+                container.innerHTML += `<div class="product-item"><span>${p.productName || p.name}</span><b>Rp ${Number(p.price).toLocaleString()}</b></div>`;
             });
         }
     </script>
 </body>
 </html>
+
