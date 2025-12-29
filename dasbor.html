@@ -47,6 +47,7 @@
             border: none; background: var(--primary); color: white; font-weight: 800; 
             font-size: 12px; cursor: pointer; transition: 0.3s;
         }
+        .btn-confirm:active { transform: scale(0.98); }
         .btn-confirm:disabled { background: #334155; cursor: not-allowed; opacity: 0.6; }
         
         .status-badge { 
@@ -123,7 +124,6 @@
                 document.getElementById('c-name').innerText = data.artistName;
                 document.getElementById('c-avatar').src = `https://api.dicebear.com/7.x/notionists/svg?seed=${data.artistName}&backgroundColor=b6e3f4`;
                 
-                // Mulai dengerin pesanan khusus untuk Creator ini
                 listenOrders(uid);
             } else {
                 alert("Akses Ditolak! Anda bukan Creator resmi.");
@@ -132,11 +132,12 @@
         }
 
         function listenOrders(creatorID) {
-            // Filter: Hanya ambil pesanan yang memiliki creatorID sesuai user yang login
             rdb.ref('orders').orderByChild('creatorID').equalTo(creatorID).on('value', (snapshot) => {
                 const render = document.getElementById('order-render');
                 if (!snapshot.exists()) {
                     render.innerHTML = '<div class="empty-state">Belum ada pesanan untuk produk Anda.</div>';
+                    document.getElementById('stat-total').innerText = "0";
+                    document.getElementById('stat-income').innerText = "Rp 0";
                     return;
                 }
 
@@ -147,9 +148,10 @@
                 snapshot.forEach((child) => {
                     const order = child.val();
                     totalOrder++;
+                    
                     if(order.status === "Success") {
-                        // Hilangkan titik/koma agar bisa dijumlahkan
-                        totalIncome += parseInt(order.nominal.replace(/[^0-9]/g, '')) || 0;
+                        let cleanPrice = order.nominal.toString().replace(/[^0-9]/g, '');
+                        totalIncome += parseInt(cleanPrice) || 0;
                     }
 
                     const isPending = order.status === "Pending";
@@ -177,8 +179,11 @@
         async function confirmOrder(orderKey) {
             if(confirm("Pastikan uang sudah masuk ke e-wallet Anda sebelum konfirmasi! Lanjutkan?")) {
                 try {
-                    await rdb.ref('orders/' + orderKey).update({ status: "Success" });
-                    alert("Berhasil! Tombol download sudah muncul di pembeli.");
+                    // Update status ke Success agar terdeteksi oleh sistem pembeli
+                    await rdb.ref('orders/' + orderKey).update({ 
+                        status: "Success" 
+                    });
+                    alert("Berhasil dikonfirmasi!");
                 } catch (e) {
                     alert("Gagal update: " + e.message);
                 }
@@ -187,3 +192,4 @@
     </script>
 </body>
 </html>
+
