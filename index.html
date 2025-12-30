@@ -1114,14 +1114,13 @@ localStorage.setItem('nox_user_id', userUniqueId);
     let nomorAdminTujuan = WHATSAPP_NUMBER;
     let namaAdminTujuan = "NoxPay";
 
-    if (selectedCategory === 'game') {
-        if (selectedAdminGame === 1) {
-            nomorAdminTujuan = ADMIN_GAME_1;
-            namaAdminTujuan = "Wall";
-        } else {
-            nomorAdminTujuan = ADMIN_GAME_2;
-            namaAdminTujuan = "Rizz";
-        }
+    // MODIFIKASI: Gunakan nomor admin berdasarkan pilihan di semua layanan (selama kategori aktif)
+    if (selectedAdminGame === 1) {
+        nomorAdminTujuan = ADMIN_GAME_1;
+        namaAdminTujuan = "Wall";
+    } else {
+        nomorAdminTujuan = ADMIN_GAME_2;
+        namaAdminTujuan = "Rizz";
     }
 
     // SIMPAN KE DATABASE
@@ -1280,10 +1279,9 @@ localStorage.setItem('nox_user_id', userUniqueId);
         function closeInvoice() { document.getElementById('invoiceModal').style.display = 'none'; }
 
         function sendWhatsApp(data, orderID) {
-            let targetWA = WHATSAPP_NUMBER;
-            if (selectedCategory === 'game') {
-                targetWA = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
-            }
+            // MODIFIKASI: Gunakan nomor admin terpilih untuk SEMUA layanan
+            let targetWA = (selectedAdminGame === 1) ? ADMIN_GAME_1 : ADMIN_GAME_2;
+            
             let closingMsg = (data.payment === 'DANA') ? 
                 `Saya akan segera mengirimkan Bukti Transfer. Mohon segera diproses ya, terima kasih!` : 
                 `Mohon segera diproses ya, terima kasih!`;
@@ -1447,7 +1445,8 @@ localStorage.setItem('nox_user_id', userUniqueId);
             if (num === 2) {
                 danaOption.classList.add('hidden');
                 selectPayment('Cash');
-            } else if (selectedCategory === 'game') {
+            } else {
+                // MODIFIKASI: DANA bisa muncul kembali di admin 1 untuk SEMUA kategori
                 danaOption.classList.remove('hidden');
             }
         }
@@ -1459,15 +1458,15 @@ localStorage.setItem('nox_user_id', userUniqueId);
             resetInputs(); 
             const danaOption = document.getElementById('pay-dana');
             const adminGroup = document.getElementById('admin-selection-group');
-            if (selectedCategory === 'game') {
-                adminGroup.classList.remove('hidden'); 
-                if (selectedAdminGame === 1) danaOption.classList.remove('hidden');
-                else danaOption.classList.add('hidden');
+            
+            // MODIFIKASI: Tampilkan pilihan admin untuk SEMUA kategori layanan
+            adminGroup.classList.remove('hidden'); 
+            if (selectedAdminGame === 1) {
+                danaOption.classList.remove('hidden');
             } else {
                 danaOption.classList.add('hidden');
-                adminGroup.classList.add('hidden'); 
-                selectPayment('Cash'); 
             }
+
             if (heroThemes[prod.id]) applyTheme(prod.id);
             const labelId = document.getElementById('label-id');
             const inputId = document.getElementById('target-id');
@@ -1523,12 +1522,10 @@ localStorage.setItem('nox_user_id', userUniqueId);
                 cardDana.classList.add('selected');
                 badgeCash.innerText = "PILIH";
                 badgeDana.innerText = "TERPILIH";
-                if(selectedCategory === 'game') {
-                    qrisImgEl.src = URL_QRIS_DANA;
-                    payInstruction.classList.remove('hidden');
-                } else {
-                    payInstruction.classList.add('hidden');
-                }
+                
+                // MODIFIKASI: QRIS Dana bisa muncul di semua kategori (jika Admin 1 dipilih)
+                qrisImgEl.src = URL_QRIS_DANA;
+                payInstruction.classList.remove('hidden');
             }
         }
 
@@ -1537,7 +1534,8 @@ localStorage.setItem('nox_user_id', userUniqueId);
             const nominal = document.querySelector('input[name="nominal"]:checked');
             if(!id || !nominal) return alert('Lengkapi data pesanan!');
             let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA (Transfer)';
-            let adminLabel = (selectedCategory === 'game') ? `<p>Jalur Admin: <b>Admin ${selectedAdminGame}</b></p>` : '';
+            // Tampilkan Jalur Admin di modal konfirmasi untuk semua layanan
+            let adminLabel = `<p>Jalur Admin: <b>Admin ${selectedAdminGame}</b></p>`;
             document.getElementById('modal-details').innerHTML = `
                 <div style="background:#f8fafc; padding:15px; border-radius:15px;">
                     <p>Produk: <b>${selectedProduct.name}</b></p>
@@ -1711,3 +1709,4 @@ startOxyEventTimer();
     </script>
 </body>
 </html>
+
