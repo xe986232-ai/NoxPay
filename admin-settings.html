@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Noxpay Admin Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Mode Colors */
+            --primary: #0f172a;
+            --accent: #4f46e5;
+            --accent-soft: #eef2ff;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-site: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            --input-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode Colors */
+            --primary: #f8fafc;
+            --accent: #6366f1;
+            --accent-soft: rgba(99, 102, 241, 0.1);
+            --success: #10b981;
+            --danger: #f87171;
+            --bg-site: #020617;
+            --card-bg: #0f172a;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --input-bg: #1e293b;
+            --shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background 0.3s, border 0.3s, color 0.3s; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-site);
+            color: var(--text-main);
+            padding: 20px 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; display: none; }
+
+        /* Floating Theme Switcher */
+        .theme-toggle {
+            position: fixed; bottom: 20px; right: 20px;
+            width: 45px; height: 45px; border-radius: 50%;
+            background: var(--accent); color: white;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 10001; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
+            font-size: 20px; border: none;
+        }
+
+        /* Login Screen Premium */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-site); display: flex; align-items: center; justify-content: center; z-index: 9999;
+            padding: 20px;
+        }
+        .login-card { background: var(--card-bg); width: 100%; max-width: 400px; padding: 40px 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
+
+        .brand h1 { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -1.5px; margin-bottom: 5px; }
+        .brand p { font-size: 14px; color: var(--text-muted); font-weight: 500; margin-bottom: 30px; }
+
+        .card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .input-group { margin-bottom: 18px; }
+        label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        input { 
+            width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-md); 
+            font-family: inherit; font-size: 14px; outline: none; background: var(--input-bg); color: var(--text-main);
+        }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+
+        .btn { cursor: pointer; border: none; border-radius: var(--radius-md); font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-main { background: var(--accent); color: white; padding: 16px; width: 100%; margin-top: 10px; font-size: 15px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        .btn-logout { background: var(--danger); color: white; padding: 10px 18px; font-size: 12px; border-radius: 50px; }
+
+        /* Accordion Style Premium */
+        .product-card { background: var(--card-bg); border-radius: var(--radius-lg); margin-bottom: 16px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
+        .product-header-clickable { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .product-info { display: flex; flex-direction: column; }
+        .product-name-display { font-size: 18px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+        .badge-display { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; background: var(--accent-soft); padding: 2px 10px; border-radius: 50px; width: fit-content; margin-top: 5px; }
+        
+        .product-content { display: none; padding: 0 24px 24px 24px; border-top: 1px solid var(--border); background: var(--bg-site); }
+        .is-open .product-content { display: block; }
+        .is-open .product-header-clickable { background: var(--card-bg); }
+
+        .items-container { background: var(--card-bg); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-top: 12px; }
+        .item-row { display: grid; grid-template-columns: 1fr 1fr 44px; gap: 12px; margin-bottom: 10px; }
+        .btn-add { background: var(--accent-soft); color: var(--accent); margin-top: 12px; width: 100%; padding: 12px; font-size: 13px; border: 2px dashed var(--accent); }
+        .btn-update { background: var(--success); color: white; flex: 2; padding: 14px; }
+        .btn-delete { background: var(--border); color: var(--text-main); flex: 1; padding: 14px; }
+        .btn-del-row { background: var(--danger); color: white; font-size: 18px; border-radius: 10px; }
+
+        #notif { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); padding: 16px 32px; border-radius: 50px; color: white; font-weight: 700; z-index: 10000; display: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
+        
+        /* Skeleton/Empty state */
+        .loading-text { text-align: center; color: var(--text-muted); font-weight: 600; padding: 40px; }
+    </style>
+</head>
+<body data-theme="light">
+
+<button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
+
+<div id="login-screen">
+    <div class="login-card">
+        <div class="brand">
+            <h1>Noxpay Admin</h1>
+            <p>Sistem Manajemen Produk Digital</p>
+        </div>
+        <div class="input-group" style="text-align: left;">
+            <label>Email Akses</label>
+            <input type="email" id="login-email" placeholder="admin@noxpay.com">
+        </div>
+        <div class="input-group" style="text-align: left;">
+            <label>Password</label>
+            <input type="password" id="login-pass" placeholder="••••••••">
+        </div>
+        <button class="btn btn-main" onclick="handleLogin()">AUTHENTICATION</button>
+    </div>
+</div>
+
+<div class="container" id="main-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0 30px;">
+        <div class="brand" style="text-align: left; padding: 0;">
+            <h1>Noxpay.</h1>
+        </div>
+        <button class="btn btn-logout" onclick="handleLogout()">LOGOUT</button>
+    </div>
+
+    <div class="card">
+        <div style="font-weight:800; margin-bottom:20px; color:var(--text-main); font-size: 16px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: var(--accent); color:white; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:12px;">+</span> 
+            Tambah Layanan Baru
+        </div>
+        <div class="input-group">
+            <label>Nama Produk</label>
+            <input type="text" id="p-nama" placeholder="Contoh: Mobile Legends">
+        </div>
+        <div class="input-group">
+            <label>Kategori</label>
+            <input type="text" id="p-kategori" placeholder="Contoh: game, Pulsa, PLN">
+        </div>
+        <label>Variasi & Harga</label>
+        <div class="items-container" id="tambah-items-container">
+            <div class="item-row">
+                <input type="text" class="item-nominal" placeholder="Nominal">
+                <input type="text" class="item-harga" placeholder="Harga">
+                <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
+            </div>
+        </div>
+        <button class="btn btn-add" onclick="addItemRow('tambah-items-container')">+ Baris Baru</button>
+        <button class="btn btn-main" onclick="tambahProduk()">SIMPAN KE DATABASE</button>
+    </div>
+
+    <div id="list-layanan">
+        <div class="loading-text">Menghubungkan ke server...</div>
+    </div>
+</div>
+
+<div id="notif"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+        authDomain: "noxpay-admin.firebaseapp.com",
+        projectId: "noxpay-admin",
+        storageBucket: "noxpay-admin.firebasestorage.app",
+        messagingSenderId: "212794945472",
+        appId: "1:212794945472:web:bd803bb3e71b48ea99a225",
+        measurementId: "G-2PXC06145B"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const colRef = collection(db, "layanan_noxpay");
+
+    const allowedAdmins = ["tokonoxpay@gmail.com", "walladmin@gmail.com"];
+
+    // THEME TOGGLE LOGIC
+    window.toggleTheme = () => {
+        const body = document.body;
+        const btn = document.getElementById('theme-btn');
+        if (body.getAttribute('data-theme') === 'light') {
+            body.setAttribute('data-theme', 'dark');
+            btn.innerText = '☀️';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            body.setAttribute('data-theme', 'light');
+            btn.innerText = '🌙';
+            localStorage.setItem('theme', 'light');
+        }
+    };
+
+    // Load saved theme
+    if (localStorage.getItem('theme') === 'dark') toggleTheme();
+
+    window.handleLogin = async () => {
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-pass').value;
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } catch (e) {
+            alert("Login Gagal: Periksa kembali kredensial Anda.");
+        }
+    };
+
+    window.handleLogout = () => signOut(auth);
+
+    onAuthStateChanged(auth, (user) => {
+        const loginScreen = document.getElementById('login-screen');
+        const mainContent = document.getElementById('main-content');
+        if (user && allowedAdmins.includes(user.email)) {
+            loginScreen.style.display = 'none';
+            mainContent.style.display = 'block';
+            loadData();
+        } else {
+            if (user) { signOut(auth); alert("Akses Ditolak!"); }
+            loginScreen.style.display = 'flex';
+            mainContent.style.display = 'none';
+        }
+    });
+
+    function loadData() {
+        const q = query(colRef, orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const list = document.getElementById('list-layanan');
+            list.innerHTML = `<div style="font-size:11px; font-weight:800; color:var(--text-muted); margin: 30px 0 15px 5px; text-transform:uppercase; letter-spacing:1px;">Database Layanan (${snapshot.size})</div>`;
+            snapshot.forEach((s) => {
+                const d = s.data();
+                const id = s.id;
+                let dataHarga = [];
+                try { dataHarga = typeof d.harga_json === 'string' ? JSON.parse(d.harga_json) : d.harga_json; } catch(e) { dataHarga = []; }
+
+                const div = document.createElement('div');
+                div.className = 'product-card';
+                div.id = `card-${id}`;
+                div.innerHTML = `
+                    <div class="product-header-clickable" onclick="toggleAccordion('${id}')">
+                        <div class="product-info">
+                            <span class="product-name-display">${d.nama_produk || 'No Name'}</span>
+                            <span class="badge-display">${d.kategori || 'General'}</span>
+                        </div>
+                        <div style="color:var(--text-muted); font-size:12px;">▼</div>
+                    </div>
+                    <div class="product-content">
+                        <div class="input-group" style="margin-top:20px"><label>Nama Produk</label><input type="text" id="n-${id}" value="${d.nama_produk}"></div>
+                        <div class="input-group"><label>Kategori</label><input type="text" id="cat-${id}" value="${d.kategori}"></div>
+                        <label>Daftar Harga</label>
+                        <div class="items-container" id="items-${id}">
+                            ${dataHarga.map(item => `
+                                <div class="item-row">
+                                    <input type="text" class="item-nominal" value="${item.a}">
+                                    <input type="text" class="item-harga" value="${item.p}">
+                                    <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="btn btn-add" style="background:transparent" onclick="addItemRow('items-${id}')">+ Tambah Variasi</button>
+                        <div style="display:flex; gap:12px; margin-top:25px">
+                            <button class="btn btn-update" onclick="simpanEdit('${id}')">UPDATE DATA</button>
+                            <button class="btn btn-delete" onclick="hapusProduk('${id}')">HAPUS</button>
+                        </div>
+                    </div>`;
+                list.appendChild(div);
+            });
+        });
+    }
+
+    window.toggleAccordion = (id) => document.getElementById(`card-${id}`).classList.toggle('is-open');
+    window.addItemRow = (containerId, n = "", h = "") => {
+        const c = document.getElementById(containerId);
+        const d = document.createElement('div'); d.className = 'item-row';
+        d.innerHTML = `<input type="text" class="item-nominal" value="${n}"><input type="text" class="item-harga" value="${h}"><button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>`;
+        c.appendChild(d);
+    };
+    function getJsonData(cid) {
+        const c = document.getElementById(cid);
+        const n = c.getElementsByClassName('item-nominal');
+        const h = c.getElementsByClassName('item-harga');
+        const r = [];
+        for(let i=0; i<n.length; i++) if(n[i].value.trim()!="") r.push({a:n[i].value, p:h[i].value});
+        return JSON.stringify(r);
+    }
+    window.tambahProduk = async () => {
+        const n = document.getElementById('p-nama').value, c = document.getElementById('p-kategori').value, j = getJsonData('tambah-items-container');
+        if(!n || !c) return alert("Wajib diisi!");
+        await addDoc(colRef, { nama_produk: n, kategori: c, harga_json: j, createdAt: new Date().getTime() });
+        tampilNotif("Produk Berhasil Disimpan!", "#10b981");
+        document.getElementById('p-nama').value = ""; document.getElementById('p-kategori').value = "";
+    };
+    window.simpanEdit = async (id) => {
+        const n = document.getElementById(`n-${id}`).value, c = document.getElementById(`cat-${id}`).value, j = getJsonData(`items-${id}`);
+        await updateDoc(doc(db, "layanan_noxpay", id), { nama_produk: n, kategori: c, harga_json: j });
+        tampilNotif("Data Berhasil Diperbarui!", "#4f46e5");
+    };
+    window.hapusProduk = async (id) => { if(confirm("Hapus layanan ini permanen?")) await deleteDoc(doc(db, "layanan_noxpay", id)); };
+    function tampilNotif(m, b) { const e = document.getElementById('notif'); e.innerText = m; e.style.background = b; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 2500); }
+</script>
+</body>
+</html>
