@@ -628,10 +628,10 @@
             <div class="section-header" id="kategori-section"><h2>Layanan Top Up</h2></div>
             <div class="category-grid">
                 <div class="category-card" data-cat="game"><div class="icon-box icon-game">🎮</div><span>Game</span></div>
-                <div class="category-card" data-cat="pulsa"><div class="icon-box icon-pulsa">📱</div><span>Pulsa</span></div>
+                <div class="category-card" data-cat="Pulsa"><div class="icon-box icon-pulsa">📱</div><span>Pulsa</span></div>
                 <div class="category-card" data-cat="data"><div class="icon-box icon-data">📶</div><span>Paket Data</span></div>
-                <div class="category-card" data-cat="pln"><div class="icon-box icon-pln">⚡</div><span>PLN</span></div>
-                <div class="category-card" data-cat="ewallet" style="grid-column: span 2;"><div class="icon-box icon-ewallet">👛</div><span>E-Wallet</span></div>
+                <div class="category-card" data-cat="PLN"><div class="icon-box icon-pln">⚡</div><span>PLN</span></div>
+                <div class="category-card" data-cat="E-Wallet" style="grid-column: span 2;"><div class="icon-box icon-ewallet">👛</div><span>E-Wallet</span></div>
             </div>
 
             <div id="sub-items-container" class="hidden fade-in">
@@ -1416,24 +1416,54 @@ localStorage.setItem('nox_user_id', userUniqueId);
             });
         });
 
+        // --- MODIFIKASI: SHOW PRODUCTS DARI FIRESTORE ---
         function showProducts(cat) {
             const container = document.getElementById('sub-items-container');
             const list = document.getElementById('items-list');
-            list.innerHTML = '';
-            database[cat].forEach(prod => {
-                const item = document.createElement('div');
-                item.className = 'category-card fade-in';
-                if(cat === 'pulsa' || cat === 'data') {
-                    item.innerHTML = `<span>${prod.name}</span>`;
+            list.innerHTML = '<p style="text-align:center; width:100%; font-size:12px; color:var(--gray); padding:20px;">Memuat Layanan...</p>';
+            
+            // Mengambil data dari koleksi layanan_noxpay secara Real-time
+            fs.collection("layanan_noxpay").where("kategori", "==", cat).onSnapshot((querySnapshot) => {
+                list.innerHTML = '';
+                
+                // Jika data di Firestore kosong, gunakan data cadangan dari variabel 'database'
+                if (querySnapshot.empty) {
+                    if (database[cat]) {
+                        database[cat].forEach(prod => {
+                            renderProductItem(prod, list, cat);
+                        });
+                    }
                 } else {
-                    item.innerHTML = `<div class="icon-box" style="background:var(--primary-light)"><img src="${prod.img}" style="width:70%; height:70%; object-fit:contain;"></div><span>${prod.name}</span>`;
+                    querySnapshot.forEach((doc) => {
+                        const prod = doc.data();
+                        renderProductItem(prod, list, cat);
+                    });
                 }
-                item.onclick = () => selectProduct(prod, item);
-                list.appendChild(item);
             });
+
             container.classList.remove('hidden');
             const y = container.getBoundingClientRect().top + window.pageYOffset - 80;
             window.scrollTo({top: y, behavior: 'smooth'});
+        }
+
+        // Fungsi pembantu untuk menggambar item produk
+        function renderProductItem(prod, list, cat) {
+            const item = document.createElement('div');
+            item.className = 'category-card fade-in';
+            
+            // PERBAIKAN: Gunakan prod.nama_produk (sesuai Firestore Anda)
+            const namaLayanan = prod.nama_produk || prod.name || "Produk";
+            
+            let iconHtml = `<div class="icon-box" style="background:var(--primary-light)">📱</div>`;
+            if (prod.img) {
+                iconHtml = `<div class="icon-box" style="background:var(--primary-light)"><img src="${prod.img}" style="width:70%; height:70%; object-fit:contain;"></div>`;
+            } else if (cat === 'game') {
+                iconHtml = `<div class="icon-box" style="background:var(--primary-light)">🎮</div>`;
+            }
+
+            item.innerHTML = `${iconHtml}<span>${namaLayanan}</span>`;
+            item.onclick = () => selectProduct(prod, item);
+            list.appendChild(item);
         }
 
         function selectAdmin(num) {
@@ -1477,7 +1507,7 @@ localStorage.setItem('nox_user_id', userUniqueId);
                 labelId.innerText = "Masukkan Nomor HP";
                 inputId.placeholder = "Contoh: 08123456789";
             } else if(selectedCategory === 'ewallet') {
-                labelId.innerText = "Nomor Terdaftar di " + prod.name;
+                labelId.innerText = "Nomor Terdaftar di " + (prod.nama_produk || prod.name);
                 inputId.placeholder = "Contoh: 08123456789";
             } else {
                 labelId.innerText = "User ID";
@@ -1486,14 +1516,36 @@ localStorage.setItem('nox_user_id', userUniqueId);
             document.getElementById('input-server-group').className = prod.needsServer ? 'form-group' : 'hidden';
             const nominalList = document.getElementById('nominal-list');
             nominalList.innerHTML = '';
-            prod.prices.forEach((p, i) => {
-                const isWDP = p.a.toUpperCase().includes('WDP');
+            
+            // PERBAIKAN: Logic Handling untuk harga_json (String) dari Firestore
+            let listHarga = [];
+            
+            // --- MODIFIKASI KRUSIAL AGAR TIDAK UNDEFINED ---
+            if (prod.harga_json) {
+                try {
+                    // Jika data berupa string JSON dari Firebase
+                    listHarga = typeof prod.harga_json === 'string' ? JSON.parse(prod.harga_json) : prod.harga_json;
+                } catch(e) {
+                    console.error("Gagal parse harga_json", e);
+                }
+            } else if (prod.prices) {
+                listHarga = prod.prices;
+            } else if (prod.variasi) {
+                listHarga = prod.variasi;
+            }
+            
+            listHarga.forEach((p, i) => {
+                // Mendeteksi kunci yang mungkin berbeda di database (a/nominal, p/harga)
+                const nominalName = p.a || p.nominal || "Pilihan " + (i+1);
+                const nominalPrice = p.p || p.harga || "0";
+                const isWDP = nominalName.toUpperCase().includes('WDP');
+                
                 nominalList.innerHTML += `
                     <div class="nominal-item fade-in ${isWDP ? 'wdp-special' : ''}">
-                        <input type="radio" name="nominal" id="n-${i}" value="${p.a}" data-price="${p.p}">
+                        <input type="radio" name="nominal" id="n-${i}" value="${nominalName}" data-price="${nominalPrice}">
                         <label for="n-${i}">
-                            <b>${p.a}</b><br>
-                            <span style="font-size:11px; color:var(--primary)">Rp ${p.p}</span>
+                            <b>${nominalName}</b><br>
+                            <span style="font-size:11px; color:var(--primary)">Rp ${nominalPrice}</span>
                         </label>
                     </div>`;
             });
@@ -1538,7 +1590,7 @@ localStorage.setItem('nox_user_id', userUniqueId);
             let adminLabel = `<p>Jalur Admin: <b>Admin ${selectedAdminGame}</b></p>`;
             document.getElementById('modal-details').innerHTML = `
                 <div style="background:#f8fafc; padding:15px; border-radius:15px;">
-                    <p>Produk: <b>${selectedProduct.name}</b></p>
+                    <p>Produk: <b>${selectedProduct.nama_produk || selectedProduct.name}</b></p>
                     <p>Nominal: <b>${nominal.value}</b></p>
                     <p>Tujuan: <b>${id}</b></p>
                     <p>Pembayaran: <b>${paymentLabel}</b></p>
@@ -1556,7 +1608,7 @@ localStorage.setItem('nox_user_id', userUniqueId);
             const nominal = document.querySelector('input[name="nominal"]:checked');
             const custName = document.getElementById('customer-name').value;
             const data = {
-                product: selectedProduct.name,
+                product: selectedProduct.nama_produk || selectedProduct.name,
                 nominal: nominal.value,
                 target: serverId ? `${id} (${serverId})` : id,
                 price: nominal.dataset.price,
@@ -1635,7 +1687,7 @@ function startOxyEventTimer() {
         const d = Math.floor(distance / (1000 * 60 * 60 * 24));
         const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((distance % (1000 * 60)) / 1000);
+        const s = Math.floor((distance % (1000 * 60 * 60)) / 1000);
 
         if (document.getElementById("days")) {
             document.getElementById("days").innerText = d.toString().padStart(2, '0');
@@ -1652,7 +1704,7 @@ function startOxyEventTimer() {
     }, 1000);
 }
 startOxyEventTimer();
-// --- MESIN PENGGERAK KOIN (PASTE DI BARIS 1682) ---
+// --- MESIN PENGGERAK KOIN ---
 function setTranslate(xPos, yPos, el) {
     el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
 }
@@ -1701,10 +1753,6 @@ function drag(e) {
         setTranslate(currentX, currentY, dragItem);
     }
 }
-
-startOxyEventTimer();
-
-
 
     </script>
 </body>
