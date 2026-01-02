@@ -53,7 +53,6 @@
 
         .container { max-width: 600px; margin: 0 auto; display: none; }
 
-        /* Floating Theme Switcher */
         .theme-toggle {
             position: fixed; bottom: 20px; right: 20px;
             width: 45px; height: 45px; border-radius: 50%;
@@ -63,7 +62,6 @@
             font-size: 20px; border: none;
         }
 
-        /* Login Screen Premium */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-site); display: flex; align-items: center; justify-content: center; z-index: 9999;
@@ -88,7 +86,6 @@
         .btn-main { background: var(--accent); color: white; padding: 16px; width: 100%; margin-top: 10px; font-size: 15px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
         .btn-logout { background: var(--danger); color: white; padding: 10px 18px; font-size: 12px; border-radius: 50px; }
 
-        /* Accordion Style Premium */
         .product-card { background: var(--card-bg); border-radius: var(--radius-lg); margin-bottom: 16px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
         .product-header-clickable { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .product-info { display: flex; flex-direction: column; }
@@ -97,20 +94,19 @@
         
         .product-content { display: none; padding: 0 24px 24px 24px; border-top: 1px solid var(--border); background: var(--bg-site); }
         .is-open .product-content { display: block; }
-        .is-open .product-header-clickable { background: var(--card-bg); }
 
-        /* Variasi & Harga Grid Modification */
         .items-container { background: var(--card-bg); padding: 16px 12px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-top: 12px; }
-        .item-row { display: grid; grid-template-columns: 1fr 1fr 44px; gap: 8px; margin-bottom: 12px; align-items: end; }
+        /* MODIFIED: Mengatur kolom agar muat 3 input + tombol hapus */
+        .item-row { display: grid; grid-template-columns: 1fr 1fr 0.8fr 44px; gap: 8px; margin-bottom: 12px; align-items: end; }
         
         .col-input { display: flex; flex-direction: column; gap: 4px; }
         .col-input label { margin: 0; font-size: 9px; color: var(--accent); opacity: 0.8; }
-        .col-input input { font-size: 13px; padding: 10px 8px; } /* More compact font */
+        .col-input input { font-size: 12px; padding: 10px 8px; }
 
         .btn-add { background: var(--accent-soft); color: var(--accent); margin-top: 12px; width: 100%; padding: 12px; font-size: 13px; border: 2px dashed var(--accent); }
         .btn-update { background: var(--success); color: white; flex: 2; padding: 14px; }
         .btn-delete { background: var(--border); color: var(--text-main); flex: 1; padding: 14px; }
-        .btn-del-row { background: var(--danger); color: white; height: 40px; border-radius: 10px; font-size: 18px; }
+        .btn-del-row { background: var(--danger); color: white; height: 38px; border-radius: 10px; font-size: 18px; }
 
         #notif { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); padding: 16px 32px; border-radius: 50px; color: white; font-weight: 700; z-index: 10000; display: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
         
@@ -165,11 +161,15 @@
             <div class="item-row">
                 <div class="col-input">
                     <label>NOMINAL</label>
-                    <input type="text" class="item-nominal" placeholder="Contoh: 86">
+                    <input type="text" class="item-nominal" placeholder="86">
                 </div>
                 <div class="col-input">
-                    <label>HARGA (IDR)</label>
-                    <input type="text" class="item-harga" placeholder="Contoh: 20000">
+                    <label>HARGA</label>
+                    <input type="text" class="item-harga" placeholder="20000">
+                </div>
+                <div class="col-input">
+                    <label>DISKON</label>
+                    <input type="text" class="item-diskon" placeholder="10%">
                 </div>
                 <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
             </div>
@@ -280,11 +280,15 @@
                                 <div class="item-row">
                                     <div class="col-input">
                                         <label>NOMINAL</label>
-                                        <input type="text" class="item-nominal" value="${item.a}">
+                                        <input type="text" class="item-nominal" value="${item.a || ''}">
                                     </div>
                                     <div class="col-input">
                                         <label>HARGA</label>
-                                        <input type="text" class="item-harga" value="${item.p}">
+                                        <input type="text" class="item-harga" value="${item.p || ''}">
+                                    </div>
+                                    <div class="col-input">
+                                        <label>DISKON</label>
+                                        <input type="text" class="item-diskon" value="${item.d || ''}">
                                     </div>
                                     <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
                                 </div>
@@ -303,10 +307,10 @@
 
     window.toggleAccordion = (id) => document.getElementById(`card-${id}`).classList.toggle('is-open');
     
-    window.addItemRow = (containerId, n = "", h = "") => {
+    window.addItemRow = (containerId, n = "", h = "", d = "") => {
         const c = document.getElementById(containerId);
-        const d = document.createElement('div'); d.className = 'item-row';
-        d.innerHTML = `
+        const divRow = document.createElement('div'); divRow.className = 'item-row';
+        divRow.innerHTML = `
             <div class="col-input">
                 <label>NOMINAL</label>
                 <input type="text" class="item-nominal" value="${n}">
@@ -315,17 +319,30 @@
                 <label>HARGA</label>
                 <input type="text" class="item-harga" value="${h}">
             </div>
+            <div class="col-input">
+                <label>DISKON</label>
+                <input type="text" class="item-diskon" value="${d}">
+            </div>
             <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
         `;
-        c.appendChild(d);
+        c.appendChild(divRow);
     };
 
     function getJsonData(cid) {
         const c = document.getElementById(cid);
         const n = c.getElementsByClassName('item-nominal');
         const h = c.getElementsByClassName('item-harga');
+        const d = c.getElementsByClassName('item-diskon');
         const r = [];
-        for(let i=0; i<n.length; i++) if(n[i].value.trim()!="") r.push({a:n[i].value, p:h[i].value});
+        for(let i=0; i<n.length; i++) {
+            if(n[i].value.trim()!="") {
+                r.push({
+                    a: n[i].value, 
+                    p: h[i].value,
+                    d: d[i].value // Menyimpan nilai diskon
+                });
+            }
+        }
         return JSON.stringify(r);
     }
 
@@ -335,6 +352,24 @@
         await addDoc(colRef, { nama_produk: n, kategori: c, harga_json: j, createdAt: new Date().getTime() });
         tampilNotif("Produk Berhasil Disimpan!", "#10b981");
         document.getElementById('p-nama').value = ""; document.getElementById('p-kategori').value = "";
+        // Reset baris input tambah
+        document.getElementById('tambah-items-container').innerHTML = `
+            <div class="item-row">
+                <div class="col-input">
+                    <label>NOMINAL</label>
+                    <input type="text" class="item-nominal" placeholder="86">
+                </div>
+                <div class="col-input">
+                    <label>HARGA</label>
+                    <input type="text" class="item-harga" placeholder="20000">
+                </div>
+                <div class="col-input">
+                    <label>DISKON</label>
+                    <input type="text" class="item-diskon" placeholder="10%">
+                </div>
+                <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
+            </div>
+        `;
     };
 
     window.simpanEdit = async (id) => {
