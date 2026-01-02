@@ -573,6 +573,28 @@
             justify-content: center;
             gap: 6px;
         }
+    .badge-diskon {
+        position: absolute;
+        top: -10px;
+        right: -5px;
+        background: #ef4444;
+        color: white;
+        font-size: 8px;
+        font-weight: 800;
+        padding: 2px 7px;
+        border-radius: 4px;
+        z-index: 10;
+        box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+        text-transform: uppercase;
+        border: 1px solid white;
+        pointer-events: none;
+    }
+
+    .nominal-item {
+        position: relative;
+        overflow: visible !important;
+    }
+
     </style>
 </head>
 <body>
@@ -1481,79 +1503,90 @@ localStorage.setItem('nox_user_id', userUniqueId);
             }
         }
 
-        function selectProduct(prod, element) {
-            document.querySelectorAll('#items-list .category-card').forEach(c => c.classList.remove('active'));
-            element.classList.add('active');
-            selectedProduct = prod;
-            resetInputs(); 
-            const danaOption = document.getElementById('pay-dana');
-            const adminGroup = document.getElementById('admin-selection-group');
-            
-            // MODIFIKASI: Tampilkan pilihan admin untuk SEMUA kategori layanan
-            adminGroup.classList.remove('hidden'); 
-            if (selectedAdminGame === 1) {
-                danaOption.classList.remove('hidden');
-            } else {
-                danaOption.classList.add('hidden');
-            }
+function selectProduct(prod, element) {
+    // Memberikan tanda 'active' pada produk yang dipilih
+    document.querySelectorAll('#items-list .category-card').forEach(c => c.classList.remove('active'));
+    element.classList.add('active');
+    
+    selectedProduct = prod;
+    resetInputs(); 
+    
+    const danaOption = document.getElementById('pay-dana');
+    const adminGroup = document.getElementById('admin-selection-group');
+    
+    // Tampilkan pilihan admin untuk SEMUA kategori layanan
+    adminGroup.classList.remove('hidden'); 
+    if (selectedAdminGame === 1) {
+        danaOption.classList.remove('hidden');
+    } else {
+        danaOption.classList.add('hidden');
+    }
 
-            if (heroThemes[prod.id]) applyTheme(prod.id);
-            const labelId = document.getElementById('label-id');
-            const inputId = document.getElementById('target-id');
-            if(selectedCategory === 'pln') {
-                labelId.innerText = "Nomor Meter / ID Pelanggan";
-                inputId.placeholder = "Contoh: 12345678901";
-            } else if(selectedCategory === 'pulsa' || selectedCategory === 'data') {
-                labelId.innerText = "Masukkan Nomor HP";
-                inputId.placeholder = "Contoh: 08123456789";
-            } else if(selectedCategory === 'ewallet') {
-                labelId.innerText = "Nomor Terdaftar di " + (prod.nama_produk || prod.name);
-                inputId.placeholder = "Contoh: 08123456789";
-            } else {
-                labelId.innerText = "User ID";
-                inputId.placeholder = "Masukkan ID Akun";
-            }
-            document.getElementById('input-server-group').className = prod.needsServer ? 'form-group' : 'hidden';
-            const nominalList = document.getElementById('nominal-list');
-            nominalList.innerHTML = '';
-            
-            // PERBAIKAN: Logic Handling untuk harga_json (String) dari Firestore
-            let listHarga = [];
-            
-            // --- MODIFIKASI KRUSIAL AGAR TIDAK UNDEFINED ---
-            if (prod.harga_json) {
-                try {
-                    // Jika data berupa string JSON dari Firebase
-                    listHarga = typeof prod.harga_json === 'string' ? JSON.parse(prod.harga_json) : prod.harga_json;
-                } catch(e) {
-                    console.error("Gagal parse harga_json", e);
-                }
-            } else if (prod.prices) {
-                listHarga = prod.prices;
-            } else if (prod.variasi) {
-                listHarga = prod.variasi;
-            }
-            
-            listHarga.forEach((p, i) => {
-                // Mendeteksi kunci yang mungkin berbeda di database (a/nominal, p/harga)
-                const nominalName = p.a || p.nominal || "Pilihan " + (i+1);
-                const nominalPrice = p.p || p.harga || "0";
-                const isWDP = nominalName.toUpperCase().includes('WDP');
-                
-                nominalList.innerHTML += `
-                    <div class="nominal-item fade-in ${isWDP ? 'wdp-special' : ''}">
-                        <input type="radio" name="nominal" id="n-${i}" value="${nominalName}" data-price="${nominalPrice}">
-                        <label for="n-${i}">
-                            <b>${nominalName}</b><br>
-                            <span style="font-size:11px; color:var(--primary)">Rp ${nominalPrice}</span>
-                        </label>
-                    </div>`;
-            });
-            const orderForm = document.getElementById('order-form-container');
-            orderForm.classList.remove('hidden');
-            const y = orderForm.getBoundingClientRect().top + window.pageYOffset - 80;
-            window.scrollTo({top: y, behavior: 'smooth'});
-        }
+    if (heroThemes[prod.id]) applyTheme(prod.id);
+    
+    const labelId = document.getElementById('label-id');
+    const inputId = document.getElementById('target-id');
+    
+    // Penyesuaian Label Input berdasarkan kategori
+    if(selectedCategory === 'pln') {
+        labelId.innerText = "Nomor Meter / ID Pelanggan";
+        inputId.placeholder = "Contoh: 12345678901";
+    } else if(selectedCategory === 'pulsa' || selectedCategory === 'data') {
+        labelId.innerText = "Masukkan Nomor HP";
+        inputId.placeholder = "Contoh: 08123456789";
+    } else if(selectedCategory === 'ewallet') {
+        labelId.innerText = "Nomor Terdaftar di " + (prod.nama_produk || prod.name);
+        inputId.placeholder = "Contoh: 08123456789";
+    } else {
+        labelId.innerText = "User ID";
+        inputId.placeholder = "Masukkan ID Akun";
+    }
+
+    // Munculkan input Server ID jika produk membutuhkannya
+    document.getElementById('input-server-group').className = prod.needsServer ? 'form-group' : 'hidden';
+    
+    const nominalList = document.getElementById('nominal-list');
+    nominalList.innerHTML = '';
+    
+    // Logic Handling untuk harga_json dari Firestore/Database
+    let listHarga = [];
+    if (prod.harga_json) {
+        try {
+            listHarga = typeof prod.harga_json === 'string' ? JSON.parse(prod.harga_json) : prod.harga_json;
+        } catch(e) { console.error("Gagal parse harga_json", e); }
+    } else if (prod.prices) {
+        listHarga = prod.prices;
+    } else if (prod.variasi) {
+        listHarga = prod.variasi;
+    }
+    
+    listHarga.forEach((p, i) => {
+        const nominalName = p.a || p.nominal || "Pilihan " + (i+1);
+        const nominalPrice = p.p || p.harga || "0";
+        
+        // --- FITUR BARU: LABEL DISKON ---
+        const isiDiskon = p.d || ""; 
+        const labelHTML = isiDiskon ? `<div class="badge-diskon">DISKON ${isiDiskon}</div>` : "";
+
+        const isWDP = nominalName.toUpperCase().includes('WDP');
+        
+        nominalList.innerHTML += `
+            <div class="nominal-item fade-in ${isWDP ? 'wdp-special' : ''}" onclick="this.querySelector('input').click()">
+                <input type="radio" name="nominal" id="n-${i}" value="${nominalName}" data-price="${nominalPrice}" style="display:none">
+                <label for="n-${i}" style="display:block; width:100%; cursor:pointer;">
+                    ${labelHTML}
+                    <b style="display:block; margin-bottom:4px;">${nominalName}</b>
+                    <span style="font-size:12px; color:var(--primary); font-weight:700;">Rp ${nominalPrice}</span>
+                </label>
+            </div>`;
+    });
+
+    const orderForm = document.getElementById('order-form-container');
+    orderForm.classList.remove('hidden');
+    const y = orderForm.getBoundingClientRect().top + window.pageYOffset - 80;
+    window.scrollTo({top: y, behavior: 'smooth'});
+}
+
 
         function selectPayment(method) {
             currentPaymentMethod = method;
