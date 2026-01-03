@@ -211,6 +211,17 @@
         .section-header { margin: 20px 0 12px; display: flex; justify-content: space-between; align-items: center; }
         .section-header h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: white; }
         .section-header h2::before { content: ''; width: 5px; height: 15px; background: var(--primary); border-radius: 10px; }
+        
+        /* --- UPDATE: TABS KATEGORI DALAM CREATOR --- */
+        .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        .tab-item { 
+            padding: 10px 18px; border-radius: 14px; background: rgba(255,255,255,0.05); 
+            color: var(--gray); font-size: 11px; font-weight: 800; cursor: pointer; 
+            white-space: nowrap; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+        }
+        .tab-item.active { background: var(--primary); color: white; border-color: var(--primary); }
+
         .project-card { background: var(--white); padding: 16px; border-radius: 24px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 8px 20px rgba(0,0,0,0.2); position: relative; overflow: hidden; animation: cardEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
         @keyframes cardEntrance { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .card-main-info { display: flex; align-items: center; gap: 12px; width: 100%; }
@@ -368,6 +379,13 @@
                     <button onclick="showCreators()" style="background:transparent; border:1.5px solid var(--primary); color:var(--primary); padding:6px 12px; border-radius:10px; font-size:10px; font-weight:800; cursor:pointer;">GANTI</button>
                 </div>
             </div>
+
+            <div class="category-tabs">
+                <div class="tab-item active" id="tab-all" onclick="filterBySubCategory('all')">Semua</div>
+                <div class="tab-item" id="tab-flm" onclick="filterBySubCategory('Projects FLM')">Projects FLM</div>
+                <div class="tab-item" id="tab-acapella" onclick="filterBySubCategory('Acapella Mashup')">Acapella Mashup</div>
+            </div>
+
             <div id="project-render"></div>
         </div>
     </main>
@@ -431,6 +449,9 @@
         let currentAudio = null;
         let currentIdx = null;
         let creatorsList = {};
+        let currentCreatorName = ""; 
+        let currentCreatorAvatar = ""; 
+        let currentSubCategory = "all"; 
 
         async function syncUser() {
             let localID = localStorage.getItem('uID');
@@ -478,7 +499,20 @@
             document.getElementById('creator-section').classList.remove('hidden');
         }
 
+        function filterBySubCategory(cat) {
+            currentSubCategory = cat;
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            if(cat === 'all') document.getElementById('tab-all').classList.add('active');
+            else if(cat === 'Projects FLM') document.getElementById('tab-flm').classList.add('active');
+            else if(cat === 'Acapella Mashup') document.getElementById('tab-acapella').classList.add('active');
+            
+            showProjects(currentCreatorName, currentCreatorAvatar);
+        }
+
         async function showProjects(name, avatarUrl) {
+            currentCreatorName = name; 
+            currentCreatorAvatar = avatarUrl; 
+            
             document.getElementById('creator-section').classList.add('hidden');
             document.getElementById('project-section').classList.remove('hidden');
             document.getElementById('creator-name-display').innerText = name;
@@ -493,8 +527,15 @@
                 rdb.ref('orders').on('value', (allOrdersSnap) => {
                     const allOrders = allOrdersSnap.val() || {};
                     
-                    fs.collection("projects").where("creatorName", "==", name).get().then(snapshot => {
-                        if (snapshot.empty) { render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project.</p>'; return; }
+                    let query = fs.collection("projects").where("creatorName", "==", name);
+                    
+                    // UPDATE: Field disinkronkan ke "category" agar nyambung dengan upload.html
+                    if(currentSubCategory !== "all") {
+                        query = query.where("category", "==", currentSubCategory);
+                    }
+
+                    query.get().then(snapshot => {
+                        if (snapshot.empty) { render.innerHTML = '<p style="text-align:center; font-size:12px; color:var(--gray); margin-top:20px;">Belum ada project di kategori ini.</p>'; return; }
                         
                         render.innerHTML = '';
                         let i = 0;
@@ -706,7 +747,6 @@
             closeModalGeneric('modal-detail');
         }
 
-        // FUNGSI UTAMA MONITORING REAL-TIME AGAR TOMBOL PERMANEN
         function monitorStatus() {
             rdb.ref('orders').on('value', (snap) => {
                 if(!snap.exists()) return;
@@ -745,7 +785,6 @@
             });
         }
 
-        /* --- UPDATE: FITUR EDIT PROFIL REAL-TIME --- */
         async function handleEditProfile() {
             const user = auth.currentUser;
             if(!user) return alert("Silakan Login terlebih dahulu!");
@@ -792,7 +831,7 @@
                 name: document.getElementById('sidebar-user-name'),
                 role: document.getElementById('sidebar-user-role'),
                 avatar: document.getElementById('sidebar-avatar'),
-                headerAvatar: document.getElementById('header-avatar'), // UPDATE
+                headerAvatar: document.getElementById('header-avatar'), 
                 menuDashboard: document.getElementById('menu-dashboard') 
             };
             if (user) {
@@ -807,7 +846,7 @@
                         
                         if(ui.name) ui.name.innerText = artistName;
                         if(ui.avatar) ui.avatar.src = avatarUrl;
-                        if(ui.headerAvatar) ui.headerAvatar.src = avatarUrl; // UPDATE
+                        if(ui.headerAvatar) ui.headerAvatar.src = avatarUrl; 
                         
                         if (data.isApproved === true) {
                             if(ui.role) ui.role.innerText = "OFFICIAL ARTIST";
