@@ -281,7 +281,7 @@
         <div class="form-group active" id="step-1">
             <label>PILIH JENIS PRODUK</label>
             <select id="p-product-type" class="form-control" onchange="togglePriceField()">
-                <option value="" disabled selected>--- Pilih Kategori Produk ---</option>
+                <option value="" disabled selected>--- Pilih Jenis Jualan ---</option>
                 <option value="reguler">REGULER (Bisa dibeli berkali-kali)</option>
                 <option value="free">GRATIS (Download Langsung)</option>
                 <option value="exclusive">EXCLUSIVE (Hanya 1 Pembeli)</option>
@@ -292,30 +292,42 @@
         </div>
 
         <div class="form-group" id="step-2">
-            <label>NAMA PRODUK (Tampilan di Halaman)</label>
-            <input type="text" id="p-display-name" class="form-control" placeholder="Contoh: Viral Bass Kane">
-            <button class="btn-next" onclick="nextStep(3, 'p-display-name')">
+            <label>KATEGORI PRODUK</label>
+            <select id="p-category" class="form-control">
+                <option value="" disabled selected>--- Pilih Kategori Produk ---</option>
+                <option value="Projects FLM">PROJECTS FLM</option>
+                <option value="Acapella Mashup">ACAPELLA MASHUP</option>
+            </select>
+            <button class="btn-next" style="margin-top: 15px;" onclick="nextStep(3, 'p-category')">
                 LANJUTKAN <span>&rarr;</span>
             </button>
         </div>
 
         <div class="form-group" id="step-3">
-            <label>NAMA PROJECT ZIP (Sesuai File)</label>
-            <input type="text" id="p-name" class="form-control" placeholder="Contoh: MEMEW">
-            <button class="btn-next" onclick="nextStep(4, 'p-name')">
-                LANJUTKAN <span>&rarr;</span>
-            </button>
-        </div>
-        
-        <div class="form-group" id="step-4">
-            <label id="label-price">HARGA (RP)</label>
-            <input type="number" id="p-price" class="form-control" placeholder="15000">
-            <button class="btn-next" onclick="nextStep(5, 'p-price')">
+            <label>NAMA PRODUK (Tampilan di Halaman)</label>
+            <input type="text" id="p-display-name" class="form-control" placeholder="Contoh: Viral Bass Kane">
+            <button class="btn-next" onclick="nextStep(4, 'p-display-name')">
                 LANJUTKAN <span>&rarr;</span>
             </button>
         </div>
 
+        <div class="form-group" id="step-4">
+            <label>NAMA PROJECT ZIP (Sesuai File)</label>
+            <input type="text" id="p-name" class="form-control" placeholder="Contoh: MEMEW">
+            <button class="btn-next" onclick="nextStep(5, 'p-name')">
+                LANJUTKAN <span>&rarr;</span>
+            </button>
+        </div>
+        
         <div class="form-group" id="step-5">
+            <label id="label-price">HARGA (RP)</label>
+            <input type="number" id="p-price" class="form-control" placeholder="15000">
+            <button class="btn-next" onclick="nextStep(6, 'p-price')">
+                LANJUTKAN <span>&rarr;</span>
+            </button>
+        </div>
+
+        <div class="form-group" id="step-6">
             <div class="wallet-row">
                 <div class="wallet-col-1">
                     <label>E-WALLET</label>
@@ -331,20 +343,20 @@
                     <input type="number" id="p-wallet-num" class="form-control" placeholder="08xxxx">
                 </div>
             </div>
-            <button class="btn-next" style="margin-top: 15px;" onclick="nextStep(6, 'p-wallet-num')">
-                LANJUTKAN <span>&rarr;</span>
-            </button>
-        </div>
-
-        <div class="form-group" id="step-6">
-            <label>PREVIEW AUDIO</label>
-            <input type="file" id="p-audio" accept="audio/*">
-            <button class="btn-next" onclick="nextStep(7, 'p-audio')">
+            <button class="btn-next" style="margin-top: 15px;" onclick="nextStep(7, 'p-wallet-num')">
                 LANJUTKAN <span>&rarr;</span>
             </button>
         </div>
 
         <div class="form-group" id="step-7">
+            <label>PREVIEW AUDIO</label>
+            <input type="file" id="p-audio" accept="audio/*">
+            <button class="btn-next" onclick="nextStep(8, 'p-audio')">
+                LANJUTKAN <span>&rarr;</span>
+            </button>
+        </div>
+
+        <div class="form-group" id="step-8">
             <label>LINK FILE ASLI (Link MediaFire/G-Drive)</label>
             <input type="text" id="p-link" class="form-control" placeholder="https://www.mediafire.com/...">
         </div>
@@ -413,7 +425,7 @@
             if(nextEl) {
                 nextEl.classList.add('active');
             }
-            if(step === 7) {
+            if(step === 8) {
                 document.getElementById('btn-submit').style.display = 'block';
             }
         }
@@ -463,6 +475,7 @@
 
         async function handlePublish() {
             const productType = document.getElementById('p-product-type').value;
+            const category = document.getElementById('p-category').value;
             const displayName = document.getElementById('p-display-name').value;
             const name = document.getElementById('p-name').value.toUpperCase();
             const price = document.getElementById('p-price').value;
@@ -471,7 +484,7 @@
             const audioFile = document.getElementById('p-audio').files[0];
             const linkFile = document.getElementById('p-link').value;
 
-            if(!productType || !displayName || !name || price === "" || !audioFile || !linkFile || !walletNum) return alert("Lengkapi semua data!");
+            if(!productType || !category || !displayName || !name || price === "" || !audioFile || !linkFile || !walletNum) return alert("Lengkapi semua data!");
             if(!currentCreator) return alert("Nama Artist belum terdeteksi.");
 
             document.getElementById('progress-container').style.display = 'block';
@@ -482,6 +495,7 @@
                 const audioUrl = await uploadAudio(audioFile);
                 await fs.collection("projects").add({
                     productType: productType,
+                    category: category,
                     productName: displayName, 
                     name: name,
                     price: price,
