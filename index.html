@@ -1561,25 +1561,47 @@ function selectProduct(prod, element) {
     }
     
     listHarga.forEach((p, i) => {
+        // --- AMBIL DATA DARI FIREBASE ---
         const nominalName = p.a || p.nominal || "Pilihan " + (i+1);
-        const nominalPrice = p.p || p.harga || "0";
         
-        // --- FITUR BARU: LABEL DISKON ---
-        const isiDiskon = p.d || ""; 
-        const labelHTML = isiDiskon ? `<div class="badge-diskon">DISKON ${isiDiskon}</div>` : "";
+        // Bersihkan harga dari titik/karakter non-angka
+        const hargaAsli = parseInt(String(p.p || 0).replace(/[^\d]/g, ''));
+        const hargaPromo = p.pr ? parseInt(String(p.pr).replace(/[^\d]/g, '')) : 0;
+        
+        const sekarang = new Date().getTime();
+        const formatExpired = p.ex ? p.ex.replace(" ", "T") : ""; 
+        const waktuBerakhir = formatExpired ? new Date(formatExpired).getTime() : 0;
+        
+        // Logika: Promo aktif jika hargaPromo ada dan belum expired
+        const isPromoAktif = hargaPromo > 0 && (waktuBerakhir === 0 || sekarang < waktuBerakhir);
+        const hargaFinal = isPromoAktif ? hargaPromo : hargaAsli;
+
+        // --- TAMPILAN (PERSIS KODE REFERENSI ANDA) ---
+        // Label diskon muncul jika promo aktif
+        const labelHTML = isPromoAktif ? `<div class="badge-diskon">PROMO</div>` : "";
+        
+        // Harga coret & Timer (Ditampilkan rapi di bawah harga utama jika ada promo)
+        const hargaCoret = isPromoAktif ? `<del style="display:block; font-size:10px; color:#94a3b8; margin-top:2px;">Rp ${hargaAsli.toLocaleString('id-ID')}</del>` : "";
+        const timerHTML = (isPromoAktif && waktuBerakhir > 0) ? `<div class="promo-timer" data-endtime="${formatExpired}" style="font-size:9px; color:#ef4444; font-weight:700; margin-top:2px;">Menghitung...</div>` : "";
 
         const isWDP = nominalName.toUpperCase().includes('WDP');
         
         nominalList.innerHTML += `
             <div class="nominal-item fade-in ${isWDP ? 'wdp-special' : ''}" onclick="this.querySelector('input').click()">
-                <input type="radio" name="nominal" id="n-${i}" value="${nominalName}" data-price="${nominalPrice}" style="display:none">
+                <input type="radio" name="nominal" id="n-${i}" value="${nominalName}" data-price="${hargaFinal}" style="display:none">
                 <label for="n-${i}" style="display:block; width:100%; cursor:pointer;">
                     ${labelHTML}
                     <b style="display:block; margin-bottom:4px;">${nominalName}</b>
-                    <span style="font-size:12px; color:var(--primary); font-weight:700;">Rp ${nominalPrice}</span>
+                    <span style="font-size:12px; color:var(--primary); font-weight:700;">Rp ${hargaFinal.toLocaleString('id-ID')}</span>
+                    ${hargaCoret}
+                    ${timerHTML}
                 </label>
             </div>`;
     });
+
+    if (typeof startPromoCountdowns === 'function') {
+        startPromoCountdowns();
+    }
 
     const orderForm = document.getElementById('order-form-container');
     orderForm.classList.remove('hidden');
@@ -1786,8 +1808,60 @@ function drag(e) {
         setTranslate(currentX, currentY, dragItem);
     }
 }
+function startPromoCountdowns() {
+    const timers = document.querySelectorAll('.promo-timer');
+    
+    const interval = setInterval(() => {
+        let adaTimerAktif = false;
+        
+        timers.forEach(timer => {
+            const endStr = timer.getAttribute('data-endtime');
+            if (!endStr) return;
+
+            const endTime = new Date(endStr).getTime();
+            const now = new Date().getTime();
+            const distance = endTime - now;
+            const parentLabel = timer.closest('label');
+            const parentItem = timer.closest('.nominal-item');
+
+            if (distance <= 0) {
+                // --- LOGIKA KEMBALI KE NORMAL ---
+                timer.innerHTML = "Promo Berakhir";
+                
+                // 1. Ambil harga asli dari elemen <del>
+                const delElem = parentLabel.querySelector('del');
+                if (delElem) {
+                    const hargaAsliText = delElem.innerText; // Contoh: "Rp 10.000"
+                    const hargaAsliAngka = hargaAsliText.replace(/[^\d]/g, '');
+                    
+                    // 2. Update tampilan harga utama (span)
+                    const spanHarga = parentLabel.querySelector('span');
+                    if (spanHarga) spanHarga.innerText = hargaAsliText;
+                    
+                    // 3. Update data-price di input radio agar sistem checkout tahu harganya berubah
+                    const inputRadio = parentItem.querySelector('input');
+                    if (inputRadio) inputRadio.setAttribute('data-price', hargaAsliAngka);
+                    
+                    // 4. Hapus elemen promo (badge, harga coret, dan timer itu sendiri)
+                    const badge = parentItem.querySelector('.badge-diskon');
+                    if (badge) badge.remove();
+                    delElem.remove();
+                    timer.remove();
+                }
+            } else {
+                adaTimerAktif = true;
+                const jam = Math.floor(distance / (1000 * 60 * 60));
+                const menit = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const detik = Math.floor((distance % (1000 * 60)) / 1000);
+                timer.innerHTML = `Sisa: ${jam}j ${menit}m ${detik}d`;
+            }
+        });
+
+        // Berhenti jalankan interval jika sudah tidak ada timer yang aktif
+        if (!adaTimerAktif) clearInterval(interval);
+    }, 1000);
+}
 
     </script>
 </body>
 </html>
-
