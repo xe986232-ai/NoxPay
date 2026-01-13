@@ -96,8 +96,8 @@
         .is-open .product-content { display: block; }
 
         .items-container { background: var(--card-bg); padding: 16px 12px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-top: 12px; }
-        /* MODIFIED: Mengatur kolom agar muat 3 input + tombol hapus */
-        .item-row { display: grid; grid-template-columns: 1fr 1fr 0.8fr 44px; gap: 8px; margin-bottom: 12px; align-items: end; }
+        /* Grid disesuaikan untuk fitur diskon durasi */
+        .item-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border); align-items: end; position: relative; }
         
         .col-input { display: flex; flex-direction: column; gap: 4px; }
         .col-input label { margin: 0; font-size: 9px; color: var(--accent); opacity: 0.8; }
@@ -106,7 +106,7 @@
         .btn-add { background: var(--accent-soft); color: var(--accent); margin-top: 12px; width: 100%; padding: 12px; font-size: 13px; border: 2px dashed var(--accent); }
         .btn-update { background: var(--success); color: white; flex: 2; padding: 14px; }
         .btn-delete { background: var(--border); color: var(--text-main); flex: 1; padding: 14px; }
-        .btn-del-row { background: var(--danger); color: white; height: 38px; border-radius: 10px; font-size: 18px; }
+        .btn-del-row { background: var(--danger); color: white; height: 32px; width: 32px; border-radius: 8px; font-size: 16px; border: none; position: absolute; top: -10px; right: -5px; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); cursor: pointer; }
 
         #notif { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); padding: 16px 32px; border-radius: 50px; color: white; font-weight: 700; z-index: 10000; display: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
         
@@ -159,19 +159,23 @@
         <label>Variasi & Harga</label>
         <div class="items-container" id="tambah-items-container">
             <div class="item-row">
+                <button class="btn-del-row" onclick="this.parentElement.remove()">×</button>
                 <div class="col-input">
                     <label>NOMINAL</label>
                     <input type="text" class="item-nominal" placeholder="86">
                 </div>
                 <div class="col-input">
-                    <label>HARGA</label>
-                    <input type="text" class="item-harga" placeholder="20000">
+                    <label>HARGA NORMAL</label>
+                    <input type="number" class="item-harga" placeholder="20000">
                 </div>
                 <div class="col-input">
-                    <label>DISKON</label>
-                    <input type="text" class="item-diskon" placeholder="10%">
+                    <label>HARGA PROMO</label>
+                    <input type="number" class="item-promo" placeholder="18000">
                 </div>
-                <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
+                <div class="col-input">
+                    <label>EXPIRED DISKON</label>
+                    <input type="datetime-local" class="item-exp">
+                </div>
             </div>
         </div>
         <button class="btn btn-add" onclick="addItemRow('tambah-items-container')">+ Baris Baru</button>
@@ -278,19 +282,23 @@
                         <div class="items-container" id="items-${id}">
                             ${dataHarga.map(item => `
                                 <div class="item-row">
+                                    <button class="btn-del-row" onclick="this.parentElement.remove()">×</button>
                                     <div class="col-input">
                                         <label>NOMINAL</label>
                                         <input type="text" class="item-nominal" value="${item.a || ''}">
                                     </div>
                                     <div class="col-input">
-                                        <label>HARGA</label>
-                                        <input type="text" class="item-harga" value="${item.p || ''}">
+                                        <label>HARGA NORMAL</label>
+                                        <input type="number" class="item-harga" value="${item.p || ''}">
                                     </div>
                                     <div class="col-input">
-                                        <label>DISKON</label>
-                                        <input type="text" class="item-diskon" value="${item.d || ''}">
+                                        <label>HARGA PROMO</label>
+                                        <input type="number" class="item-promo" value="${item.pr || ''}">
                                     </div>
-                                    <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
+                                    <div class="col-input">
+                                        <label>EXPIRED DISKON</label>
+                                        <input type="datetime-local" class="item-exp" value="${item.ex || ''}">
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
@@ -307,23 +315,27 @@
 
     window.toggleAccordion = (id) => document.getElementById(`card-${id}`).classList.toggle('is-open');
     
-    window.addItemRow = (containerId, n = "", h = "", d = "") => {
+    window.addItemRow = (containerId, n = "", h = "", pr = "", ex = "") => {
         const c = document.getElementById(containerId);
         const divRow = document.createElement('div'); divRow.className = 'item-row';
         divRow.innerHTML = `
+            <button class="btn-del-row" onclick="this.parentElement.remove()">×</button>
             <div class="col-input">
                 <label>NOMINAL</label>
                 <input type="text" class="item-nominal" value="${n}">
             </div>
             <div class="col-input">
-                <label>HARGA</label>
-                <input type="text" class="item-harga" value="${h}">
+                <label>HARGA NORMAL</label>
+                <input type="number" class="item-harga" value="${h}">
             </div>
             <div class="col-input">
-                <label>DISKON</label>
-                <input type="text" class="item-diskon" value="${d}">
+                <label>HARGA PROMO</label>
+                <input type="number" class="item-promo" value="${pr}">
             </div>
-            <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
+            <div class="col-input">
+                <label>EXPIRED DISKON</label>
+                <input type="datetime-local" class="item-exp" value="${ex}">
+            </div>
         `;
         c.appendChild(divRow);
     };
@@ -332,14 +344,16 @@
         const c = document.getElementById(cid);
         const n = c.getElementsByClassName('item-nominal');
         const h = c.getElementsByClassName('item-harga');
-        const d = c.getElementsByClassName('item-diskon');
+        const pr = c.getElementsByClassName('item-promo');
+        const ex = c.getElementsByClassName('item-exp');
         const r = [];
         for(let i=0; i<n.length; i++) {
             if(n[i].value.trim()!="") {
                 r.push({
                     a: n[i].value, 
                     p: h[i].value,
-                    d: d[i].value // Menyimpan nilai diskon
+                    pr: pr[i].value, // Promo price
+                    ex: ex[i].value  // Expiry datetime
                 });
             }
         }
@@ -347,35 +361,42 @@
     }
 
     window.tambahProduk = async () => {
-        const n = document.getElementById('p-nama').value, c = document.getElementById('p-kategori').value, j = getJsonData('tambah-items-container');
-        if(!n || !c) return alert("Wajib diisi!");
-        await addDoc(colRef, { nama_produk: n, kategori: c, harga_json: j, createdAt: new Date().getTime() });
-        tampilNotif("Produk Berhasil Disimpan!", "#10b981");
-        document.getElementById('p-nama').value = ""; document.getElementById('p-kategori').value = "";
-        // Reset baris input tambah
-        document.getElementById('tambah-items-container').innerHTML = `
-            <div class="item-row">
-                <div class="col-input">
-                    <label>NOMINAL</label>
-                    <input type="text" class="item-nominal" placeholder="86">
-                </div>
-                <div class="col-input">
-                    <label>HARGA</label>
-                    <input type="text" class="item-harga" placeholder="20000">
-                </div>
-                <div class="col-input">
-                    <label>DISKON</label>
-                    <input type="text" class="item-diskon" placeholder="10%">
-                </div>
-                <button class="btn btn-del-row" onclick="this.parentElement.remove()">×</button>
-            </div>
-        `;
+        try {
+            const n = document.getElementById('p-nama').value, c = document.getElementById('p-kategori').value, j = getJsonData('tambah-items-container');
+            if(!n || !c) return alert("Nama Produk dan Kategori Wajib diisi!");
+            
+            await addDoc(colRef, { 
+                nama_produk: n, 
+                kategori: c, 
+                harga_json: j, 
+                createdAt: new Date().getTime() 
+            });
+            
+            tampilNotif("Produk Berhasil Disimpan!", "#10b981");
+            document.getElementById('p-nama').value = ""; 
+            document.getElementById('p-kategori').value = "";
+            document.getElementById('tambah-items-container').innerHTML = `
+                <div class="item-row">
+                    <button class="btn-del-row" onclick="this.parentElement.remove()">×</button>
+                    <div class="col-input"><label>NOMINAL</label><input type="text" class="item-nominal" placeholder="86"></div>
+                    <div class="col-input"><label>HARGA NORMAL</label><input type="number" class="item-harga" placeholder="20000"></div>
+                    <div class="col-input"><label>HARGA PROMO</label><input type="number" class="item-promo" placeholder="18000"></div>
+                    <div class="col-input"><label>EXPIRED DISKON</label><input type="datetime-local" class="item-exp"></div>
+                </div>`;
+        } catch (error) {
+            console.error(error);
+            alert("Gagal simpan: Pastikan Firebase Rules Anda diizinkan.");
+        }
     };
 
     window.simpanEdit = async (id) => {
-        const n = document.getElementById(`n-${id}`).value, c = document.getElementById(`cat-${id}`).value, j = getJsonData(`items-${id}`);
-        await updateDoc(doc(db, "layanan_noxpay", id), { nama_produk: n, kategori: c, harga_json: j });
-        tampilNotif("Data Berhasil Diperbarui!", "#4f46e5");
+        try {
+            const n = document.getElementById(`n-${id}`).value, c = document.getElementById(`cat-${id}`).value, j = getJsonData(`items-${id}`);
+            await updateDoc(doc(db, "layanan_noxpay", id), { nama_produk: n, kategori: c, harga_json: j });
+            tampilNotif("Data Berhasil Diperbarui!", "#4f46e5");
+        } catch (error) {
+            alert("Gagal update data!");
+        }
     };
 
     window.hapusProduk = async (id) => { if(confirm("Hapus layanan ini permanen?")) await deleteDoc(doc(db, "layanan_noxpay", id)); };
@@ -384,4 +405,3 @@
 </script>
 </body>
 </html>
-
