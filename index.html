@@ -524,55 +524,7 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 900;
         }
-
-        .history-card {
-            background: var(--white);
-            padding: 14px;
-            border-radius: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border: 1px solid #eef2f6;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            position: relative;
-        }
-        .history-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .delete-btn {
-            background: #fee2e2;
-            color: #ef4444;
-            border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            cursor: pointer;
-            margin-left: 10px;
-            font-size: 14px;
-        }
-        .delete-all-btn {
-            width: 100%;
-            padding: 10px;
-            background: #fee2e2;
-            color: #ef4444;
-            border: none;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
+        
     .badge-diskon {
         position: absolute;
         top: -10px;
@@ -627,10 +579,12 @@
                     <div class="logo-box">N</div>
                     <div class="logo-text-nav"><span>Nox</span><span>Pay</span></div>
                 </div>
-                <nav class="nav-right">
-                    <span class="menu-link" onclick="handleHome()">Home</span>
-                    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
-                </nav>
+<nav class="nav-right" style="display: flex; gap: 10px; font-size: 13px;">
+    <span class="menu-link" onclick="handleHome()">Home</span>
+    <span class="menu-link" onclick="window.location.href='riwayat.html'">🕒 Riwayat</span>
+    <span class="menu-link" onclick="openCaraOrder()">Bantuan</span>
+</nav>
+
             </div>
         </header>
 
@@ -753,7 +707,7 @@
                 </div>
             </div>
 
-            <div id="history-section" style="margin-top: 40px;">
+            <div id="history-section" style="display: none; margin-top: 40px;">
                 <div class="section-header"><h2>Riwayat Terakhir</h2></div>
                 <div id="history-list">
                     <p style="text-align: center; font-size: 11px; color: var(--gray); padding: 20px;">Belum ada riwayat pesanan.</p>
@@ -1040,6 +994,39 @@
         }
         const db = firebase.database();
         const fs = firebase.firestore();
+        // --- ANTENA SALDO ADMIN ---
+let saldoAdmin1 = 0; // Wall
+let saldoAdmin2 = 0; // Riz
+
+db.ref('admin_balance').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        saldoAdmin1 = data.wall || 0;
+        saldoAdmin2 = data.riz || 0;
+        console.log("Update Saldo - wall:", saldoAdmin1, "riz:", saldoAdmin2);
+        
+        // Update tampilan status admin (opsional jika ingin muncul tulisan "Online/Offline")
+        const box1 = document.getElementById('admin-box-1');
+        const box2 = document.getElementById('admin-box-2');
+        
+        if(saldoAdmin1 <= 0) { 
+            box1.style.opacity = "0.5";
+            box1.querySelector('p').innerText = "Saldo Habis";
+        } else {
+            box1.style.opacity = "1";
+            box1.querySelector('p').innerText = "Wall (Ready)";
+        }
+
+        if(saldoAdmin2 <= 0) {
+            box2.style.opacity = "0.5";
+            box2.querySelector('p').innerText = "Saldo Habis";
+        } else {
+            box2.style.opacity = "1";
+            box2.querySelector('p').innerText = "Riz (Ready)";
+        }
+    }
+});
+
 // Membuat ID unik untuk user ini jika belum ada
 let userUniqueId = localStorage.getItem('nox_user_id') || 'USER-' + Math.floor(Math.random() * 1000000);
 localStorage.setItem('nox_user_id', userUniqueId);
@@ -1637,24 +1624,54 @@ function selectProduct(prod, element) {
         }
 
         document.getElementById('btn-review').onclick = () => {
-            const id = document.getElementById('target-id').value;
-            const nominal = document.querySelector('input[name="nominal"]:checked');
-            if(!id || !nominal) return alert('Lengkapi data pesanan!');
-            let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA (Transfer)';
-            // Tampilkan Jalur Admin di modal konfirmasi untuk semua layanan
-            let adminLabel = `<p>Jalur Admin: <b>Admin ${selectedAdminGame}</b></p>`;
-            document.getElementById('modal-details').innerHTML = `
-                <div style="background:#f8fafc; padding:15px; border-radius:15px;">
-                    <p>Produk: <b>${selectedProduct.nama_produk || selectedProduct.name}</b></p>
-                    <p>Nominal: <b>${nominal.value}</b></p>
-                    <p>Tujuan: <b>${id}</b></p>
-                    <p>Pembayaran: <b>${paymentLabel}</b></p>
-                    ${adminLabel}
-                    <hr style="margin:8px 0; opacity:0.1">
-                    <p>Total: <b>Rp ${nominal.dataset.price}</b></p>
-                </div>`;
-            document.getElementById('orderModal').style.display = 'block';
-        };
+    const id = document.getElementById('target-id').value;
+    const nominal = document.querySelector('input[name="nominal"]:checked');
+    
+    // 1. Cek kelengkapan input (Fungsi Lama)
+    if(!id || !nominal) return alert('Lengkapi data pesanan!');
+
+    // 2. Ambil data harga dan tentukan admin (Fungsi Baru)
+    const hargaProduk = parseInt(nominal.dataset.price);
+    const namaAdminTerpilih = selectedAdminGame === 1 ? "Wall" : "Rizz";
+
+    // --- LOGIKA PENGUNCI: CEK KECUKUPAN SALDO ---
+    if (selectedAdminGame === 1) {
+        if (saldoAdmin1 <= 0) {
+            alert("Maaf, Saldo Admin Wall sedang habis.");
+            return;
+        } else if (saldoAdmin1 < hargaProduk) {
+            alert(`Maaf, Saldo Admin Wall tidak cukup (Sisa: Rp ${saldoAdmin1.toLocaleString()}). Silahkan pilih Jalur Admin Rizz.`);
+            return;
+        }
+    }
+    
+    if (selectedAdminGame === 2) {
+        if (saldoAdmin2 <= 0) {
+            alert("Maaf, Saldo Admin Rizz sedang habis.");
+            return;
+        } else if (saldoAdmin2 < hargaProduk) {
+            alert(`Maaf, Saldo Admin Rizz tidak cukup (Sisa: Rp ${saldoAdmin2.toLocaleString()}). Silahkan pilih Jalur Admin Wall.`);
+            return;
+        }
+    }
+
+    // 3. Tampilkan Modal Detail (Fungsi Lama yang sudah disinkronkan)
+    let paymentLabel = currentPaymentMethod === 'Cash' ? 'Tunai / Cash (COD)' : 'DANA (Transfer)';
+    let adminLabel = `<p>Jalur Admin: <b>${namaAdminTerpilih}</b></p>`;
+    
+    document.getElementById('modal-details').innerHTML = `
+        <div style="background:#f8fafc; padding:15px; border-radius:15px;">
+            <p>Produk: <b>${selectedProduct.nama_produk || selectedProduct.name}</b></p>
+            <p>Nominal: <b>${nominal.value}</b></p>
+            <p>Tujuan: <b>${id}</b></p>
+            <p>Pembayaran: <b>${paymentLabel}</b></p>
+            ${adminLabel}
+            <hr style="margin:8px 0; opacity:0.1">
+            <p>Total: <b>Rp ${hargaProduk.toLocaleString()}</b></p>
+        </div>`;
+        
+    document.getElementById('orderModal').style.display = 'block';
+};
 
         document.getElementById('btn-send-wa').onclick = () => {
             closeModal();
