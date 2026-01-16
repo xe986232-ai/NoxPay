@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin 1 - Wall</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6; /* Warna Biru untuk Wall */
+            --dark: #080a12;
+            --white: #111625;
+            --gray: #8b949e;
+            --success: #10b981;
+            --pending: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--dark); color: white; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--white); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        /* Style Tambahan untuk Kartu Saldo */
+        .stat-card.balance-box { grid-column: span 2; border: 1px solid rgba(59, 130, 246, 0.3); background: linear-gradient(145deg, #0f172a, #111625); }
+        .stat-card h3 { font-size: 20px; margin-top: 5px; }
+        .section-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .section-title::before { content: ''; width: 4px; height: 16px; background: var(--primary); border-radius: 10px; }
+        .order-card { background: var(--white); padding: 16px; border-radius: 22px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .order-flex { display: flex; justify-content: space-between; align-items: flex-start; }
+        .order-info b { font-size: 14px; display: block; color: #fff; }
+        .order-info span { font-size: 11px; color: var(--gray); }
+        .price-tag { font-size: 13px; color: var(--primary); font-weight: 800; }
+        .btn-confirm { width: 100%; margin-top: 15px; padding: 12px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer; }
+        .status-badge { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; margin-top: 8px; display: inline-block; }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--pending); }
+        .status-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h2 style="font-size: 16px;">Admin: WALL</h2>
+                <p style="font-size: 10px; color: var(--gray);">Dashboard Admin 1 Active</p>
+            </div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card balance-box">
+                <small style="color:var(--gray); font-size: 10px; font-weight: 700;">LIMIT SALDO SAYA</small>
+                <h3 id="stat-balance" style="color: #fff;">Rp 0</h3>
+            </div>
+            <div class="stat-card"><h3><span id="stat-total">0</span></h3><small style="color:var(--gray)">TOTAL ORDER</small></div>
+            <div class="stat-card"><h3><span id="stat-income">Rp 0</span></h3><small style="color:var(--gray)">PENDAPATAN</small></div>
+        </div>
+        <div class="section-title">Antrean Pesanan Wall</div>
+        <div id="order-render"><p style="text-align:center; color:var(--gray)">Memuat data...</p></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = { 
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app" // Sesuai database Anda
+        };
+        firebase.initializeApp(firebaseConfig);
+        const rdb = firebase.database();
+
+        // LISTEN SALDO LIMIT WALL
+        rdb.ref('admin_balance/wall').on('value', (snap) => {
+            const saldo = snap.val() || 0;
+            document.getElementById('stat-balance').innerText = "Rp " + saldo.toLocaleString('id-ID');
+        });
+
+        // LOGIKA SINKRONISASI: Filter berdasarkan admin_name = 'Wall'
+        rdb.ref('orders').orderByChild('admin_name').equalTo('Wall').on('value', (snapshot) => {
+            const render = document.getElementById('order-render');
+            let listHTML = ''; let income = 0; let total = 0;
+
+            if (!snapshot.exists()) {
+                render.innerHTML = '<p style="text-align:center; color:var(--gray)">Belum ada pesanan.</p>';
+                document.getElementById('stat-total').innerText = "0";
+                document.getElementById('stat-income').innerText = "Rp 0";
+                return;
+            }
+
+snapshot.forEach((child) => {
+    const order = child.val();
+    total++;
+    
+    // Sesuaikan dengan nama field di database Anda
+    const namaProduk = order.product || "Produk";
+    const namaPembeli = order.buyerName || "Pelanggan";
+    const hargaTampil = order.price || order.nominal;
+
+    if(order.status === "Success") {
+        // Hitung pendapatan (hapus titik dulu agar kalkulasi benar)
+        let valIncome = parseInt(hargaTampil.replace(/\./g, '')) || 0;
+        income += valIncome;
+    }
+    
+    listHTML = `
+    <div class="order-card">
+        <div class="order-flex">
+            <div class="order-info">
+                <b>${namaProduk}</b>
+                <span>Pembeli: ${namaPembeli}</span>
+                <div class="status-badge ${order.status === 'Pending' ? 'status-pending' : 'status-success'}">${order.status}</div>
+            </div>
+            <div class="price-tag">Rp ${hargaTampil}</div>
+        </div>
+        ${order.status === 'Pending' ? `<button class="btn-confirm" onclick="confirmOrder('${child.key}')">KONFIRMASI</button>` : ''}
+    </div>` + listHTML;
+});
+
+
+            render.innerHTML = listHTML;
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-income').innerText = "Rp " + income.toLocaleString('id-ID');
+        });
+
+async function confirmOrder(key) {
+    try {
+        const orderSnap = await rdb.ref('orders/' + key).get();
+        if (!orderSnap.exists()) return;
+        const orderData = orderSnap.val();
+
+        // PENTING: Menghapus titik agar "5.000" dibaca "5000"
+        const modalProduk = parseInt(orderData.nominal.replace(/\./g, '')) || 0;
+        
+        const saldoRef = rdb.ref('admin_balance/wall');
+        const saldoSnap = await saldoRef.get();
+        const saldoSekarang = saldoSnap.val() || 0;
+
+        if (saldoSekarang < modalProduk) {
+            alert("GAGAL: Saldo limit tidak cukup! Modal: Rp " + modalProduk.toLocaleString());
+            return;
+        }
+
+        if(confirm("Selesaikan pesanan ini?\nSaldo terpotong: Rp " + modalProduk.toLocaleString())) {
+            // Update Saldo Baru (Sekarang berkurang 5000, bukan 5)
+            await saldoRef.set(saldoSekarang - modalProduk);
+            // Update Status Pesanan
+            await rdb.ref('orders/' + key).update({ status: "Success" });
+            alert("Berhasil dikonfirmasi!");
+        }
+    } catch (e) {
+        alert("Gagal: " + e.message);
+    }
+}
+
+    </script>
+</body>
+</html>
