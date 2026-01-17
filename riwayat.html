@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Transaksi - NoxPay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066ff;
+            --primary-soft: #eef5ff;
+            --dark: #0f172a;
+            --white: #ffffff;
+            --gray: #64748b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: #f4f7fe; color: var(--dark); min-height: 100vh; }
+        .container { padding: 25px 20px; max-width: 500px; margin: 0 auto; }
+        header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
+        .header-tag { background: var(--white); padding: 8px 16px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .btn-back { background: var(--white); border: none; width: 42px; height: 42px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; font-size: 20px; }
+        
+        .history-card { 
+            background: var(--white); padding: 18px; border-radius: 24px; 
+            margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.02); 
+            border: 1px solid rgba(0,0,0,0.02); position: relative;
+        }
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .product-detail { flex: 1; margin-left: 10px; }
+        .product-name { font-size: 15px; font-weight: 800; color: var(--dark); }
+        .product-info { font-size: 11px; color: var(--gray); font-weight: 600; margin-top: 2px; }
+        .price-tag { font-size: 16px; font-weight: 800; color: var(--primary); }
+        .divider { height: 1px; background: #f1f5f9; width: 100%; margin: 12px 0; }
+        .card-bottom { display: flex; justify-content: space-between; align-items: center; }
+        .status-badge { font-size: 10px; font-weight: 800; padding: 6px 12px; border-radius: 10px; }
+        .empty-state { text-align: center; padding: 100px 20px; color: var(--gray); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <button class="btn-back" onclick="window.location.href='index.html'">←</button>
+            <div class="header-tag">
+                <span style="font-size: 14px; font-weight: 800;">Riwayat Pesanan</span>
+            </div>
+            <div style="width: 42px;"></div>
+        </header>
+
+        <div id="history-container">
+            <p style="text-align: center; color: var(--gray);">Menghubungkan ke Firebase...</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin",
+            storageBucket: "noxpay-admin.firebasestorage.app",
+            messagingSenderId: "212794945472",
+            appId: "1:212794945472:web:bd803bb3e71b48ea99a225"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let rawID = localStorage.getItem('user_id_noxpay') || "593086"; 
+        const fixUserID = rawID.startsWith("USER-") ? rawID : "USER-" + rawID;
+
+        function loadHistory() {
+            const container = document.getElementById('history-container');
+
+            db.ref('orders').orderByChild('userID').equalTo(fixUserID).on('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <p style="font-weight: 800;">Belum Ada Pesanan</p>
+                            <p style="font-size: 12px;">Tidak ditemukan data untuk ID: ${fixUserID}</p>
+                        </div>`;
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    
+                    // Modifikasi Logika Status Teks
+                    let stDB = (data.status || "Pending").toUpperCase();
+                    let statusTeks = "";
+                    let bg = "";
+                    let cl = "";
+
+                    if (stDB === "SUCCESS") {
+                        statusTeks = "DIBAYAR!!"; 
+                        bg = "#d1fae5"; 
+                        cl = "#059669";
+                    } else if (stDB === "PENDING") {
+                        statusTeks = "BELUM DIBAYAR"; 
+                        bg = "#fef3c7"; 
+                        cl = "#d97706";
+                    } else {
+                        statusTeks = stDB;
+                        bg = "#f1f5f9";
+                        cl = "#475569";
+                    }
+
+                    html = `
+                    <div class="history-card">
+                        <div class="card-top">
+                            <div class="product-detail">
+                                <div class="product-name">${data.product}</div>
+                                <div class="product-info">Target: ${data.target} | Nominal: ${data.nominal}</div>
+                            </div>
+                            <div class="price-tag">Rp ${data.price}</div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="card-bottom">
+                            <div style="font-size: 10px; color: var(--gray); font-weight: 600;">
+                                📅 ${data.waktu_masuk || ''}
+                            </div>
+                            <span class="status-badge" style="background: ${bg}; color: ${cl};">
+                                ● ${statusTeks}
+                            </span>
+                        </div>
+                    </div>` + html; 
+                });
+                container.innerHTML = html;
+            });
+        }
+
+        window.onload = loadHistory;
+    </script>
+</body>
+</html>
