@@ -34,6 +34,18 @@
         .card-bottom { display: flex; justify-content: space-between; align-items: center; }
         .status-badge { font-size: 10px; font-weight: 800; padding: 6px 12px; border-radius: 10px; }
         .empty-state { text-align: center; padding: 100px 20px; color: var(--gray); }
+        
+        /* Efek getar untuk yang expired */
+        .status-badge[style*="#ef4444"] {
+            border: 1px solid #ef4444;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -68,7 +80,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let rawID = localStorage.getItem('user_id_noxpay') || "593086"; 
+        let rawID = localStorage.getItem('nox_user_id') || "593086"; 
         const fixUserID = rawID.startsWith("USER-") ? rawID : "USER-" + rawID;
 
         function loadHistory() {
@@ -88,8 +100,29 @@
                 snapshot.forEach((child) => {
                     const data = child.val();
                     
-                    // Modifikasi Logika Status Teks
-                    let stDB = (data.status || "Pending").toUpperCase();
+                    // --- LOGIKA CEK EXPIRED (DIPERBAIKI) ---
+                    const sekarang = new Date();
+                    let isExpired = false;
+
+                    if (data.waktu_masuk) {
+                        // Menghapus koma, memperbaiki titik jam menjadi titik dua, dan merapikan spasi
+                        const cleanDate = data.waktu_masuk.replace(',', '').replace(/\./g, ':').trim();
+                        const parts = cleanDate.split(/\s+/); // Memisah berdasarkan satu atau lebih spasi
+                        
+                        if (parts.length >= 2) {
+                            const d = parts[0].split('/');
+                            const t = parts[1];
+                            const waktuTrx = new Date(`${d[2]}-${d[1]}-${d[0]}T${t}`);
+                            
+                            if (!isNaN(waktuTrx)) {
+                                const selisihJam = (sekarang - waktuTrx) / (1000 * 60 * 60);
+                                if (selisihJam >= 24) isExpired = true;
+                            }
+                        }
+                    }
+
+                    // --- LOGIKA WARNA & STATUS ---
+                    let stDB = (data.status || "PENDING").toUpperCase();
                     let statusTeks = "";
                     let bg = "";
                     let cl = "";
@@ -99,9 +132,15 @@
                         bg = "#d1fae5"; 
                         cl = "#059669";
                     } else if (stDB === "PENDING") {
-                        statusTeks = "BELUM DIBAYAR"; 
-                        bg = "#fef3c7"; 
-                        cl = "#d97706";
+                        if (isExpired) {
+                            statusTeks = "KADALUARSA (BLOKIR)"; 
+                            bg = "#fee2e2"; 
+                            cl = "#ef4444"; 
+                        } else {
+                            statusTeks = "BELUM DIBAYAR"; 
+                            bg = "#fef3c7"; 
+                            cl = "#d97706";
+                        }
                     } else {
                         statusTeks = stDB;
                         bg = "#f1f5f9";
@@ -128,6 +167,7 @@
                         </div>
                     </div>` + html; 
                 });
+
                 container.innerHTML = html;
             });
         }
