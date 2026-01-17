@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6; /* Warna Biru untuk Wall */
+            --primary: #3b82f6; /* Warna biru untuk Admin 1 */
             --dark: #080a12;
             --white: #111625;
             --gray: #8b949e;
@@ -20,8 +20,7 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .stat-card { background: var(--white); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        /* Style Tambahan untuk Kartu Saldo */
-        .stat-card.balance-box { grid-column: span 2; border: 1px solid rgba(59, 130, 246, 0.3); background: linear-gradient(145deg, #0f172a, #111625); }
+        .stat-card.balance-box { grid-column: span 2; border: 1px solid rgba(59, 130, 246, 0.3); background: linear-gradient(145deg, #1e293b, #111625); }
         .stat-card h3 { font-size: 20px; margin-top: 5px; }
         .section-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
         .section-title::before { content: ''; width: 4px; height: 16px; background: var(--primary); border-radius: 10px; }
@@ -60,18 +59,18 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script>
         const firebaseConfig = { 
-            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app" // Sesuai database Anda
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app" 
         };
         firebase.initializeApp(firebaseConfig);
         const rdb = firebase.database();
 
-        // LISTEN SALDO LIMIT WALL
+        // Mengambil Saldo khusus Admin Wall
         rdb.ref('admin_balance/wall').on('value', (snap) => {
             const saldo = snap.val() || 0;
             document.getElementById('stat-balance').innerText = "Rp " + saldo.toLocaleString('id-ID');
         });
 
-        // LOGIKA SINKRONISASI: Filter berdasarkan admin_name = 'Wall'
+        // Filter pesanan khusus untuk Admin Wall
         rdb.ref('orders').orderByChild('admin_name').equalTo('Wall').on('value', (snapshot) => {
             const render = document.getElementById('order-render');
             let listHTML = ''; let income = 0; let total = 0;
@@ -83,71 +82,80 @@
                 return;
             }
 
-snapshot.forEach((child) => {
-    const order = child.val();
-    total++;
-    
-    // Sesuaikan dengan nama field di database Anda
-    const namaProduk = order.product || "Produk";
-    const namaPembeli = order.buyerName || "Pelanggan";
-    const hargaTampil = order.price || order.nominal;
+            snapshot.forEach((child) => {
+                const order = child.val();
+                total++;
+                const hargaTampil = order.price || order.nominal;
 
-    if(order.status === "Success") {
-        // Hitung pendapatan (hapus titik dulu agar kalkulasi benar)
-        let valIncome = parseInt(hargaTampil.replace(/\./g, '')) || 0;
-        income += valIncome;
-    }
-    
-    listHTML = `
-    <div class="order-card">
-        <div class="order-flex">
-            <div class="order-info">
-                <b>${namaProduk}</b>
-                <span>Pembeli: ${namaPembeli}</span>
-                <div class="status-badge ${order.status === 'Pending' ? 'status-pending' : 'status-success'}">${order.status}</div>
-            </div>
-            <div class="price-tag">Rp ${hargaTampil}</div>
-        </div>
-        ${order.status === 'Pending' ? `<button class="btn-confirm" onclick="confirmOrder('${child.key}')">KONFIRMASI</button>` : ''}
-    </div>` + listHTML;
-});
-
+                if(order.status === "Success") {
+                    let valIncome = parseInt(hargaTampil.toString().replace(/\./g, '')) || 0;
+                    income += valIncome;
+                }
+                
+                listHTML = `
+                <div class="order-card">
+                    <div class="order-flex">
+                        <div class="order-info">
+                            <b>${order.product || "Produk"}</b>
+                            <span>Pembeli: ${order.buyerName || "Pelanggan"}</span>
+                            <div class="status-badge ${order.status === 'Pending' ? 'status-pending' : 'status-success'}">${order.status}</div>
+                        </div>
+                        <div class="price-tag">Rp ${hargaTampil}</div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-confirm" style="background: #6366f1;" onclick="toggleStatus('${child.key}', '${order.status}')">
+                            ${order.status === 'Pending' ? 'SET SUCCESS' : 'SET PENDING'}
+                        </button>
+                        ${!order.balanceCut ? `
+                            <button class="btn-confirm" style="background: var(--success);" onclick="cutBalanceOnly('${child.key}')">PROSES</button>
+                        ` : `
+                            <button class="btn-confirm" style="background: #333; cursor: default;" disabled>DIPROSES!</button>
+                        `}
+                    </div>
+                </div>` + listHTML;
+            });
 
             render.innerHTML = listHTML;
             document.getElementById('stat-total').innerText = total;
             document.getElementById('stat-income').innerText = "Rp " + income.toLocaleString('id-ID');
         });
 
-async function confirmOrder(key) {
-    try {
-        const orderSnap = await rdb.ref('orders/' + key).get();
-        if (!orderSnap.exists()) return;
-        const orderData = orderSnap.val();
-
-        // PENTING: Menghapus titik agar "5.000" dibaca "5000"
-        const modalProduk = parseInt(orderData.nominal.replace(/\./g, '')) || 0;
-        
-        const saldoRef = rdb.ref('admin_balance/wall');
-        const saldoSnap = await saldoRef.get();
-        const saldoSekarang = saldoSnap.val() || 0;
-
-        if (saldoSekarang < modalProduk) {
-            alert("GAGAL: Saldo limit tidak cukup! Modal: Rp " + modalProduk.toLocaleString());
-            return;
+        async function toggleStatus(key, currentStatus) {
+            const newStatus = currentStatus === 'Pending' ? 'Success' : 'Pending';
+            if(confirm(`Ubah status transaksi menjadi ${newStatus}?`)) {
+                await rdb.ref('orders/' + key).update({ status: newStatus });
+            }
         }
 
-        if(confirm("Selesaikan pesanan ini?\nSaldo terpotong: Rp " + modalProduk.toLocaleString())) {
-            // Update Saldo Baru (Sekarang berkurang 5000, bukan 5)
-            await saldoRef.set(saldoSekarang - modalProduk);
-            // Update Status Pesanan
-            await rdb.ref('orders/' + key).update({ status: "Success" });
-            alert("Berhasil dikonfirmasi!");
-        }
-    } catch (e) {
-        alert("Gagal: " + e.message);
-    }
-}
+        async function cutBalanceOnly(key) {
+            try {
+                const orderSnap = await rdb.ref('orders/' + key).get();
+                const orderData = orderSnap.val();
 
+                if(orderData.balanceCut) {
+                    alert("Saldo untuk pesanan ini sudah dipotong sebelumnya!");
+                    return;
+                }
+
+                const modal = parseInt(orderData.nominal.toString().replace(/\./g, '')) || 0;
+                const saldoRef = rdb.ref('admin_balance/wall'); // Referensi saldo Wall
+                const saldoSnap = await saldoRef.get();
+                const saldoSekarang = saldoSnap.val() || 0;
+
+                if (saldoSekarang < modal) {
+                    alert("GAGAL: Saldo limit Wall tidak cukup!");
+                    return;
+                }
+
+                if(confirm(`Proses transaksi ini dan potong saldo sebesar Rp ${modal.toLocaleString()}?`)) {
+                    await saldoRef.set(saldoSekarang - modal);
+                    await rdb.ref('orders/' + key).update({ balanceCut: true });
+                    alert("Berhasil diproses!");
+                }
+            } catch (e) {
+                alert("Gagal: " + e.message);
+            }
+        }
     </script>
 </body>
 </html>
