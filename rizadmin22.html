@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #8b5cf6; /* Warna Ungu untuk Riz agar beda dengan Wall */
+            --primary: #8b5cf6;
             --dark: #080a12;
             --white: #111625;
             --gray: #8b949e;
@@ -64,13 +64,11 @@
         firebase.initializeApp(firebaseConfig);
         const rdb = firebase.database();
 
-        // LISTEN SALDO LIMIT RIZ
         rdb.ref('admin_balance/riz').on('value', (snap) => {
             const saldo = snap.val() || 0;
             document.getElementById('stat-balance').innerText = "Rp " + saldo.toLocaleString('id-ID');
         });
 
-        // LOGIKA SINKRONISASI: Filter berdasarkan admin_name = 'Riz'
         rdb.ref('orders').orderByChild('admin_name').equalTo('Rizz').on('value', (snapshot) => {
             const render = document.getElementById('order-render');
             let listHTML = ''; let income = 0; let total = 0;
@@ -85,9 +83,6 @@
             snapshot.forEach((child) => {
                 const order = child.val();
                 total++;
-                
-                const namaProduk = order.product || "Produk";
-                const namaPembeli = order.buyerName || "Pelanggan";
                 const hargaTampil = order.price || order.nominal;
 
                 if(order.status === "Success") {
@@ -99,13 +94,22 @@
                 <div class="order-card">
                     <div class="order-flex">
                         <div class="order-info">
-                            <b>${namaProduk}</b>
-                            <span>Pembeli: ${namaPembeli}</span>
+                            <b>${order.product || "Produk"}</b>
+                            <span>Pembeli: ${order.buyerName || "Pelanggan"}</span>
                             <div class="status-badge ${order.status === 'Pending' ? 'status-pending' : 'status-success'}">${order.status}</div>
                         </div>
                         <div class="price-tag">Rp ${hargaTampil}</div>
                     </div>
-                    ${order.status === 'Pending' ? `<button class="btn-confirm" onclick="confirmOrder('${child.key}')">KONFIRMASI</button>` : ''}
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-confirm" style="background: #3b82f6;" onclick="toggleStatus('${child.key}', '${order.status}')">
+                            ${order.status === 'Pending' ? 'SET SUCCESS' : 'SET PENDING'}
+                        </button>
+                        ${!order.balanceCut ? `
+                            <button class="btn-confirm" style="background: var(--success);" onclick="cutBalanceOnly('${child.key}')">PROSES</button>
+                        ` : `
+                            <button class="btn-confirm" style="background: #333; cursor: default;" disabled>DIPROSES!</button>
+                        `}
+                    </div>
                 </div>` + listHTML;
             });
 
@@ -114,27 +118,39 @@
             document.getElementById('stat-income').innerText = "Rp " + income.toLocaleString('id-ID');
         });
 
-        async function confirmOrder(key) {
+        async function toggleStatus(key, currentStatus) {
+            const newStatus = currentStatus === 'Pending' ? 'Success' : 'Pending';
+            if(confirm(`Ubah status transaksi menjadi ${newStatus}?`)) {
+                await rdb.ref('orders/' + key).update({ status: newStatus });
+            }
+        }
+
+        async function cutBalanceOnly(key) {
             try {
                 const orderSnap = await rdb.ref('orders/' + key).get();
-                if (!orderSnap.exists()) return;
                 const orderData = orderSnap.val();
 
-                const modalProduk = parseInt(orderData.nominal.replace(/\./g, '')) || 0;
-                
+                // Cek sekali lagi jika sudah pernah dipotong
+                if(orderData.balanceCut) {
+                    alert("Saldo untuk pesanan ini sudah dipotong sebelumnya!");
+                    return;
+                }
+
+                const modal = parseInt(orderData.nominal.replace(/\./g, '')) || 0;
                 const saldoRef = rdb.ref('admin_balance/riz');
                 const saldoSnap = await saldoRef.get();
                 const saldoSekarang = saldoSnap.val() || 0;
 
-                if (saldoSekarang < modalProduk) {
+                if (saldoSekarang < modal) {
                     alert("GAGAL: Saldo limit Riz tidak cukup!");
                     return;
                 }
 
-                if(confirm("Selesaikan pesanan ini?\nSaldo Riz terpotong: Rp " + modalProduk.toLocaleString())) {
-                    await saldoRef.set(saldoSekarang - modalProduk);
-                    await rdb.ref('orders/' + key).update({ status: "Success" });
-                    alert("Berhasil dikonfirmasi oleh Riz!");
+                if(confirm(`Proses transaksi ini dan potong saldo sebesar Rp ${modal.toLocaleString()}?`)) {
+                    await saldoRef.set(saldoSekarang - modal);
+                    // Tandai di database agar tombol hilang
+                    await rdb.ref('orders/' + key).update({ balanceCut: true });
+                    alert("Berhasil diproses!");
                 }
             } catch (e) {
                 alert("Gagal: " + e.message);
