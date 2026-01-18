@@ -1588,22 +1588,45 @@ alert("⚠️ WADUH, DOMPET MACET?\n\nAda hutang yang belum kamu bayar nih udah 
     document.getElementById('orderModal').style.display = 'block';
 };
 
-        document.getElementById('btn-send-wa').onclick = () => {
-            closeModal();
-            const id = document.getElementById('target-id').value;
-            const serverId = document.getElementById('server-id').value;
-            const nominal = document.querySelector('input[name="nominal"]:checked');
-            const custName = document.getElementById('customer-name').value;
-            const data = {
-                product: selectedProduct.nama_produk || selectedProduct.name,
-                nominal: nominal.value,
-                target: serverId ? `${id} (${serverId})` : id,
-                price: nominal.dataset.price,
-                payment: currentPaymentMethod === 'Cash' ? 'Tunai' : 'DANA',
-                buyerName: custName ? custName : 'Pelanggan'
-            };
-            showInvoice(data);
+document.getElementById('btn-send-wa').onclick = async () => {
+    // 1. Identifikasi admin yang dipilih (wall atau riz)
+    const keyAdmin = selectedAdminGame === 1 ? "wall" : "riz";
+    const namaTampilan = selectedAdminGame === 1 ? "Wall" : "Riz";
+
+    try {
+        // 2. Ambil status terbaru dari Firebase admin_status
+        const snapshot = await db.ref(`admin_status/${keyAdmin}`).get();
+        const status = snapshot.val() || "Offline";
+
+        // 3. Jika status Offline, beri peringatan confirm (OK/Batal)
+        if (status === "Offline" || status !== "Online") {
+            const yakin = confirm(`⚠️ ADMIN SEDANG OFFLINE\n\nAdmin ${namaTampilan} saat ini sedang offline. Jika Anda lanjut, pesanan mungkin akan di proses agak lama sampai admin online kembali!.\n\nTetap lanjut ke pembayaran?`);
+            if (!yakin) return; // Berhenti jika user klik 'Batal'
+        }
+
+        // 4. Lanjut proses invoice jika Online atau user tetap pilih lanjut
+        closeModal();
+        const id = document.getElementById('target-id').value;
+        const serverId = document.getElementById('server-id').value;
+        const nominal = document.querySelector('input[name="nominal"]:checked');
+        const custName = document.getElementById('customer-name').value;
+        const data = {
+            product: selectedProduct.nama_produk || selectedProduct.name,
+            nominal: nominal.value,
+            target: serverId ? `${id} (${serverId})` : id,
+            price: nominal.dataset.price,
+            payment: currentPaymentMethod === 'Cash' ? 'Tunai' : 'DANA',
+            buyerName: custName ? custName : 'Pelanggan'
         };
+        showInvoice(data);
+
+    } catch (error) {
+        console.error("Gagal cek status admin:", error);
+        // Jika ada error jaringan, tutup modal & tampilkan invoice saja (fallback)
+        closeModal();
+    }
+};
+
 
         function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
                const notiBtn = document.getElementById('noti-btn');
