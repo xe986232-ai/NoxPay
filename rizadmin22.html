@@ -13,6 +13,7 @@
             --gray: #8b949e;
             --success: #10b981;
             --pending: #f59e0b;
+            --danger: #ef4444;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--dark); color: white; padding: 20px; }
@@ -21,6 +22,30 @@
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .stat-card { background: var(--white); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
         .stat-card.balance-box { grid-column: span 2; border: 1px solid rgba(139, 92, 246, 0.3); background: linear-gradient(145deg, #1e1b4b, #111625); }
+        
+        /* Gaya Baru untuk Saklar Status */
+        .status-card { 
+            grid-column: span 2; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: var(--white); 
+            padding: 15px 20px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 15px;
+        }
+        .status-info h3 { font-size: 16px; font-weight: 800; }
+        .btn-status { 
+            padding: 8px 16px; 
+            border-radius: 12px; 
+            border: none; 
+            font-weight: 800; 
+            font-size: 12px;
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+
         .stat-card h3 { font-size: 20px; margin-top: 5px; }
         .section-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
         .section-title::before { content: ''; width: 4px; height: 16px; background: var(--primary); border-radius: 10px; }
@@ -43,6 +68,15 @@
                 <p style="font-size: 10px; color: var(--gray);">Dashboard Admin 2 Active</p>
             </div>
         </div>
+
+        <div class="status-card">
+            <div class="status-info">
+                <small style="color:var(--gray); font-size: 10px; font-weight: 700;">STATUS SAYA</small>
+                <h3 id="text-status-admin">MEMUAT...</h3>
+            </div>
+            <button id="btn-status-toggle" class="btn-status" onclick="toggleStatusAdmin()">GANTI STATUS</button>
+        </div>
+
         <div class="stats-grid">
             <div class="stat-card balance-box">
                 <small style="color:var(--gray); font-size: 10px; font-weight: 700;">LIMIT SALDO SAYA</small>
@@ -63,6 +97,35 @@
         };
         firebase.initializeApp(firebaseConfig);
         const rdb = firebase.database();
+
+        // --- LOGIKA BARU: SINKRONISASI SAKLAR STATUS ---
+        const statusRef = rdb.ref('admin_status/riz');
+        statusRef.on('value', (snap) => {
+            const status = snap.val() || "Offline";
+            const textStatus = document.getElementById('text-status-admin');
+            const btnStatus = document.getElementById('btn-status-toggle');
+
+            if (status === "Online") {
+                textStatus.innerText = "ONLINE";
+                textStatus.style.color = "var(--success)";
+                btnStatus.innerText = "SET OFFLINE";
+                btnStatus.style.background = "var(--danger)";
+                btnStatus.style.color = "white";
+            } else {
+                textStatus.innerText = "OFFLINE";
+                textStatus.style.color = "var(--danger)";
+                btnStatus.innerText = "SET ONLINE";
+                btnStatus.style.background = "var(--success)";
+                btnStatus.style.color = "white";
+            }
+        });
+
+        async function toggleStatusAdmin() {
+            const current = document.getElementById('text-status-admin').innerText;
+            const newStatus = current === "ONLINE" ? "Offline" : "Online";
+            await statusRef.set(newStatus);
+        }
+        // --- END LOGIKA SAKLAR ---
 
         rdb.ref('admin_balance/riz').on('value', (snap) => {
             const saldo = snap.val() || 0;
