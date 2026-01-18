@@ -137,20 +137,27 @@
                     return;
                 }
 
-                const modal = parseInt(orderData.nominal.toString().replace(/\./g, '')) || 0;
-                const saldoRef = rdb.ref('admin_balance/wall'); // Referensi saldo Wall
+                // FIX: Mengambil nilai dari 'price' dan membersihkan titik
+                const modal = parseInt(orderData.price.toString().replace(/\./g, '')) || 0;
+                
+                const saldoRef = rdb.ref('admin_balance/wall'); 
                 const saldoSnap = await saldoRef.get();
-                const saldoSekarang = saldoSnap.val() || 0;
+                
+                // Memastikan saldo dibaca sebagai angka murni
+                let saldoDb = saldoSnap.val() || 0;
+                const saldoSekarang = parseInt(saldoDb.toString().replace(/\./g, '')) || 0;
 
                 if (saldoSekarang < modal) {
-                    alert("GAGAL: Saldo limit Wall tidak cukup!");
+                    alert(`GAGAL: Saldo limit Wall tidak cukup!\nSaldo: Rp ${saldoSekarang.toLocaleString('id-ID')}\nTagihan: Rp ${modal.toLocaleString('id-ID')}`);
                     return;
                 }
 
-                if(confirm(`Proses transaksi ini dan potong saldo sebesar Rp ${modal.toLocaleString()}?`)) {
-                    await saldoRef.set(saldoSekarang - modal);
+                if(confirm(`Proses transaksi ini dan potong saldo sebesar Rp ${modal.toLocaleString('id-ID')}?`)) {
+                    const sisaSaldo = saldoSekarang - modal;
+                    await saldoRef.set(sisaSaldo);
+                    
                     await rdb.ref('orders/' + key).update({ balanceCut: true });
-                    alert("Berhasil diproses!");
+                    alert("Berhasil diproses berdasarkan harga (price)!");
                 }
             } catch (e) {
                 alert("Gagal: " + e.message);
