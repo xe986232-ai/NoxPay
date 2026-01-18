@@ -23,7 +23,6 @@
         .stat-card { background: var(--white); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
         .stat-card.balance-box { grid-column: span 2; border: 1px solid rgba(59, 130, 246, 0.3); background: linear-gradient(145deg, #1e293b, #111625); }
         
-        /* Gaya Saklar Status Admin 1 */
         .status-card { 
             grid-column: span 2; 
             display: flex; 
@@ -49,15 +48,70 @@
         .stat-card h3 { font-size: 20px; margin-top: 5px; }
         .section-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
         .section-title::before { content: ''; width: 4px; height: 16px; background: var(--primary); border-radius: 10px; }
-        .order-card { background: var(--white); padding: 16px; border-radius: 22px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .order-flex { display: flex; justify-content: space-between; align-items: flex-start; }
+
+        .order-card { 
+            background: var(--white); 
+            border-radius: 22px; 
+            margin-bottom: 12px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            overflow: hidden;
+        }
+        .order-header {
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        .order-header:active { background: rgba(255,255,255,0.02); }
+        
+        .order-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: rgba(0,0,0,0.2);
+            padding: 0 16px;
+        }
+        .order-content.active {
+            max-height: 600px;
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .detail-row span { color: var(--gray); font-weight: 600; }
+        .detail-row b { color: #fff; text-align: right; }
+
+        .btn-copy {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        .btn-copy:active { transform: scale(0.9); }
+
         .order-info b { font-size: 14px; display: block; color: #fff; }
         .order-info span { font-size: 11px; color: var(--gray); }
         .price-tag { font-size: 13px; color: var(--primary); font-weight: 800; }
-        .btn-confirm { width: 100%; margin-top: 15px; padding: 12px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer; }
-        .status-badge { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; margin-top: 8px; display: inline-block; }
+        .btn-confirm { width: 100%; margin-top: 10px; padding: 12px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer; }
+        .status-badge { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; display: inline-block; }
         .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--pending); }
         .status-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-cancel { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
     </style>
 </head>
 <body>
@@ -98,7 +152,6 @@
         firebase.initializeApp(firebaseConfig);
         const rdb = firebase.database();
 
-        // --- LOGIKA SINKRONISASI SAKLAR STATUS ADMIN 1 ---
         const statusRef = rdb.ref('admin_status/wall');
         statusRef.on('value', (snap) => {
             const status = snap.val() || "Offline";
@@ -126,13 +179,26 @@
             await statusRef.set(newStatus);
         }
 
-        // Mengambil Saldo khusus Admin Wall
         rdb.ref('admin_balance/wall').on('value', (snap) => {
             const saldo = snap.val() || 0;
             document.getElementById('stat-balance').innerText = "Rp " + saldo.toLocaleString('id-ID');
         });
 
-        // Filter pesanan khusus untuk Admin Wall
+        function toggleAccordion(key) {
+            const content = document.getElementById('content-' + key);
+            content.classList.toggle('active');
+        }
+
+        function copyToClipboard(text) {
+            const tempInput = document.createElement("input");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("Nomor Target Berhasil Di-Copy!");
+        }
+
         rdb.ref('orders').orderByChild('admin_name').equalTo('Wall').on('value', (snapshot) => {
             const render = document.getElementById('order-render');
             let listHTML = ''; let income = 0; let total = 0;
@@ -146,6 +212,7 @@
 
             snapshot.forEach((child) => {
                 const order = child.val();
+                const key = child.key;
                 total++;
                 const hargaTampil = order.price || order.nominal;
 
@@ -153,26 +220,60 @@
                     let valIncome = parseInt(hargaTampil.toString().replace(/\./g, '')) || 0;
                     income += valIncome;
                 }
+
+                // Logika Penentuan Class Status
+                let statusClass = "status-pending";
+                const stUpper = (order.status || "PENDING").toUpperCase();
+                if(stUpper === "SUCCESS") statusClass = "status-success";
+                if(stUpper === "CANCEL" || stUpper === "CANCELLED") statusClass = "status-cancel";
+
+                // Logika Tombol Aksi
+                let actionArea = "";
+                if(stUpper === "CANCEL" || stUpper === "CANCELLED") {
+                    actionArea = `<div style="text-align:center; color:var(--danger); font-weight:800; padding:12px; border:1px dashed var(--danger); border-radius:12px; margin-top:10px; font-size:11px;">❌ PESANAN DIBATALKAN USER</div>`;
+                } else {
+                    actionArea = `
+                        <div style="display: flex; gap: 8px; margin-top:10px;">
+                            <button class="btn-confirm" style="background: #3b82f6;" onclick="toggleStatus('${key}', '${order.status}')">
+                                ${order.status === 'Pending' ? 'SET SUCCESS' : 'SET PENDING'}
+                            </button>
+                            ${!order.balanceCut ? `
+                                <button class="btn-confirm" style="background: var(--success);" onclick="cutBalanceOnly('${key}')">PROSES</button>
+                            ` : `
+                                <button class="btn-confirm" style="background: #333; cursor: default;" disabled>DIPROSES!</button>
+                            `}
+                        </div>`;
+                }
                 
                 listHTML = `
-                <div class="order-card">
-                    <div class="order-flex">
+                <div class="order-card" style="${stUpper === 'CANCEL' || stUpper === 'CANCELLED' ? 'opacity:0.6;' : ''}">
+                    <div class="order-header" onclick="toggleAccordion('${key}')">
                         <div class="order-info">
                             <b>${order.product || "Produk"}</b>
-                            <span>Pembeli: ${order.buyerName || "Pelanggan"}</span>
-                            <div class="status-badge ${order.status === 'Pending' ? 'status-pending' : 'status-success'}">${order.status}</div>
+                            <span>${stUpper === 'CANCEL' || stUpper === 'CANCELLED' ? '🚫 Pesanan Batal' : 'Klik untuk detail lengkap'}</span>
                         </div>
-                        <div class="price-tag">Rp ${hargaTampil}</div>
+                        <div style="text-align: right;">
+                             <div class="price-tag">Rp ${hargaTampil}</div>
+                             <div class="status-badge ${statusClass}">${order.status}</div>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-confirm" style="background: #6366f1;" onclick="toggleStatus('${child.key}', '${order.status}')">
-                            ${order.status === 'Pending' ? 'SET SUCCESS' : 'SET PENDING'}
-                        </button>
-                        ${!order.balanceCut ? `
-                            <button class="btn-confirm" style="background: var(--success);" onclick="cutBalanceOnly('${child.key}')">PROSES</button>
-                        ` : `
-                            <button class="btn-confirm" style="background: #333; cursor: default;" disabled>DIPROSES!</button>
-                        `}
+
+                    <div id="content-${key}" class="order-content">
+                        <div class="detail-row">
+                            <span>Nomor Target:</span> 
+                            <div>
+                                <b>${order.target || "-"}</b>
+                                <button class="btn-copy" onclick="copyToClipboard('${order.target}')">COPY</button>
+                            </div>
+                        </div>
+                        <div class="detail-row"><span>Nama Pembeli:</span> <b>${order.buyerName || "Pelanggan"}</b></div>
+                        <div class="detail-row"><span>User ID:</span> <b>${order.userID || "-"}</b></div>
+                        <div class="detail-row"><span>Nominal Produk:</span> <b>${order.nominal || "-"}</b></div>
+                        <div class="detail-row"><span>Harga Modal:</span> <b>Rp ${order.price || "0"}</b></div>
+                        <div class="detail-row"><span>Waktu Transaksi:</span> <b>${order.waktu_masuk || "-"}</b></div>
+                        <div class="detail-row" style="border:none;"><span>ID TRX:</span> <b style="font-size:8px;">${key}</b></div>
+                        
+                        ${actionArea}
                     </div>
                 </div>` + listHTML;
             });
@@ -200,8 +301,7 @@
                 }
 
                 const modal = parseInt(orderData.price.toString().replace(/\./g, '')) || 0;
-                
-                const saldoRef = rdb.ref('admin_balance/wall'); 
+                const saldoRef = rdb.ref('admin_balance/wall');
                 const saldoSnap = await saldoRef.get();
                 
                 let saldoDb = saldoSnap.val() || 0;
@@ -212,15 +312,14 @@
                     return;
                 }
 
-                if(confirm(`Proses transaksi ini dan potong saldo sebesar Rp ${modal.toLocaleString('id-ID')}?`)) {
+                if(confirm(`Potong saldo sebesar Rp ${modal.toLocaleString('id-ID')}?`)) {
                     const sisaSaldo = saldoSekarang - modal;
                     await saldoRef.set(sisaSaldo);
-                    
                     await rdb.ref('orders/' + key).update({ balanceCut: true });
-                    alert("Berhasil diproses berdasarkan harga (price)!");
+                    alert("Berhasil! Saldo Wall telah dipotong.");
                 }
             } catch (e) {
-                alert("Gagal: " + e.message);
+                alert("Gagal memproses saldo: " + e.message);
             }
         }
     </script>
