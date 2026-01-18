@@ -13,6 +13,8 @@
             --white: #ffffff;
             --gray: #64748b;
             --danger: #ef4444;
+            --success: #059669;
+            --warning: #d97706;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: #f4f7fe; color: var(--dark); min-height: 100vh; }
@@ -33,16 +35,15 @@
         .price-tag { font-size: 16px; font-weight: 800; color: var(--primary); }
         .divider { height: 1px; background: #f1f5f9; width: 100%; margin: 12px 0; }
         .card-bottom { display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { font-size: 10px; font-weight: 800; padding: 6px 12px; border-radius: 10px; }
+        .status-badge { font-size: 10px; font-weight: 800; padding: 6px 12px; border-radius: 10px; text-transform: uppercase; }
         
-        /* Tombol Batal Style */
         .btn-batal {
             width: 100%;
             margin-top: 12px;
-            padding: 10px;
-            border-radius: 12px;
+            padding: 11px;
+            border-radius: 14px;
             border: 1.5px solid var(--danger);
-            background: rgba(239, 68, 68, 0.05);
+            background: rgba(239, 68, 68, 0.03);
             color: var(--danger);
             font-size: 11px;
             font-weight: 800;
@@ -51,11 +52,10 @@
         }
         .btn-batal:active { transform: scale(0.95); }
 
-        /* Label Proses Style */
         .proses-label {
             margin-top: 12px;
-            padding: 10px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 14px;
             background: rgba(0, 102, 255, 0.05);
             border: 1px dashed var(--primary);
             text-align: center;
@@ -63,16 +63,12 @@
 
         .empty-state { text-align: center; padding: 100px 20px; color: var(--gray); }
         
-        .status-badge[style*="#ef4444"] {
-            border: 1px solid #ef4444;
-            animation: pulse 2s infinite;
-        }
-
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.7; }
             100% { opacity: 1; }
         }
+        .loading-text { text-align: center; color: var(--gray); font-size: 13px; font-weight: 600; animation: pulse 1.5s infinite; margin-top: 50px; }
     </style>
 </head>
 <body>
@@ -87,7 +83,7 @@
         </header>
 
         <div id="history-container">
-            <p style="text-align: center; color: var(--gray);">Menghubungkan ke Firebase...</p>
+            <p class="loading-text">Menghubungkan ke Server...</p>
         </div>
     </div>
 
@@ -117,8 +113,8 @@
                 if (!snapshot.exists()) {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <p style="font-weight: 800;">Belum Ada Pesanan</p>
-                            <p style="font-size: 12px;">Tidak ditemukan data untuk ID: ${fixUserID}</p>
+                            <p style="font-weight: 800; color:var(--dark);">Belum Ada Pesanan</p>
+                            <p style="font-size: 11px; margin-top:5px;">ID: ${fixUserID}</p>
                         </div>`;
                     return;
                 }
@@ -134,12 +130,10 @@
                     if (data.waktu_masuk) {
                         const cleanDate = data.waktu_masuk.replace(',', '').replace(/\./g, ':').trim();
                         const parts = cleanDate.split(/\s+/);
-                        
                         if (parts.length >= 2) {
                             const d = parts[0].split('/');
                             const t = parts[1];
                             const waktuTrx = new Date(`${d[2]}-${d[1]}-${d[0]}T${t}`);
-                            
                             if (!isNaN(waktuTrx)) {
                                 const selisihJam = (sekarang - waktuTrx) / (1000 * 60 * 60);
                                 if (selisihJam >= 24) isExpired = true;
@@ -148,45 +142,36 @@
                     }
 
                     let stDB = (data.status || "PENDING").toUpperCase();
-                    let statusTeks = "";
-                    let bg = "";
-                    let cl = "";
+                    let statusTeks = ""; let bg = ""; let cl = "";
 
                     if (stDB === "SUCCESS") {
-                        statusTeks = "DIBAYAR!!"; 
-                        bg = "#d1fae5"; 
-                        cl = "#059669";
+                        statusTeks = "DIBAYAR!!"; bg = "#d1fae5"; cl = "#059669";
+                    } else if (stDB === "CANCEL" || stDB === "CANCELLED") {
+                        statusTeks = "DIBATALKAN"; bg = "#fee2e2"; cl = "#ef4444";
                     } else if (stDB === "PENDING") {
                         if (isExpired) {
-                            statusTeks = "KADALUARSA (BLOKIR)"; 
-                            bg = "#fee2e2"; 
-                            cl = "#ef4444"; 
+                            statusTeks = "KADALUARSA"; bg = "#f1f5f9"; cl = "#64748b"; 
                         } else {
-                            statusTeks = "BELUM DIBAYAR"; 
-                            bg = "#fef3c7"; 
-                            cl = "#d97706";
+                            statusTeks = "BELUM DIBAYAR"; bg = "#fef3c7"; cl = "#d97706";
                         }
-                    } else {
-                        statusTeks = stDB;
-                        bg = "#f1f5f9";
-                        cl = "#475569";
                     }
 
-                    // --- LOGIKA TOMBOL BATAL ATAU TEKS PROSES ---
                     let actionAreaHTML = "";
-                    if (data.balanceCut && stDB === "PENDING") {
+                    if (stDB === "CANCEL" || stDB === "CANCELLED") {
+                        actionAreaHTML = `<div style="text-align:center; padding:10px; font-size:10px; color:var(--danger); font-weight:800;">🚫 PESANAN INI TELAH DIBATALKAN</div>`;
+                    } else if (data.balanceCut && stDB === "PENDING") {
                         actionAreaHTML = `
                             <div class="proses-label">
-                                <p style="font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 0.5px;">
-                                    Pesanan sudah di proses ya,Mohon Segera dibayar dalam waktu 1x24jam...
+                                <p style="font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 0.2px; line-height:1.4;">
+                                    Pesanan sudah di proses ya, Mohon Segera dibayar dalam waktu 1x24jam...
                                 </p>
                             </div>`;
-                    } else if (stDB === "PENDING" && !isExpired) {
-                        actionAreaHTML = `<button class="btn-batal" onclick="requestCancelOrder('${key}')">BATALKAN & HAPUS</button>`;
+                    } else if (stDB === "PENDING" && !isExpired && !data.balanceCut) {
+                        actionAreaHTML = `<button class="btn-batal" onclick="requestCancelOrder('${key}')">BATALKAN PESANAN</button>`;
                     }
 
                     html = `
-                    <div class="history-card">
+                    <div class="history-card" style="${stDB === 'CANCEL' ? 'opacity:0.7;' : ''}">
                         <div class="card-top">
                             <div class="product-detail">
                                 <div class="product-name">${data.product}</div>
@@ -212,25 +197,27 @@
         }
 
         async function requestCancelOrder(key) {
-            if (!confirm("Apakah Anda yakin ingin membatalkan dan menghapus pesanan ini secara permanen?")) return;
+            if (!confirm("Batalkan pesanan ini? Pesanan yang dibatalkan tidak bisa diproses kembali.")) return;
 
             try {
                 const orderRef = db.ref('orders/' + key);
                 const snap = await orderRef.get();
                 const order = snap.val();
 
-                if (!order) return;
-
-                if (order.balanceCut) {
-                    alert("Gagal! Pesanan sudah diproses admin.");
+                if (order && order.balanceCut) {
+                    alert("Gagal! Admin sudah memproses pesanan ini.");
                     return;
                 }
 
-                await orderRef.remove();
-                alert("Pesanan berhasil dihapus.");
+                await orderRef.update({ 
+                    status: 'CANCEL',
+                    cancel_by: 'USER',
+                    waktu_batal: new Date().toLocaleString('id-ID')
+                });
+                alert("Pesanan berhasil dibatalkan.");
 
             } catch (err) {
-                alert("Terjadi kesalahan: " + err.message);
+                alert("Kesalahan: " + err.message);
             }
         }
 
