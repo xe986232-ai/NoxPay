@@ -87,7 +87,7 @@
     <header>
         <div class="noxie-profile">
             <div class="noxie-avatar-container">
-                <img src="HERO/v1.jpg" alt="Noxie Photo">
+                <img src="HERO/noxie.jpg" alt="Noxie Photo">
             </div>
             <div class="noxie-info">
                 <h1 style="font-size: 15px; font-weight: 800; color: #1e293b;">Noxie<span style="font-size: 9px; background: var(--noxie-grad); color: #fff; padding: 2px 7px; border-radius: 20px;">ULTRA</span></h1>
@@ -144,7 +144,7 @@
             } else if (cmd === 'Cek Saldo Admin') {
                 response = await getAdminDetailedInfo('balance');
             } else if (cmd === 'Sistem Blokir') {
-                response = "⚠️ <b>INFORMASI PENTING BOSS!</b> ⚠️<br><br>Sistem kami akan memblokir pesanan secara otomatis jika status tetap <b>Pending</b> selama lebih dari <b>24 Jam</b>.<br><br>Mohon segera selesaikan pembayaran agar transaksi kamu tidak terhambat ya! 🙏🚀";
+                response = "⚠️ <b>INFORMASI PENTING BOSS!</b> ⚠️<br><br>Sistem kami akan memblokir pembelian secara otomatis jika ada transaksi yang <b>Belum Dibayar</b> selama lebih dari <b>24 Jam</b>.<br><br>Mohon segera selesaikan pembayaran agar transaksi kamu tidak terhambat ya! 🙏🚀";
             }
 
             document.getElementById('typing-ui').style.display = 'none';
@@ -163,13 +163,13 @@
                 
                 const wDot = s.wall === "Online" ? "🟢" : "🔴";
                 const wStatus = s.wall === "Online" ? "<b>Siap Melayani!</b>" : "<i>Sedang Offline</i>";
-                const wSaldoText = b.wall > 0 ? `<b style="color:#22c55e">Rp ${b.wall.toLocaleString()} (Tersedia ✅)</b>` : `<b style="color:#ef4444">Kosong (Harap Tunggu ❌)</b>`;
+                const wSaldoText = b.wall > 0 ? `<b style="color:#22c55e">Rp ${b.wall.toLocaleString()} (Tersedia ✅)</b>` : `<b style="color:#ef4444">Masih Kosong🗿</b>`;
                 
                 content += `<div class="admin-status-item"><span>${wDot} Admin <b>Wall</b></span><span style="text-align:right">${mode === 'status' ? wStatus : wSaldoText}</span></div>`;
 
                 const rDot = s.riz === "Online" ? "🟢" : "🔴";
                 const rStatus = s.riz === "Online" ? "<b>Siap Melayani!</b>" : "<i>Sedang Offline</i>";
-                const rSaldoText = b.riz > 0 ? `<b style="color:#22c55e">Rp ${b.riz.toLocaleString()} (Tersedia ✅)</b>` : `<b style="color:#ef4444">Kosong (Harap Tunggu ❌)</b>`;
+                const rSaldoText = b.riz > 0 ? `<b style="color:#22c55e">Rp ${b.riz.toLocaleString()} (Tersedia ✅)</b>` : `<b style="color:#ef4444">Masih Kosong🗿</b>`;
 
                 content += `<div class="admin-status-item"><span>${rDot} Admin <b>Riz</b></span><span style="text-align:right">${mode === 'status' ? rStatus : rSaldoText}</span></div></div>`;
 
@@ -220,8 +220,7 @@
                         </div>`;
                     });
                 } else {
-                    response = `Halo Kak! 👋 Sepertinya kamu <b>belum memiliki riwayat pesanan</b> di database NoxPay.<br><br>Yuk, buat pesanan pertama kamu sekarang! 🚀`;
-                    response += `<div class="id-input-box"><input type="text" id="target-id" placeholder="Coba ID Lainnya..."><button onclick="processSearch()">Cari Manual 🔎</button></div>`;
+                    response = `Halo Kak! 👋 Sepertinya kamu <b>belum memiliki pesanan</b> di NoxPay.<br><br>Yuk, buat pesanan pertama kamu sekarang! 🚀`;
                 }
                 document.getElementById('typing-ui').style.display = 'none';
                 typeWriterMessage(response);
