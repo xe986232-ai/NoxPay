@@ -587,6 +587,106 @@
 
             </div>
         </header>
+<div class="nox-marquee-container">
+    <div class="nox-marquee-inner">
+        <div class="nox-badge">
+            <span class="pulse-icon"></span>
+            LATEST NEWS
+        </div>
+        <div class="nox-scroll-area">
+            <div class="nox-scroll-text">
+                Selamat Datang di <span class="text-gradient">NoxPay Digital</span> • 
+                Nikmati kemudahan Top Up Game & Produk Digital 24 Jam Non-stop</span> • 
+                Admin Wall & Admin Riz siap melayani transaksi Anda dengan aman • 
+                Jangan lupa cek riwayat pesanan secara berkala • 
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nox-marquee-container {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0, 102, 255, 0.08);
+        padding: 10px 0;
+        overflow: hidden;
+    }
+
+    .nox-marquee-inner {
+        max-width: 500px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 15px;
+    }
+
+    .nox-badge {
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 9px;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 100px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        letter-spacing: 0.5px;
+        border: 1px solid rgba(0, 102, 255, 0.1);
+    }
+
+    .pulse-icon {
+        width: 6px;
+        height: 6px;
+        background: var(--primary);
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse-ring 1.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    }
+
+    .nox-scroll-area {
+        flex: 1;
+        overflow: hidden;
+        mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    }
+
+    .nox-scroll-text {
+        display: inline-block;
+        white-space: nowrap;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--gray);
+        animation: nox-marquee 25s linear infinite;
+    }
+
+    .text-gradient {
+        background: var(--default-hero);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .promo-tag {
+        color: var(--accent);
+        background: rgba(255, 0, 122, 0.05);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    @keyframes nox-marquee {
+        0% { transform: translateX(50%); }
+        100% { transform: translateX(-100%); }
+    }
+
+    @keyframes pulse-ring {
+        0% { transform: scale(0.7); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.5; }
+        100% { transform: scale(0.7); opacity: 1; }
+    }
+</style>
 
         <section class="hero" id="hero-section">
             <div class="hero-shapes"></div>
