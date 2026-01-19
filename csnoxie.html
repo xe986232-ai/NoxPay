@@ -103,7 +103,7 @@
 
     <div class="suggestions">
         <div class="chip" onclick="showIdInput()">📋 Cek Pesanan</div>
-        <div class="chip" onclick="quickAsk('Cara Cek UserID')">🔍 Cara Cek UserID</div>
+        <div class="chip" onclick="window.open('https://noxpay.my.id', '_blank')">🏠 Kembali ke NoxPay</div>
         <div class="chip" onclick="quickAsk('Cek Status Admin')">👤 Status Admin</div>
         <div class="chip" onclick="quickAsk('Cek Saldo Admin')">💰 Saldo Admin</div>
         <div class="chip" onclick="quickAsk('Sistem Blokir')">⚠️ Aturan Blokir</div>
@@ -123,25 +123,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // UPDATE: FUNGSI SINKRONISASI TOTAL DENGAN RIWAYAT.HTML
         function getAutoUserID() {
-            // Mengambil key yang sama persis digunakan di riwayat.html
             let rawID = localStorage.getItem('nox_user_id'); 
-            
-            // Logika fallback yang sama dengan riwayat.html: 
-            // Jika kosong, gunakan "593086" sebagai default.
             let finalID = rawID || "593086";
-            
-            // Pastikan format diawali USER-
             return finalID.startsWith("USER-") ? finalID : "USER-" + finalID;
         }
 
         window.onload = () => {
-            const userId = getAutoUserID();
-            
-            // Pesan sambutan yang menyesuaikan ID yang terdeteksi
-            let welcomeMsg = `Halo Boss <b>${userId}</b>! 👋 Noxie mengenali ID kamu dari sistem Riwayat.<br><br>Ada yang bisa saya bantu hari ini? Klik menu di bawah ya! 😊✨`;
-            
+            let welcomeMsg = `Halo Kak! 👋 Selamat datang di assisten Noxie!.<br><br>Ada yang bisa saya bantu hari ini? Klik menu di bawah ya! 😊✨`;
             typeWriterMessage(welcomeMsg);
         };
 
@@ -154,8 +143,6 @@
                 response = await getAdminDetailedInfo('status');
             } else if (cmd === 'Cek Saldo Admin') {
                 response = await getAdminDetailedInfo('balance');
-            } else if (cmd === 'Cara Cek UserID') {
-                response = "Gampang banget Boss! 🕵️‍♂️<br><br>1. Kunjungi <b><a href='https://noxpay.my.id' target='_blank'>noxpay.my.id</a></b><br>2. Lihat di pojok kanan atas, klik tombol <b>Pesanan</b>.<br>3. UserID kamu akan langsung muncul secara otomatis di sana! ✨";
             } else if (cmd === 'Sistem Blokir') {
                 response = "⚠️ <b>INFORMASI PENTING BOSS!</b> ⚠️<br><br>Sistem kami akan memblokir pesanan secara otomatis jika status tetap <b>Pending</b> selama lebih dari <b>24 Jam</b>.<br><br>Mohon segera selesaikan pembayaran agar transaksi kamu tidak terhambat ya! 🙏🚀";
             }
@@ -196,12 +183,9 @@
             } catch (e) { return "Maaf Boss, Noxie gagal mengambil data. 🙏"; }
         }
 
-        // UPDATE: TOMBOL CEK PESANAN LANGSUNG MENGGUNAKAN ID OTOMATIS
         function showIdInput() {
             const autoID = getAutoUserID();
             addMessage("Saya ingin cek riwayat pesanan", 'user');
-            
-            // Langsung memproses pencarian berdasarkan ID yang terdeteksi secara otomatis
             processSearch(autoID);
         }
 
@@ -209,7 +193,7 @@
             const idInput = document.getElementById('target-id');
             const id = passedID || (idInput ? idInput.value.trim().toUpperCase() : "");
             
-            if(!id) { alert("UserID tidak boleh kosong ya Boss!"); return; }
+            if(!id) { alert("UserID tidak boleh kosong ya Kak!"); return; }
 
             document.getElementById('typing-ui').style.display = 'block';
             
@@ -225,7 +209,7 @@
 
                 let response = "";
                 if(found.length > 0) {
-                    response = `Hore! Noxie menemukan <b>${found.length}</b> pesanan terakhir untuk UserID <b>${id}</b>: 🎯<br>`;
+                    response = `Hore! Noxie menemukan <b>${found.length}</b> pesanan terakhir untuk kamu: 🎯<br>`;
                     found.reverse().slice(0, 5).forEach(o => {
                         const col = o.status === 'CANCEL' ? '#ef4444' : (o.status === 'PENDING' ? '#f59e0b' : '#22c55e');
                         response += `
@@ -236,9 +220,8 @@
                         </div>`;
                     });
                 } else {
-                    response = `Aduh, maaf banget Boss... 🙏<br><br>UserID <b>${id}</b> tidak ditemukan dalam database NoxPay. Pastikan ID yang kamu masukkan sudah benar ya!`;
-                    // Jika gagal deteksi otomatis, berikan pilihan input manual sebagai cadangan
-                    response += `<div class="id-input-box"><input type="text" id="target-id" placeholder="Cek ID Lainnya..."><button onclick="processSearch()">Cari Manual 🔎</button></div>`;
+                    response = `Halo Kak! 👋 Sepertinya kamu <b>belum memiliki riwayat pesanan</b> di database NoxPay.<br><br>Yuk, buat pesanan pertama kamu sekarang! 🚀`;
+                    response += `<div class="id-input-box"><input type="text" id="target-id" placeholder="Coba ID Lainnya..."><button onclick="processSearch()">Cari Manual 🔎</button></div>`;
                 }
                 document.getElementById('typing-ui').style.display = 'none';
                 typeWriterMessage(response);
