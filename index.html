@@ -572,6 +572,65 @@
         cursor: not-allowed !important;
         opacity: 0.9;
     }
+    .noxie-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 102, 255, 0.1);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin: 8px 10px;
+}
+
+.noxie-shortcut:hover {
+    background: linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    transform: translateX(5px);
+}
+
+.noxie-icon-mini {
+    position: relative;
+    width: 32px;
+    height: 32px;
+}
+
+.noxie-icon-mini img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.online-dot-mini {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+}
+
+.menu-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.badge-new {
+    margin-left: auto;
+    font-size: 8px;
+    background: linear-gradient(135deg, #0066ff 0%, #8b5cf6 100%);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 800;
+}
 
     </style>
 </head>
@@ -584,12 +643,18 @@
             <div class="logo-text-nav"><span>Nox</span><span>Pay</span></div>
         </div>
         <div class="menu-label">Navigasi</div>
-        <div class="side-menu-item" onclick="toggleSidebar(); handleHome()"><span>🏠</span> Beranda</div>
-        <div class="side-menu-item" onclick="toggleSidebar(); openCaraOrder()"><span>📖</span> Cara Order</div>
-        <div class="side-menu-item creator-special" onclick="toggleSidebar(); openCreatorModal()"><span>✨</span> Daftar Jadi Creator</div>
-        <div class="side-menu-item" onclick="window.location.href='projects.html'"><span>🎹</span> Project Musik</div>
+        <div class="side-menu-item" onclick="toggleSidebar(); handleHome()"><span>•</span> Beranda</div>
+        <div class="side-menu-item" onclick="toggleSidebar(); openCaraOrder()"><span>•</span> Cara Order</div>
+        <div class="side-menu-item" onclick="window.location.href='riwayat.html'"><span>•</span> Pesanan Anda</div>
         <div class="menu-label">Bantuan</div>
-        <a href="https://wa.me/6283129555763" target="_blank" class="side-menu-item" style="text-decoration:none"><span>💬</span> CS NoxPay</a>
+        <a href="csnoxie.html" class="menu-item noxie-shortcut">
+    <div class="noxie-icon-mini">
+        <img src="HERO/noxie.jpg" alt="Noxie">
+        <span class="online-dot-mini"></span>
+    </div>
+    <span class="menu-text">Tanya Noxie</span>
+    <span class="badge-new">ULTRA</span>
+</a>
     </div>
 
     <div id="splash-screen">
