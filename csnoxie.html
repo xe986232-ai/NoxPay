@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Noxie AI Ultra - NoxPay Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #0066ff;
+            --noxie-grad: linear-gradient(135deg, #0066ff 0%, #8b5cf6 100%);
+            --bg-gradient: linear-gradient(180deg, #f8faff 0%, #f1f5f9 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { background: var(--bg-gradient); height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: fixed; width: 100%; }
+
+        header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; z-index: 100; flex-shrink: 0; }
+        
+        /* FOTO PROFIL NOXIE CUSTOM */
+        .noxie-profile { display: flex; align-items: center; gap: 12px; }
+        .noxie-avatar-container {
+            width: 48px; height: 48px; 
+            padding: 2px;
+            background: var(--noxie-grad);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,102,255,0.3);
+        }
+        .noxie-avatar-container img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #eee;
+            border: 2px solid white;
+        }
+
+        #chat-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; width: 100%; scrollbar-width: none; scroll-behavior: smooth; }
+        #chat-container::-webkit-scrollbar { display: none; }
+
+        .msg { max-width: 88%; padding: 14px 18px; border-radius: 20px; font-size: 13.8px; line-height: 1.6; animation: slide 0.3s ease; word-wrap: break-word; position: relative; }
+        @keyframes slide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .msg-noxie { align-self: flex-start; background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-bottom-left-radius: 4px; border: 1px solid #f0f0f0; color: #1e293b; }
+        .msg-user { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,102,255,0.2); }
+
+        .typing { font-size: 11px; color: #64748b; text-align: center; margin: 8px 0; display: none; font-weight: 700; letter-spacing: 0.5px; }
+        
+        .suggestions { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 18px; 
+            background: white; border-top: 1px solid #eee; border-radius: 24px 24px 0 0; box-shadow: 0 -10px 25px rgba(0,0,0,0.03);
+        }
+        .chip { 
+            background: #f8fafc; padding: 14px 10px; border-radius: 14px; font-size: 11.5px; 
+            font-weight: 800; color: #334155; border: 1px solid #e2e8f0; 
+            cursor: pointer; text-align: center; transition: all 0.2s ease;
+        }
+        .chip:active { transform: scale(0.92); background: #f1f5f9; border-color: var(--primary); color: var(--primary); }
+
+        /* CARD STYLE UNTUK RESPON RAPI */
+        .info-card { background: #f8fafc; border-radius: 14px; border: 1px solid #e2e8f0; padding: 12px; margin: 8px 0; }
+        .admin-status-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #cbd5e1; }
+        .admin-status-item:last-child { border: none; margin: 0; padding: 0; }
+        
+        .id-input-box {
+            background: #ffffff; border: 2px solid #0066ff; padding: 15px; border-radius: 18px; margin-top: 10px;
+            display: flex; flex-direction: column; gap: 10px; box-shadow: 0 10px 20px rgba(0,102,255,0.1);
+        }
+        .id-input-box input {
+            padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; font-weight: 800; text-align: center; font-size: 15px; color: var(--primary);
+        }
+        .id-input-box button {
+            background: var(--noxie-grad); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 14px;
+        }
+
+        .order-card { background: #f0f7ff; border-radius: 15px; padding: 14px; margin-top: 10px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,102,255,0.05); }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; margin-top: 8px; text-transform: uppercase; }
+        .alert-box { background: #fff1f2; color: #be123c; padding: 10px; border-radius: 10px; font-size: 11.5px; margin-top: 10px; font-weight: 600; border: 1px solid #fecdd3; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="noxie-profile">
+            <div class="noxie-avatar-container">
+                <img src="HERO/v1.jpg" alt="Noxie Photo">
+            </div>
+            <div class="noxie-info">
+                <h1 style="font-size: 15px; font-weight: 800; color: #1e293b;">Noxie<span style="font-size: 9px; background: var(--noxie-grad); color: #fff; padding: 2px 7px; border-radius: 20px;">ULTRA</span></h1>
+                <p style="font-size: 10px; color: #22c55e; font-weight: 700;">● Online</p>
+            </div>
+        </div>
+    </header>
+
+    <div id="chat-container">
+        </div>
+
+    <div id="typing-ui" class="typing">Noxie sedang memproses data... ⏳</div>
+
+    <div class="suggestions">
+        <div class="chip" onclick="showIdInput()">📋 Cek Pesanan</div>
+        <div class="chip" onclick="quickAsk('Cara Cek UserID')">🔍 Cara Cek UserID</div>
+        <div class="chip" onclick="quickAsk('Cek Status Admin')">👤 Status Admin</div>
+        <div class="chip" onclick="quickAsk('Cek Saldo Admin')">💰 Saldo Admin</div>
+        <div class="chip" onclick="quickAsk('Sistem Blokir')">⚠️ Aturan Blokir</div>
+        <div class="chip" onclick="location.reload()">🔄 Refresh Chat</div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin",
+            storageBucket: "noxpay-admin.firebasestorage.app",
+            messagingSenderId: "212794945472",
+            appId: "1:212794945472:web:bd803bb3e71b48ea99a225"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // UPDATE: FUNGSI SINKRONISASI TOTAL DENGAN RIWAYAT.HTML
+        function getAutoUserID() {
+            // Mengambil key yang sama persis digunakan di riwayat.html
+            let rawID = localStorage.getItem('nox_user_id'); 
+            
+            // Logika fallback yang sama dengan riwayat.html: 
+            // Jika kosong, gunakan "593086" sebagai default.
+            let finalID = rawID || "593086";
+            
+            // Pastikan format diawali USER-
+            return finalID.startsWith("USER-") ? finalID : "USER-" + finalID;
+        }
+
+        window.onload = () => {
+            const userId = getAutoUserID();
+            
+            // Pesan sambutan yang menyesuaikan ID yang terdeteksi
+            let welcomeMsg = `Halo Boss <b>${userId}</b>! 👋 Noxie mengenali ID kamu dari sistem Riwayat.<br><br>Ada yang bisa saya bantu hari ini? Klik menu di bawah ya! 😊✨`;
+            
+            typeWriterMessage(welcomeMsg);
+        };
+
+        async function quickAsk(cmd) {
+            addMessage(cmd, 'user');
+            document.getElementById('typing-ui').style.display = 'block';
+            let response = "";
+
+            if (cmd === 'Cek Status Admin') {
+                response = await getAdminDetailedInfo('status');
+            } else if (cmd === 'Cek Saldo Admin') {
+                response = await getAdminDetailedInfo('balance');
+            } else if (cmd === 'Cara Cek UserID') {
+                response = "Gampang banget Boss! 🕵️‍♂️<br><br>1. Kunjungi <b><a href='https://noxpay.my.id' target='_blank'>noxpay.my.id</a></b><br>2. Lihat di pojok kanan atas, klik tombol <b>Pesanan</b>.<br>3. UserID kamu akan langsung muncul secara otomatis di sana! ✨";
+            } else if (cmd === 'Sistem Blokir') {
+                response = "⚠️ <b>INFORMASI PENTING BOSS!</b> ⚠️<br><br>Sistem kami akan memblokir pesanan secara otomatis jika status tetap <b>Pending</b> selama lebih dari <b>24 Jam</b>.<br><br>Mohon segera selesaikan pembayaran agar transaksi kamu tidak terhambat ya! 🙏🚀";
+            }
+
+            document.getElementById('typing-ui').style.display = 'none';
+            typeWriterMessage(response);
+        }
+
+        async function getAdminDetailedInfo(mode) {
+            try {
+                const sSnap = await db.ref('admin_status').once('value');
+                const bSnap = await db.ref('admin_balance').once('value');
+                const s = sSnap.val() || { wall: "Offline", riz: "Offline" };
+                const b = bSnap.val() || { wall: 0, riz: 0 };
+
+                let intro = mode === 'status' ? "Berikut laporan <b>Status Admin</b> NoxPay saat ini: 📊" : "Berikut laporan <b>Saldo Admin</b> NoxPay saat ini: 💰";
+                let content = `<div class="info-card">`;
+                
+                const wDot = s.wall === "Online" ? "🟢" : "🔴";
+                const wStatus = s.wall === "Online" ? "<b>Siap Melayani!</b>" : "<i>Sedang Offline</i>";
+                const wSaldoText = b.wall > 0 ? `<b style="color:#22c55e">Rp ${b.wall.toLocaleString()} (Tersedia ✅)</b>` : `<b style="color:#ef4444">Kosong (Harap Tunggu ❌)</b>`;
+                
+                content += `<div class="admin-status-item"><span>${wDot} Admin <b>Wall</b></span><span style="text-align:right">${mode === 'status' ? wStatus : wSaldoText}</span></div>`;
+
+                const rDot = s.riz === "Online" ? "🟢" : "🔴";
+                const rStatus = s.riz === "Online" ? "<b>Siap Melayani!</b>" : "<i>Sedang Offline</i>";
+                const rSaldoText = b.riz > 0 ? `<b style="color:#22c55e">Rp ${b.riz.toLocaleString()} (Tersedia ✅)</b>` : `<b style="color:#ef4444">Kosong (Harap Tunggu ❌)</b>`;
+
+                content += `<div class="admin-status-item"><span>${rDot} Admin <b>Riz</b></span><span style="text-align:right">${mode === 'status' ? rStatus : rSaldoText}</span></div></div>`;
+
+                if ((s.wall === "Offline" && s.riz === "Offline") && mode === 'status') {
+                    content += `<div class="alert-box">Wah, semua admin sedang offline Boss. Pesanan kamu akan diproses saat admin kembali online ya! 🙏</div>`;
+                } else if (mode === 'status') {
+                    content += `<p style="font-size:11px; margin-top:5px;">💡 <i>Saran: Hubungi admin yang sedang online untuk respon instan!</i></p>`;
+                }
+
+                return intro + content;
+            } catch (e) { return "Maaf Boss, Noxie gagal mengambil data. 🙏"; }
+        }
+
+        // UPDATE: TOMBOL CEK PESANAN LANGSUNG MENGGUNAKAN ID OTOMATIS
+        function showIdInput() {
+            const autoID = getAutoUserID();
+            addMessage("Saya ingin cek riwayat pesanan", 'user');
+            
+            // Langsung memproses pencarian berdasarkan ID yang terdeteksi secara otomatis
+            processSearch(autoID);
+        }
+
+        async function processSearch(passedID = null) {
+            const idInput = document.getElementById('target-id');
+            const id = passedID || (idInput ? idInput.value.trim().toUpperCase() : "");
+            
+            if(!id) { alert("UserID tidak boleh kosong ya Boss!"); return; }
+
+            document.getElementById('typing-ui').style.display = 'block';
+            
+            try {
+                const snap = await db.ref('orders').once('value');
+                const orders = snap.val();
+                let found = [];
+                if(orders) {
+                    Object.keys(orders).forEach(k => {
+                        if(orders[k].userID === id) found.push(orders[k]);
+                    });
+                }
+
+                let response = "";
+                if(found.length > 0) {
+                    response = `Hore! Noxie menemukan <b>${found.length}</b> pesanan terakhir untuk UserID <b>${id}</b>: 🎯<br>`;
+                    found.reverse().slice(0, 5).forEach(o => {
+                        const col = o.status === 'CANCEL' ? '#ef4444' : (o.status === 'PENDING' ? '#f59e0b' : '#22c55e');
+                        response += `
+                        <div class="order-card">
+                            <b style="font-size:14px; color:#1e293b;">📦 ${o.product} ${o.nominal}</b><br>
+                            <span style="font-size:11px; color:#64748b;">ID Trx: ${o.id_trx}</span><br>
+                            <span class="status-badge" style="background:${col}">${o.status}</span>
+                        </div>`;
+                    });
+                } else {
+                    response = `Aduh, maaf banget Boss... 🙏<br><br>UserID <b>${id}</b> tidak ditemukan dalam database NoxPay. Pastikan ID yang kamu masukkan sudah benar ya!`;
+                    // Jika gagal deteksi otomatis, berikan pilihan input manual sebagai cadangan
+                    response += `<div class="id-input-box"><input type="text" id="target-id" placeholder="Cek ID Lainnya..."><button onclick="processSearch()">Cari Manual 🔎</button></div>`;
+                }
+                document.getElementById('typing-ui').style.display = 'none';
+                typeWriterMessage(response);
+            } catch (e) { 
+                document.getElementById('typing-ui').style.display = 'none';
+                typeWriterMessage("Waduh, ada kendala teknis saat mencari data. 😭"); 
+            }
+        }
+
+        function addMessage(text, sender) {
+            const chatContainer = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = `msg msg-${sender}`;
+            div.innerHTML = text;
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function typeWriterMessage(text) {
+            const chatContainer = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = "msg msg-noxie";
+            chatContainer.appendChild(div);
+            let i = 0;
+            const interval = setInterval(() => {
+                div.innerHTML = text.substring(0, i) + " |";
+                i++;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                if (i > text.length) {
+                    clearInterval(interval);
+                    div.innerHTML = text;
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            }, 6);
+        }
+    </script>
+</body>
+</html>
