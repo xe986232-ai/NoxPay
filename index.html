@@ -546,6 +546,32 @@
         position: relative;
         overflow: visible !important;
     }
+    /* Style untuk Overlay Coming Soon */
+    .coming-soon-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(3px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+    .coming-soon-text {
+        background: var(--accent);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 10px;
+        font-weight: 800;
+        font-size: 14px;
+        transform: rotate(-5deg);
+        box-shadow: 0 5px 15px rgba(255, 0, 122, 0.4);
+        letter-spacing: 1px;
+    }
+    .card-disabled {
+        cursor: not-allowed !important;
+        opacity: 0.9;
+    }
 
     </style>
 </head>
@@ -582,7 +608,7 @@
 <nav class="nav-right" style="display: flex; gap: 10px; font-size: 13px;">
     <span class="menu-link" onclick="handleHome()">Home</span>
     <span class="menu-link" onclick="window.location.href='riwayat.html'">Pesanan</span>
-    <span class="menu-link" onclick="openCaraOrder()">Bantuan</span>
+    <span class="menu-link" onclick="openCaraOrder()">Cara Order</span>
 </nav>
 
             </div>
@@ -687,7 +713,6 @@
         100% { transform: scale(0.7); opacity: 1; }
     }
 </style>
-
         <section class="hero" id="hero-section">
             <div class="hero-shapes"></div>
             <div class="hero-decor-icon" id="hero-icon">📱</div>
@@ -714,43 +739,47 @@
                 <div class="section-header"><h2>Pilih Produk</h2></div>
                 <div class="category-grid" id="items-list"></div>
             </div>
-
             <div id="digital-product-section">
-                <div class="section-header"><h2>Tersedia Juga Produk Digital</h2></div>
+                <div class="section-header"><h2>Aksesoris Gaming</h2></div>
                 <div class="category-grid">
-                    <div class="category-card project-card-special" onclick="window.location.href='projects.html'" style="grid-column: span 2; padding: 25px;">
-                        <div class="badge-premium">Exclusive</div>
-                        <div class="icon-box icon-project" style="width: 60px; height: 60px; font-size: 30px;">🎹</div>
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <span>Project FL Studio Mobile</span>
-                            <small style="color: var(--gray); font-size: 11px; font-weight: 700;">Dapatkan FLM Project Original Disini</small>
+                    <div class="category-card project-card-special" onclick="alert('Persiapan Stok! Produk ini akan segera hadir di NoxPay. Pantau terus ya! ✨')" style="grid-column: span 2; padding: 0; overflow: hidden; display: flex; flex-direction: column; cursor: not-allowed;">
+                        
+                        <div style="width: 100%; height: 180px; position: relative; background: #2a2a2a;">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 2;">
+                                <div style="border: 2px solid white; color: white; padding: 5px 15px; font-weight: 800; transform: rotate(-5deg); font-size: 14px; letter-spacing: 2px; box-shadow: 0 0 15px rgba(0,0,0,0.5);">COMING SOON</div>
+                            </div>
+                            <img src="GAME/banner.jpg" alt="Sarung Jempol" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <div class="exclusive-label">Lihat Semua →</div>
+
+                        <div style="padding: 15px; display: flex; flex-direction: column; gap: 5px; opacity: 0.7;">
+                            <span style="font-weight: 800; font-size: 18px; color: #fff;">Sarung Jempol Gaming</span>
+                            <small style="color: var(--gray); font-size: 12px; line-height: 1.4;">Tingkatkan akurasi & anti keringat saat bermain game kompetitif.</small>
+                            <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--gray); font-weight: bold;">Segera Hadir</span>
+                                <span style="background: rgba(255, 255, 255, 0.1); color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">Cek Berkala →</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
 
             <div id="order-form-container" class="hidden fade-in">
                 <div class="order-form">
                     
                     <div id="admin-selection-group" class="hidden" style="margin-bottom: 20px;">
-<label style="display:block; font-size:12px; font-weight:800; margin-bottom:12px; color:var(--dark); text-align:center; letter-spacing:1px;">⚡ PILIH JALUR ADMIN ⚡</label>
-<div class="admin-selector">
-    <div class="admin-box active" id="admin-box-1" onclick="selectAdmin(1)">
-        <h5>Admin 1</h5>
-        <p>Wall</p>
-        <small id="status-text-wall" style="font-size: 8px; font-weight: 900; display: inline-block; margin-top: 5px; padding: 1px 5px; border-radius: 3px; text-transform: uppercase;">Memuat...</small>
-    </div>
-    
-    <div class="admin-box" id="admin-box-2" onclick="selectAdmin(2)">
-        <h5>Admin 2</h5>
-        <p>Riz</p>
-        <small id="status-text-riz" style="font-size: 8px; font-weight: 900; display: inline-block; margin-top: 5px; padding: 1px 5px; border-radius: 3px; text-transform: uppercase;">Memuat...</small>
-    </div>
-</div>
-
-
-
+                        <label style="display:block; font-size:12px; font-weight:800; margin-bottom:12px; color:var(--dark); text-align:center; letter-spacing:1px;">⚡ PILIH JALUR ADMIN ⚡</label>
+                        <div class="admin-selector">
+                            <div class="admin-box active" id="admin-box-1" onclick="selectAdmin(1)">
+                                <h5>Admin 1</h5>
+                                <p>Wall</p>
+                            </div>
+                            <div class="admin-box" id="admin-box-2" onclick="selectAdmin(2)">
+                                <h5>Admin 2</h5>
+                                <p>Rizz</p>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="form-group">
                         <label id="label-id" style="display:block; font-size:12px; font-weight:700; margin-bottom:8px; color:var(--gray);">Tujuan</label>
@@ -1631,7 +1660,6 @@ function selectProduct(prod, element) {
             }
         }
 
-
 document.getElementById('btn-review').onclick = async () => { 
     const id = document.getElementById('target-id').value;
     const nominal = document.querySelector('input[name="nominal"]:checked');
@@ -1916,8 +1944,6 @@ function startPromoCountdowns() {
         if (!adaTimerAktif) clearInterval(interval);
     }, 1000);
 }
-// --- FUNGSI CEK HUTANG 24 JAM (SATPAM NOXPAY) ---
-// --- FUNGSI CEK HUTANG 5 MENIT (SATPAM NOXPAY) ---
 async function cekHutangUser() {
     return new Promise((resolve) => {
         const userIDSekarang = localStorage.getItem('nox_user_id');
@@ -1963,47 +1989,6 @@ async function cekHutangUser() {
         });
     });
 }
-
-// --- PERBAIKAN FUNGSI MONITOR STATUS ---
-function monitorAdminStatus() {
-    // Gunakan 'db' karena di baris 854 kamu mendefinisikannya sebagai: const db = firebase.database();
-    
-    // 1. Pantau Status Wall (Admin 1)
-    db.ref('admin_status/wall').on('value', (snapshot) => {
-        const status = snapshot.val() || "Offline";
-        const textElement = document.getElementById('status-text-wall');
-        
-        if (textElement) {
-            if (status === "Online") {
-                textElement.innerText = "● ONLINE";
-                textElement.style.color = "#10b981"; // Hijau
-            } else {
-                textElement.innerText = "○ OFFLINE";
-                textElement.style.color = "#ef4444"; // Merah
-            }
-        }
-    });
-
-    // 2. Pantau Status Riz (Admin 2)
-    db.ref('admin_status/riz').on('value', (snapshot) => {
-        const status = snapshot.val() || "Offline";
-        const textElement = document.getElementById('status-text-riz');
-        
-        if (textElement) {
-            if (status === "Online") {
-                textElement.innerText = "● ONLINE";
-                textElement.style.color = "#10b981"; // Hijau
-            } else {
-                textElement.innerText = "○ OFFLINE";
-                textElement.style.color = "#ef4444"; // Merah
-            }
-        }
-    });
-}
-
-// Pastikan fungsi ini dipanggil
-monitorAdminStatus();
-
     </script>
 </body>
 </html>
