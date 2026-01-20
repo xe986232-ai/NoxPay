@@ -17,7 +17,6 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* PERBAIKAN: Menggunakan 100vh dengan fallback untuk mobile agar tidak terpotong bar browser */
         body { 
             background: var(--bg-gradient); 
             height: 100vh; 
@@ -50,44 +49,152 @@
             border: 2px solid white;
         }
 
-        #chat-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; width: 100%; scrollbar-width: none; scroll-behavior: smooth; padding-bottom: 20px; }
+        #chat-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; width: 100%; scrollbar-width: none; scroll-behavior: smooth; padding-bottom: 100px; }
         #chat-container::-webkit-scrollbar { display: none; }
 
-        .msg { max-width: 88%; padding: 14px 18px; border-radius: 20px; font-size: 13.8px; line-height: 1.6; animation: slide 0.3s ease; word-wrap: break-word; position: relative; }
-        @keyframes slide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .msg-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-start; 
+            margin-bottom: 30px; 
+            animation: slide 0.4s ease-out; 
+            max-width: 100%;
+            width: 100%;
+        }
         
-        .msg-noxie { align-self: flex-start; background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-bottom-left-radius: 4px; border: 1px solid #f0f0f0; color: #1e293b; }
-        .msg-user { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,102,255,0.2); }
+        .msg-wrapper.reverse {
+            align-items: flex-end;
+        }
+
+        .char-container { 
+            width: 120px; 
+            margin-top: 5px; 
+            z-index: 2;
+            position: relative;
+        }
+
+        .char-container img { 
+            width: 100%; 
+            height: auto; 
+            filter: drop-shadow(0 10px 8px rgba(0,0,0,0.2)); 
+            display: block;
+        }
+
+        .msg { 
+            padding: 16px 20px; 
+            border-radius: 24px; 
+            font-size: 13.8px; 
+            line-height: 1.6; 
+            word-wrap: break-word; 
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
+            max-width: 90%;
+        }
+
+        @keyframes slide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .msg-noxie { 
+            background: white; 
+            border: 1px solid rgba(0,0,0,0.05); 
+            color: #1e293b; 
+            width: fit-content;
+            min-width: 150px;
+        }
+
+        .msg-noxie::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 30px;
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 12px solid white;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.05));
+        }
+
+        .reverse .msg-noxie::after {
+            left: auto;
+            right: 30px;
+        }
+
+        .msg-user { 
+            align-self: flex-end; 
+            background: var(--primary); 
+            color: white; 
+            border-bottom-right-radius: 4px; 
+            font-weight: 600; 
+            box-shadow: 0 8px 20px rgba(0,102,255,0.25); 
+            margin-left: auto;
+            max-width: 80%;
+        }
 
         .typing { font-size: 11px; color: #64748b; text-align: center; margin: 8px 0; display: none; font-weight: 700; letter-spacing: 0.5px; }
         
-        /* PERBAIKAN SUGGESTIONS: Memastikan tetap di atas dan terlihat */
-        .suggestions { 
-            display: none; /* Awalnya sembunyi, muncul setelah loading selesai */
-            overflow-x: auto; gap: 10px; padding: 15px; 
-            background: white; border-top: 1px solid #eee; border-radius: 24px 24px 0 0; 
-            box-shadow: 0 -10px 25px rgba(0,0,0,0.05);
-            scrollbar-width: none; -ms-overflow-style: none;
-            flex-shrink: 0;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* Support iPhone & Modern Android */
+        .menu-trigger {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--noxie-grad);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 13px;
+            box-shadow: 0 10px 20px rgba(0,102,255,0.4);
+            z-index: 1000;
+            cursor: pointer;
+            border: 2px solid white;
+            display: none;
         }
-        .suggestions::-webkit-scrollbar { display: none; }
+
+        .drop-up-menu {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+            z-index: 1001;
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .drop-up-menu.active { bottom: 0; }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(3px);
+            z-index: 1000;
+            display: none;
+        }
 
         .chip { 
-            flex: 0 0 auto; background: #f8fafc; padding: 12px 18px; border-radius: 14px; 
+            background: #f8fafc; padding: 12px; border-radius: 14px; 
             font-size: 11.5px; font-weight: 800; color: #334155; border: 1px solid #e2e8f0; 
-            cursor: pointer; text-align: center; transition: all 0.2s ease;
-            white-space: nowrap;
+            cursor: pointer; text-align: center;
         }
-        .chip:active { transform: scale(0.92); background: #f1f5f9; border-color: var(--primary); color: var(--primary); }
+        .chip:active { transform: scale(0.92); background: #f1f5f9; color: var(--primary); }
 
-        .info-card { background: #f8fafc; border-radius: 14px; border: 1px solid #e2e8f0; padding: 12px; margin: 8px 0; }
-        .admin-status-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #cbd5e1; }
-        .admin-status-item:last-child { border: none; margin: 0; padding: 0; }
-        
+        .info-card { background: #f8fafc; border-radius: 14px; border: 1px solid #e2e8f0; padding: 12px; margin: 8px 0; width: 100%; }
+        .admin-status-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #cbd5e1; gap: 10px; }
         .order-card { background: #f0f7ff; border-radius: 15px; padding: 14px; margin-top: 10px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,102,255,0.05); }
         .status-badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; margin-top: 8px; text-transform: uppercase; }
         .alert-box { background: #fff1f2; color: #be123c; padding: 10px; border-radius: 10px; font-size: 11.5px; margin-top: 10px; font-weight: 600; border: 1px solid #fecdd3; }
+        
+        .vote-container { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .vote-btn { background: white; border: 2px solid #e2e8f0; padding: 10px; border-radius: 12px; font-size: 12px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .vote-btn:active { transform: scale(0.95); background: #f0f7ff; border-color: var(--primary); }
     </style>
 </head>
 <body>
@@ -105,16 +212,18 @@
     </header>
 
     <div id="chat-container"></div>
-
     <div id="typing-ui" class="typing">Noxie sedang memproses data... ⏳</div>
 
-    <div class="suggestions" id="menu-suggestions">
-        <div class="chip" onclick="showIdInput()">📋 Cek Pesanan</div>
-        <div class="chip" onclick="window.open('https://noxpay.my.id', '_blank')">🏠 Kembali ke NoxPay</div>
-        <div class="chip" onclick="quickAsk('Cek Status Admin')">👤 Status Admin</div>
-        <div class="chip" onclick="quickAsk('Cek Saldo Admin')">💰 Saldo Admin</div>
-        <div class="chip" onclick="quickAsk('Sistem Blokir')">⚠️ Aturan Blokir</div>
-        <div class="chip" onclick="location.reload()">🔄 Refresh Chat</div>
+    <div class="menu-trigger" id="menu-btn" onclick="toggleMenu()">⚡ Menu Bantuan</div>
+    <div class="menu-overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="drop-up-menu" id="drop-menu">
+        <div class="chip" onclick="handleMenu('Cek Pesanan')">Cek Pesanan</div>
+        <div class="chip" onclick="window.open('https://noxpay.my.id', '_blank')">Web NoxPay</div>
+        <div class="chip" onclick="handleMenu('Cek Status Admin')">Status Admin</div>
+        <div class="chip" onclick="handleMenu('Cek Saldo Admin')">Saldo Admin</div>
+        <div class="chip" onclick="handleMenu('Produk Baru')">Produk Baru</div>
+        <div class="chip" onclick="handleMenu('Sistem Blokir')">Aturan Blokir</div>
+        <div class="chip" onclick="location.reload()">Refresh Chat</div>
     </div>
 
     <script>
@@ -130,6 +239,21 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        let responseCount = 0;
+
+        function toggleMenu() {
+            const menu = document.getElementById('drop-menu');
+            const overlay = document.getElementById('overlay');
+            menu.classList.toggle('active');
+            overlay.style.display = menu.classList.contains('active') ? 'block' : 'none';
+        }
+
+        function handleMenu(cmd) {
+            toggleMenu();
+            if(cmd === 'Cek Pesanan') showIdInput();
+            else quickAsk(cmd);
+        }
+
         function getAutoUserID() {
             let rawID = localStorage.getItem('nox_user_id'); 
             let finalID = rawID || "593086";
@@ -137,25 +261,49 @@
         }
 
         window.onload = () => {
-            let welcomeMsg = `Halo Kak! 👋 Selamat datang di assisten Noxie!.<br><br>Ada yang bisa saya bantu hari ini? Klik menu di bawah ya! 😊✨`;
-            typeWriterMessage(welcomeMsg, true); // Kirim flag true untuk munculkan menu
+            const welcomeMsg = `<b>Halo Bangkek! 👋</b><br>Kenalin, aku <b>Noxie</b>. Tidak Senang sekali bisa bertemu kamu lagi! Ada yang bisa aku bantu hari ini? ✨`;
+            typeWriterMessage(welcomeMsg, true, "HERO/noxie2.png");
         };
 
         async function quickAsk(cmd) {
             addMessage(cmd, 'user');
             document.getElementById('typing-ui').style.display = 'block';
             let response = "";
+            let customImg = "HERO/noxie2.png"; 
 
             if (cmd === 'Cek Status Admin') {
+                customImg = "HERO/status.png";
                 response = await getAdminDetailedInfo('status');
             } else if (cmd === 'Cek Saldo Admin') {
+                customImg = "HERO/saldo.png";
                 response = await getAdminDetailedInfo('balance');
+            } else if (cmd === 'Produk Baru') {
+                customImg = "HERO/noxie2.png";
+                response = `Akan segera hadir produk baru yaitu <b>Sarung Jempol AP King V1/V2</b>! 🔥<br><br>Boss lebih tertarik yang mana nih? Yuk bantu Noxie voting biar makin semangat stoknya! 👇<div class="vote-container"><div class="vote-btn" onclick="submitVote('V1')">👑 Pilih AP King V1</div><div class="vote-btn" onclick="submitVote('V2')">⚡ Pilih AP King V2</div></div>`;
             } else if (cmd === 'Sistem Blokir') {
+                customImg = "HERO/warning.png";
                 response = "⚠️ <b>INFORMASI PENTING BOSS!</b> ⚠️<br><br>Sistem kami akan memblokir pembelian secara otomatis jika ada transaksi yang <b>Belum Dibayar</b> selama lebih dari <b>24 Jam</b>.<br><br>Mohon segera selesaikan pembayaran agar transaksi kamu tidak terhambat ya! 🙏🚀";
             }
 
             document.getElementById('typing-ui').style.display = 'none';
-            typeWriterMessage(response);
+            typeWriterMessage(response, false, customImg);
+        }
+
+        async function submitVote(type) {
+            addMessage(`Saya pilih AP King ${type}!`, 'user');
+            document.getElementById('typing-ui').style.display = 'block';
+            
+            try {
+                // Menyimpan data voting ke node 'product_votes' di Firebase Console
+                const voteRef = db.ref('product_votes').child(type);
+                await voteRef.transaction((current) => (current || 0) + 1);
+                
+                document.getElementById('typing-ui').style.display = 'none';
+                typeWriterMessage(`Terima kasih Boss atas votingnya! 🫡 Pilihan <b>AP King ${type}</b> sudah Noxie catat di database ya! ✨`, false, "HERO/noxie2.png");
+            } catch (e) {
+                document.getElementById('typing-ui').style.display = 'none';
+                typeWriterMessage("Waduh, gagal kirim vote ke Firebase. Coba lagi nanti ya Boss! 🙏", false, "HERO/error.png");
+            }
         }
 
         async function getAdminDetailedInfo(mode) {
@@ -165,29 +313,20 @@
                 const s = sSnap.val() || { wall: "Offline", riz: "Offline" };
                 const b = bSnap.val() || { wall: 0, riz: 0 };
 
-                let intro = mode === 'status' ? "Berikut laporan <b>Status Admin</b> NoxPay saat ini: 📊" : "Berikut laporan <b>Saldo Admin</b> NoxPay saat ini: 💰";
+                let intro = mode === 'status' ? "Laporan <b>Status Admin</b>: 📊" : "Laporan <b>Saldo Admin</b>: 💰";
                 let content = `<div class="info-card">`;
                 
-                const wDot = s.wall === "Online" ? "🟢" : "🔴";
-                const wStatus = s.wall === "Online" ? "<b>Siap Melayani!</b>" : "<i>Sedang Offline</i>";
-                const wSaldoText = b.wall > 0 ? `<b style="color:#22c55e">Rp ${b.wall.toLocaleString()} (Tersedia ✅)</b>` : `<b style="color:#ef4444">Masih Kosong🗿</b>`;
-                
-                content += `<div class="admin-status-item"><span>${wDot} Admin <b>Wall</b></span><span style="text-align:right">${mode === 'status' ? wStatus : wSaldoText}</span></div>`;
-
-                const rDot = s.riz === "Online" ? "🟢" : "🔴";
-                const rStatus = s.riz === "Online" ? "<b>Siap Melayani!</b>" : "<i>Sedang Offline</i>";
-                const rSaldoText = b.riz > 0 ? `<b style="color:#22c55e">Rp ${b.riz.toLocaleString()} (Tersedia ✅)</b>` : `<b style="color:#ef4444">Masih Kosong🗿</b>`;
-
-                content += `<div class="admin-status-item"><span>${rDot} Admin <b>Riz</b></span><span style="text-align:right">${mode === 'status' ? rStatus : rSaldoText}</span></div></div>`;
-
-                if ((s.wall === "Offline" && s.riz === "Offline") && mode === 'status') {
-                    content += `<div class="alert-box">Wah, semua admin sedang offline Boss. Pesanan kamu akan diproses saat admin kembali online ya! 🙏</div>`;
-                } else if (mode === 'status') {
-                    content += `<p style="font-size:11px; margin-top:5px;">💡 <i>Saran: Hubungi admin yang sedang online untuk respon instan!</i></p>`;
+                if (mode === 'status') {
+                    content += `<div class="admin-status-item"><span>Admin <b>Wall</b></span><span>${s.wall === "Online" ? "🟢 Online" : "🔴 Offline"}</span></div>`;
+                    content += `<div class="admin-status-item"><span>Admin <b>Riz</b></span><span>${s.riz === "Online" ? "🟢 Online" : "🔴 Offline"}</span></div>`;
+                } else {
+                    content += `<div class="admin-status-item"><span>Saldo <b>Wall</b></span><span>Rp ${Number(b.wall).toLocaleString('id-ID')}</span></div>`;
+                    content += `<div class="admin-status-item"><span>Saldo <b>Riz</b></span><span>Rp ${Number(b.riz).toLocaleString('id-ID')}</span></div>`;
                 }
-
+                
+                content += `</div>`;
                 return intro + content;
-            } catch (e) { return "Maaf Boss, Noxie gagal mengambil data. 🙏"; }
+            } catch (e) { return "Gagal ambil data Boss. 🙏"; }
         }
 
         function showIdInput() {
@@ -196,41 +335,23 @@
             processSearch(autoID);
         }
 
-        async function processSearch(passedID = null) {
-            const id = passedID || "";
+        async function processSearch(id) {
             document.getElementById('typing-ui').style.display = 'block';
-            
             try {
                 const snap = await db.ref('orders').once('value');
                 const orders = snap.val();
                 let found = [];
-                if(orders) {
-                    Object.keys(orders).forEach(k => {
-                        if(orders[k].userID === id) found.push(orders[k]);
-                    });
-                }
+                if(orders) Object.keys(orders).forEach(k => { if(orders[k].userID === id) found.push(orders[k]); });
 
-                let response = "";
+                let response = found.length > 0 ? `Hore! Ada <b>${found.length}</b> pesanan: 🎯<br>` : "Halo Kak! 👋 Sepertinya kamu <b>belum memiliki pesanan</b> di NoxPay.<br><br>Yuk, buat pesanan pertama kamu sekarang! 🚀";
                 if(found.length > 0) {
-                    response = `Hore! Noxie menemukan <b>${found.length}</b> pesanan terakhir untuk kamu: 🎯<br>`;
-                    found.reverse().slice(0, 5).forEach(o => {
-                        const col = o.status === 'CANCEL' ? '#ef4444' : (o.status === 'PENDING' ? '#f59e0b' : '#22c55e');
-                        response += `
-                        <div class="order-card">
-                            <b style="font-size:14px; color:#1e293b;">📦 ${o.product} ${o.nominal}</b><br>
-                            <span style="font-size:11px; color:#64748b;">ID Trx: ${o.id_trx}</span><br>
-                            <span class="status-badge" style="background:${col}">${o.status}</span>
-                        </div>`;
+                    found.reverse().slice(0, 3).forEach(o => {
+                        response += `<div class="order-card"><b>📦 ${o.product}</b><br><span class="status-badge" style="background:${o.status === 'CANCEL' ? '#ef4444' : '#22c55e'}">${o.status}</span></div>`;
                     });
-                } else {
-                    response = `Halo Kak! 👋 Sepertinya kamu <b>belum memiliki pesanan</b> di NoxPay.<br><br>Yuk, buat pesanan pertama kamu sekarang! 🚀`;
                 }
                 document.getElementById('typing-ui').style.display = 'none';
-                typeWriterMessage(response);
-            } catch (e) { 
-                document.getElementById('typing-ui').style.display = 'none';
-                typeWriterMessage("Waduh, ada kendala teknis saat mencari data. 😭"); 
-            }
+                typeWriterMessage(response, false, "HERO/search.png");
+            } catch (e) { typeWriterMessage("Gagal memuat data! 😭", false, "HERO/error.png"); }
         }
 
         function addMessage(text, sender) {
@@ -242,25 +363,35 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function typeWriterMessage(text, showMenu = false) {
+        function typeWriterMessage(text, showMenu = false, imgPath = "HERO/noxie2.png") {
             const chatContainer = document.getElementById('chat-container');
-            const div = document.createElement('div');
-            div.className = "msg msg-noxie";
-            chatContainer.appendChild(div);
+            const wrapper = document.createElement('div');
+            const isRight = responseCount % 2 !== 0;
+            wrapper.className = `msg-wrapper ${isRight ? 'reverse' : ''}`;
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "msg msg-noxie";
+            
+            const charDiv = document.createElement('div');
+            charDiv.className = 'char-container';
+            charDiv.innerHTML = `<img src="${imgPath}" alt="Noxie">`;
+            
+            wrapper.appendChild(msgDiv);
+            wrapper.appendChild(charDiv);
+            
+            chatContainer.appendChild(wrapper);
+            responseCount++;
+
             let i = 0;
             const interval = setInterval(() => {
-                div.innerHTML = text.substring(0, i) + " |";
+                msgDiv.innerHTML = text.substring(0, i) + " |";
                 i++;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
                 if (i > text.length) {
                     clearInterval(interval);
-                    div.innerHTML = text;
+                    msgDiv.innerHTML = text;
+                    if(showMenu) document.getElementById('menu-btn').style.display = 'block';
                     chatContainer.scrollTop = chatContainer.scrollHeight;
-                    // JIKA showMenu TRUE, MUNCULKAN MENU SETELAH KETIK SELESAI
-                    if(showMenu) {
-                        document.getElementById('menu-suggestions').style.display = 'flex';
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                    }
                 }
             }, 6);
         }
