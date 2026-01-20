@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Noxie Community Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #0066ff;
+            --noxie-grad: linear-gradient(135deg, #0066ff 0%, #8b5cf6 100%);
+            --bg-gradient: linear-gradient(180deg, #f8faff 0%, #f1f5f9 100%);
+            --boss-gold: linear-gradient(45deg, #ffd700, #fff3a0, #ffae00, #b8860b);
+            --premium-dark: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { background: var(--bg-gradient); height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: fixed; width: 100%; }
+
+        header { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(15px); 
+            padding: 15px 20px; 
+            border-bottom: 1px solid rgba(0,0,0,0.05); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .back-btn { font-size: 20px; cursor: pointer; color: #1e293b; text-decoration: none; font-weight: 800; }
+
+        #community-chat { 
+            flex: 1; 
+            padding: 15px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+        #community-chat::-webkit-scrollbar { display: none; }
+
+        .msg-wrapper { display: flex; gap: 10px; max-width: 85%; align-items: flex-end; position: relative; }
+        .wrapper-me { align-self: flex-end; flex-direction: row-reverse; }
+        .wrapper-other { align-self: flex-start; }
+
+        .wrapper-premium {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+        .wrapper-me.wrapper-premium {
+            align-items: flex-end !important;
+        }
+
+        .user-avatar { 
+            width: 38px; height: 38px; border-radius: 50%; object-fit: cover; 
+            border: 2px solid #ffd700; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .msg-premium {
+            background: var(--premium-dark) !important;
+            color: white !important;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px !important;
+            margin-top: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .msg-premium::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            width: 0; height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid var(--premium-dark);
+        }
+        .wrapper-other .msg-premium::before { left: 12px; }
+        .wrapper-me .msg-premium::before { right: 12px; }
+
+        .name-premium {
+            background: var(--boss-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800 !important;
+            font-size: 11px !important;
+        }
+
+        .msg-boss {
+            background: #000 !important;
+            border: 1.5px solid #ffd700 !important;
+        }
+        .msg-boss::before { border-bottom-color: #ffd700 !important; }
+
+        .comm-msg { 
+            padding: 10px 14px; 
+            border-radius: 18px; 
+            position: relative; 
+            animation: pop 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            min-width: 80px;
+        }
+
+        @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .msg-other { background: white; border: 1px solid #f1f5f9; color: #334155; border-bottom-left-radius: 4px; }
+        .msg-me { background: var(--noxie-grad); color: white; border-bottom-right-radius: 4px; }
+
+        .sender-name { font-size: 10px; font-weight: 800; margin-bottom: 3px; text-transform: capitalize; letter-spacing: 0.3px; opacity: 0.8; }
+        .msg-text { font-size: 13.5px; line-height: 1.4; word-wrap: break-word; font-weight: 500; }
+        .msg-time { font-size: 8.5px; margin-top: 4px; text-align: right; opacity: 0.6; font-weight: 600; display: flex; justify-content: flex-end; align-items: center; gap: 5px; }
+
+        .reply-box {
+            background: rgba(0,0,0,0.1);
+            border-left: 3px solid var(--primary);
+            padding: 5px 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            font-size: 11px;
+            color: #64748b;
+        }
+        .msg-premium .reply-box { background: rgba(255,255,255,0.1); color: #cbd5e1; }
+        
+        .reply-preview {
+            background: #f1f5f9;
+            padding: 8px 15px;
+            border-top: 1px solid #e2e8f0;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .msg-actions { font-size: 10px; cursor: pointer; opacity: 0.5; transition: 0.2s; }
+        .msg-actions:hover { opacity: 1; }
+        .del-btn { color: #ff4444; }
+
+        #input-container {
+            background: white;
+            border-top: 1px solid #f1f5f9;
+            z-index: 1000;
+        }
+
+        /* BOX PEMBERITAHUAN DAFTAR */
+        .notice-box {
+            background: var(--noxie-grad);
+            color: white;
+            padding: 12px 20px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .btn-notice-reg {
+            background: white;
+            color: var(--primary);
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 11px;
+            text-decoration: none;
+            margin-left: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* UPDATE: Menaikkan posisi input lebih drastis untuk keamanan browser HP */
+        .chat-input-area { 
+            padding: 15px 20px calc(70px + env(safe-area-inset-bottom)); 
+            display: flex; gap: 10px; align-items: center;
+        }
+
+        .chat-input-area input {
+            flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #e2e8f0;
+            background: #f8fafc; outline: none; font-size: 14px; font-weight: 600;
+        }
+
+        .send-btn {
+            width: 45px; height: 45px; background: var(--noxie-grad);
+            border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,102,255,0.3);
+        }
+
+        /* UPDATE: Menaikkan login overlay jauh lebih tinggi drastis */
+        .login-overlay {
+            padding: 40px 20px calc(80px + env(safe-area-inset-bottom));
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            display: none;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="csnoxie.html" class="back-btn">←</a>
+        <div style="text-align: center;">
+            <h2 style="font-size: 16px; font-weight: 800; color: #1e293b;">Komunitas NoxPay</h2>
+            <p style="font-size: 10px; color: #64748b; font-weight: 700;">Sharing & Diskusi Bareng Member</p>
+        </div>
+        <div style="width: 24px;"></div>
+    </header>
+
+    <div id="community-chat"></div>
+
+    <div id="input-container">
+        <div id="reg-notice" class="notice-box">
+            <span>Waduh Boss! Daftar akun dulu yuk biar bisa chatting.</span>
+            <a href="form.html" class="btn-notice-reg">DAFTAR</a>
+        </div>
+
+        <div id="reply-container" class="reply-preview">
+            <div id="reply-text" style="font-size: 11px; font-weight: 600; color: #64748b;"></div>
+            <div onclick="cancelReply()" style="cursor:pointer; font-weight: 800;">✕</div>
+        </div>
+        
+        <div class="chat-input-area" id="active-input" style="display:none">
+            <input type="text" id="msg-input" placeholder="Tulis sesuatu boss...">
+            <button class="send-btn" onclick="sendMessage()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+        </div>
+
+        <div class="login-overlay" id="locked-input">
+            <p style="font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 25px;">Boss harus Login/Daftar dulu biar bisa chattingan.</p>
+            <button style="background: var(--noxie-grad); color: white; padding: 15px 35px; border-radius: 25px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,102,255,0.4);" onclick="window.location.href='form.html'">LOGIN SEKARANG</button>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin",
+            storageBucket: "noxpay-admin.firebasestorage.app",
+            messagingSenderId: "212794945472",
+            appId: "1:212794945472:web:bd803bb3e71b48ea99a225"
+        };
+        firebase.initializeApp(firebaseConfig);
+        
+        const db = firebase.firestore();
+        const rtdb = firebase.database();
+        const auth = firebase.auth();
+
+        let currentUserData = null;
+        let selectedReply = null;
+
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                document.getElementById('active-input').style.display = 'flex';
+                document.getElementById('locked-input').style.display = 'none';
+                rtdb.ref('users/' + user.uid).on('value', s => {
+                    currentUserData = s.val();
+                    // Jika data user ditemukan, sembunyikan notice box jika sedang tampil
+                    if(currentUserData) document.getElementById('reg-notice').style.display = 'none';
+                });
+            } else {
+                document.getElementById('active-input').style.display = 'none';
+                document.getElementById('locked-input').style.display = 'block';
+                document.getElementById('reg-notice').style.display = 'none';
+            }
+        });
+
+        db.collection("community_chats")
+            .orderBy("timestamp", "asc")
+            .limitToLast(50)
+            .onSnapshot(snapshot => {
+                const container = document.getElementById('community-chat');
+                container.innerHTML = "";
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const msgId = doc.id;
+                    const isMe = auth.currentUser && data.uid === auth.currentUser.uid;
+                    const isBoss = data.email === "xie@gmail.com";
+                    const hasPhoto = data.photo && data.photo !== "";
+                    const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "...";
+                    
+                    const html = `
+                        <div class="msg-wrapper ${isMe ? 'wrapper-me' : 'wrapper-other'} ${hasPhoto ? 'wrapper-premium' : ''}" id="msg-${msgId}">
+                            ${hasPhoto ? `<img src="${data.photo}" class="user-avatar">` : ''}
+                            
+                            <div class="comm-msg ${hasPhoto ? (isBoss ? 'msg-boss msg-premium' : 'msg-premium') : (isMe ? 'msg-me' : 'msg-other')}">
+                                <div class="sender-name ${hasPhoto ? 'name-premium' : ''}">${isBoss ? '' : ''}${data.username || "Anonymous"}</div>
+                                
+                                ${data.replyTo ? `<div class="reply-box"><b>@${data.replyUser}</b>: ${data.replyMsg}</div>` : ''}
+                                
+                                <div class="msg-text">${data.message}</div>
+                                
+                                <div class="msg-time">
+                                    <span class="msg-actions" onclick="setReply('${msgId}', '${data.username}', '${data.message.substring(0,20)}')">Reply</span>
+                                    ${isMe ? `<span class="msg-actions del-btn" onclick="deleteMessage('${msgId}')">Delete</span>` : ''}
+                                    ${time}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+                container.scrollTop = container.scrollHeight;
+            });
+
+        function setReply(id, user, msg) {
+            selectedReply = { id, user, msg };
+            document.getElementById('reply-text').innerText = `Membalas @${user}: "${msg}..."`;
+            document.getElementById('reply-container').style.display = 'flex';
+            document.getElementById('msg-input').focus();
+        }
+
+        function cancelReply() {
+            selectedReply = null;
+            document.getElementById('reply-container').style.display = 'none';
+        }
+
+        async function deleteMessage(id) {
+            if(confirm("Hapus pesan ini Boss?")) {
+                try {
+                    await db.collection("community_chats").doc(id).delete();
+                } catch (e) { alert("Gagal hapus!"); }
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if(!text || !auth.currentUser) return;
+
+            // CEK APAKAH USER SUDAH TERDAFTAR DI DATABASE
+            if(!currentUserData) {
+                // Tampilkan Box Notifikasi sebagai pengganti Pop-up
+                document.getElementById('reg-notice').style.display = 'flex';
+                return;
+            }
+
+            const payload = {
+                uid: auth.currentUser.uid,
+                email: auth.currentUser.email || "",
+                username: currentUserData.username,
+                photo: currentUserData.photo || "", 
+                message: text,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if(selectedReply) {
+                payload.replyTo = selectedReply.id;
+                payload.replyUser = selectedReply.user;
+                payload.replyMsg = selectedReply.msg;
+            }
+
+            try {
+                await db.collection("community_chats").add(payload);
+                input.value = "";
+                cancelReply();
+            } catch (e) {
+                alert("Gagal kirim pesan Boss!");
+            }
+        }
+
+        document.getElementById('msg-input').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>

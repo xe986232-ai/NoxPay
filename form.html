@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Masuk & Daftar | NoxPay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --noxie-grad: linear-gradient(135deg, #0066ff 0%, #8b5cf6 100%);
+            --bg: #f8faff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+        .auth-card { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,102,255,0.08); border: 1px solid rgba(0,102,255,0.05); }
+        h2 { font-weight: 800; color: #1e293b; margin-bottom: 8px; text-align: center; }
+        p { font-size: 13px; color: #64748b; text-align: center; margin-bottom: 25px; }
+
+        /* BOX PEMBERITAHUAN INFO */
+        #info-box {
+            background: #eef5ff;
+            border: 1px solid #cce0ff;
+            color: #0055dd;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            display: block;
+        }
+
+        .tab-menu { display: flex; gap: 10px; background: #f1f5f9; padding: 5px; border-radius: 12px; margin-bottom: 25px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; background: transparent; color: #64748b; transition: 0.3s; }
+        .tab-btn.active { background: white; color: #0066ff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1.5px solid #e2e8f0; outline: none; font-size: 14px; font-weight: 600; transition: 0.3s; }
+        .input-group input:focus { border-color: #0066ff; background: #f0f7ff; }
+
+        /* Style Upload Foto */
+        .photo-upload { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .preview-box { width: 80px; height: 80px; border-radius: 50%; background: #f1f5f9; border: 2px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-box span { font-size: 20px; color: #94a3b8; }
+
+        .btn-auth { width: 100%; padding: 14px; border: none; border-radius: 15px; background: var(--noxie-grad); color: white; font-weight: 800; font-size: 14px; cursor: pointer; margin-top: 10px; box-shadow: 0 5px 15px rgba(0,102,255,0.3); }
+        .btn-auth:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        #upload-status { font-size: 11px; font-weight: 700; color: #0066ff; margin-top: 5px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h2 id="form-title">Selamat Datang!</h2>
+        <p id="form-desc">Silakan masuk ke akun NoxPay Anda</p>
+
+        <div id="info-box">
+            ℹ️ Untuk email dan password bisa buat asal asalan aja ya jadi aman!
+        </div>
+
+        <div class="tab-menu">
+            <button class="tab-btn active" onclick="switchTab('login')">Masuk</button>
+            <button class="tab-btn" onclick="switchTab('register')">Daftar</button>
+        </div>
+
+        <form id="auth-form">
+            <div id="register-fields" style="display: none;">
+                <div class="photo-upload">
+                    <div class="preview-box" onclick="alert('Waduh Boss! Fitur upload foto profil ini cuma khusus buat Pelanggan Premium NoxPay.')">
+                        <img id="img-preview" src="" style="display:none">
+                        <span id="placeholder-icon">+</span>
+                    </div>
+                    <label style="font-size: 11px; font-weight: 800; color: #64748b;">Klik untuk Foto Profil</label>
+                    <input type="file" id="photo-input" hidden accept="image/*">
+                    <div id="upload-status">Sedang mengupload foto...</div>
+                </div>
+
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="Contoh: noxie_user">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="email@contoh.com" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-auth" id="btn-submit">MASUK SEKARANG</button>
+        </form>
+    </div>
+
+    <script>
+        // --- KONFIGURASI CLOUDINARY & FIREBASE ---
+        const CLOUD_NAME = "dt2u1r8ni"; 
+        const UPLOAD_PRESET = "admin_super"; 
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9_F1HGMru6vVdBlTqdxfJ-_6wb9CFSyU",
+            authDomain: "noxpay-admin.firebaseapp.com",
+            databaseURL: "https://noxpay-admin-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "noxpay-admin",
+            storageBucket: "noxpay-admin.firebasestorage.app",
+            messagingSenderId: "212794945472",
+            appId: "1:212794945472:web:bd803bb3e71b48ea99a225"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const rtdb = firebase.database();
+
+        let mode = 'login';
+        let uploadedPhotoUrl = "";
+
+        function switchTab(newMode) {
+            mode = newMode;
+            const btns = document.querySelectorAll('.tab-btn');
+            const regFields = document.getElementById('register-fields');
+            const submitBtn = document.getElementById('btn-submit');
+            const title = document.getElementById('form-title');
+            const usernameInput = document.getElementById('username');
+
+            if(mode === 'login') {
+                btns[0].classList.add('active'); btns[1].classList.remove('active');
+                regFields.style.display = 'none';
+                submitBtn.innerText = "MASUK SEKARANG";
+                title.innerText = "Selamat Datang!";
+                usernameInput.removeAttribute('required');
+            } else {
+                btns[1].classList.add('active'); btns[0].classList.remove('active');
+                regFields.style.display = 'block';
+                submitBtn.innerText = "DAFTAR AKUN BARU";
+                title.innerText = "Buat Akun";
+                usernameInput.setAttribute('required', '');
+            }
+        }
+
+        // Logic Upload Foto ke Cloudinary
+        document.getElementById('photo-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            document.getElementById('upload-status').style.display = 'block';
+            document.getElementById('btn-submit').disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', UPLOAD_PRESET);
+
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                uploadedPhotoUrl = data.secure_url;
+
+                document.getElementById('img-preview').src = uploadedPhotoUrl;
+                document.getElementById('img-preview').style.display = 'block';
+                document.getElementById('placeholder-icon').style.display = 'none';
+                document.getElementById('upload-status').innerText = "✅ Foto siap!";
+            } catch (err) {
+                alert("Gagal upload foto!");
+            } finally {
+                document.getElementById('btn-submit').disabled = false;
+            }
+        });
+
+        // Submit Form
+        document.getElementById('auth-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+
+            try {
+                if(mode === 'register') {
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    await rtdb.ref('users/' + userCredential.user.uid).set({
+                        username: username,
+                        email: email,
+                        photo: "",
+                        role: 'member'
+                    });
+                    alert("Pendaftaran Berhasil!");
+                } else {
+                    await auth.signInWithEmailAndPassword(email, password);
+                }
+                window.location.href = 'chatcomunity.html'; 
+            } catch (error) {
+                if(mode === 'login' && (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential')) {
+                    alert("Akun tidak ditemukan atau password salah Boss!");
+                } else {
+                    alert(error.message);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
