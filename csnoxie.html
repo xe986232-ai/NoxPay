@@ -195,6 +195,11 @@
         .vote-container { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
         .vote-btn { background: white; border: 2px solid #e2e8f0; padding: 10px; border-radius: 12px; font-size: 12px; font-weight: 700; color: #1e293b; cursor: pointer; transition: all 0.2s; text-align: center; }
         .vote-btn:active { transform: scale(0.95); background: #f0f7ff; border-color: var(--primary); }
+
+        /* Style Baru untuk Step Order */
+        .step-order { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+        .step-num { background: var(--primary); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+        .step-text { font-size: 12.5px; color: #334155; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -219,6 +224,8 @@
     <div class="drop-up-menu" id="drop-menu">
         <div class="chip" onclick="handleMenu('Cek Pesanan')">Cek Pesanan</div>
         <div class="chip" onclick="window.open('https://noxpay.my.id', '_blank')">Web NoxPay</div>
+        <div class="chip" onclick="handleMenu('Cara Order')">Cara Order</div>
+        <div class="chip" onclick="handleMenu('Link Grup Noxpay')">Grup Noxpay</div>
         <div class="chip" onclick="handleMenu('Cek Status Admin')">Status Admin</div>
         <div class="chip" onclick="handleMenu('Cek Saldo Admin')">Saldo Admin</div>
         <div class="chip" onclick="handleMenu('Produk Baru')">Produk Baru</div>
@@ -283,6 +290,20 @@
             } else if (cmd === 'Sistem Blokir') {
                 customImg = "HERO/warning.png";
                 response = "⚠️ <b>INFORMASI PENTING BOSS!</b> ⚠️<br><br>Sistem kami akan memblokir pembelian secara otomatis jika ada transaksi yang <b>Belum Dibayar</b> selama lebih dari <b>24 Jam</b>.<br><br>Mohon segera selesaikan pembayaran agar transaksi kamu tidak terhambat ya! 🙏🚀";
+            } else if (cmd === 'Cara Order') {
+                customImg = "HERO/noxie2.png";
+                response = `
+                <div style="width:100%;">
+                    <h3 style="margin-bottom:15px; font-size:16px; font-weight:800;">Cara Belanja di NoxPay</h3>
+                    <div class="step-order"><div class="step-num">1</div><div class="step-text">Pilih kategori layanan (Game, Pulsa, atau E-Wallet).</div></div>
+                    <div class="step-order"><div class="step-num">2</div><div class="step-text">Masukkan <b>Nomor HP</b> atau <b>ID Akun</b> tujuan dengan benar.</div></div>
+                    <div class="step-order"><div class="step-num">3</div><div class="step-text">Pilih <b>Nominal</b> produk yang ingin kamu beli.</div></div>
+                    <div class="step-order"><div class="step-num">4</div><div class="step-text">Klik <b>Beli Sekarang</b>, cek detailnya, lalu klik <b>Bayar</b>.</div></div>
+                    <div class="step-order"><div class="step-num">5</div><div class="step-text">Kamu akan diarahkan ke WhatsApp untuk menyelesaikan pembayaran.</div></div>
+                </div>`;
+            } else if (cmd === 'Link Grup Noxpay') {
+                customImg = "HERO/noxie2.png";
+                response = "Untu link grup Noxpay ada disini ya banke langsung join aja:<br><br><a href='https://chat.whatsapp.com/FGHOFKwPcu51ttEGO10Ryr' target='_blank' style='color:var(--primary); font-weight:bold;'>https://chat.whatsapp.com/FGHOFKwPcu51ttEGO10Ryr</a>";
             }
 
             document.getElementById('typing-ui').style.display = 'none';
@@ -292,12 +313,9 @@
         async function submitVote(type) {
             addMessage(`Saya pilih AP King ${type}!`, 'user');
             document.getElementById('typing-ui').style.display = 'block';
-            
             try {
-                // Menyimpan data voting ke node 'product_votes' di Firebase Console
                 const voteRef = db.ref('product_votes').child(type);
                 await voteRef.transaction((current) => (current || 0) + 1);
-                
                 document.getElementById('typing-ui').style.display = 'none';
                 typeWriterMessage(`Terima kasih Boss atas votingnya! 🫡 Pilihan <b>AP King ${type}</b> sudah Noxie catat di database ya! ✨`, false, "HERO/noxie2.png");
             } catch (e) {
@@ -315,7 +333,6 @@
 
                 let intro = mode === 'status' ? "Laporan <b>Status Admin</b>: 📊" : "Laporan <b>Saldo Admin</b>: 💰";
                 let content = `<div class="info-card">`;
-                
                 if (mode === 'status') {
                     content += `<div class="admin-status-item"><span>Admin <b>Wall</b></span><span>${s.wall === "Online" ? "🟢 Online" : "🔴 Offline"}</span></div>`;
                     content += `<div class="admin-status-item"><span>Admin <b>Riz</b></span><span>${s.riz === "Online" ? "🟢 Online" : "🔴 Offline"}</span></div>`;
@@ -323,7 +340,6 @@
                     content += `<div class="admin-status-item"><span>Saldo <b>Wall</b></span><span>Rp ${Number(b.wall).toLocaleString('id-ID')}</span></div>`;
                     content += `<div class="admin-status-item"><span>Saldo <b>Riz</b></span><span>Rp ${Number(b.riz).toLocaleString('id-ID')}</span></div>`;
                 }
-                
                 content += `</div>`;
                 return intro + content;
             } catch (e) { return "Gagal ambil data Boss. 🙏"; }
@@ -368,17 +384,13 @@
             const wrapper = document.createElement('div');
             const isRight = responseCount % 2 !== 0;
             wrapper.className = `msg-wrapper ${isRight ? 'reverse' : ''}`;
-            
             const msgDiv = document.createElement('div');
             msgDiv.className = "msg msg-noxie";
-            
             const charDiv = document.createElement('div');
             charDiv.className = 'char-container';
             charDiv.innerHTML = `<img src="${imgPath}" alt="Noxie">`;
-            
             wrapper.appendChild(msgDiv);
             wrapper.appendChild(charDiv);
-            
             chatContainer.appendChild(wrapper);
             responseCount++;
 
