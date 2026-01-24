@@ -21,7 +21,16 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .stat-card { background: var(--white); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .stat-card.balance-box { grid-column: span 2; border: 1px solid rgba(59, 130, 246, 0.3); background: linear-gradient(145deg, #1e293b, #111625); }
+        
+        /* Modifikasi sedikit di area balance untuk menampung tombol setting */
+        .stat-card.balance-box { 
+            grid-column: span 2; 
+            border: 1px solid rgba(59, 130, 246, 0.3); 
+            background: linear-gradient(145deg, #1e293b, #111625);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         
         .status-card { 
             grid-column: span 2; 
@@ -112,6 +121,18 @@
         .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--pending); }
         .status-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
         .status-cancel { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        /* Style Baru Untuk Edit Saldo */
+        .btn-edit-balance {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -133,8 +154,11 @@
 
         <div class="stats-grid">
             <div class="stat-card balance-box">
-                <small style="color:var(--gray); font-size: 10px; font-weight: 700;">LIMIT SALDO SAYA</small>
-                <h3 id="stat-balance" style="color: #fff;">Rp 0</h3>
+                <div>
+                    <small style="color:var(--gray); font-size: 10px; font-weight: 700;">LIMIT SALDO SAYA</small>
+                    <h3 id="stat-balance" style="color: #fff;">Rp 0</h3>
+                </div>
+                <button class="btn-edit-balance" onclick="updateLimitBalance()">SET SALDO</button>
             </div>
             <div class="stat-card"><h3><span id="stat-total">0</span></h3><small style="color:var(--gray)">TOTAL ORDER</small></div>
             <div class="stat-card"><h3><span id="stat-income">Rp 0</span></h3><small style="color:var(--gray)">PENDAPATAN</small></div>
@@ -184,6 +208,26 @@
             document.getElementById('stat-balance').innerText = "Rp " + saldo.toLocaleString('id-ID');
         });
 
+        // FUNGSI BARU: UPDATE LIMIT SALDO KE FIREBASE
+        async function updateLimitBalance() {
+            const currentSaldoText = document.getElementById('stat-balance').innerText.replace("Rp ", "").replace(/\./g, "");
+            const newBalance = prompt("Masukkan jumlah Limit Saldo baru untuk Wall:", currentSaldoText);
+            
+            if (newBalance !== null && newBalance !== "") {
+                const numBalance = parseInt(newBalance);
+                if (!isNaN(numBalance)) {
+                    try {
+                        await rdb.ref('admin_balance/wall').set(numBalance);
+                        alert("Limit Saldo Wall berhasil diperbarui!");
+                    } catch (e) {
+                        alert("Gagal update: " + e.message);
+                    }
+                } else {
+                    alert("Mohon masukkan angka yang valid.");
+                }
+            }
+        }
+
         function toggleAccordion(key) {
             const content = document.getElementById('content-' + key);
             content.classList.toggle('active');
@@ -221,13 +265,11 @@
                     income += valIncome;
                 }
 
-                // Logika Penentuan Class Status
                 let statusClass = "status-pending";
                 const stUpper = (order.status || "PENDING").toUpperCase();
                 if(stUpper === "SUCCESS") statusClass = "status-success";
                 if(stUpper === "CANCEL" || stUpper === "CANCELLED") statusClass = "status-cancel";
 
-                // Logika Tombol Aksi
                 let actionArea = "";
                 if(stUpper === "CANCEL" || stUpper === "CANCELLED") {
                     actionArea = `<div style="text-align:center; color:var(--danger); font-weight:800; padding:12px; border:1px dashed var(--danger); border-radius:12px; margin-top:10px; font-size:11px;">❌ PESANAN DIBATALKAN USER</div>`;
