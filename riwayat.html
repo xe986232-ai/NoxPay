@@ -160,17 +160,37 @@
             const detailContainer = document.getElementById('receipt-details');
             const stDB = (data.status || "PENDING").toUpperCase();
             
+            // Logika Penyesuaian Teks Status
+            let statusText = stDB;
+            let statusColor = "#d97706"; // default pending
+
+            if (stDB === "SUCCESS") {
+                statusText = "SUDAH DIBAYAR";
+                statusColor = "#059669";
+            } else if (stDB === "PENDING") {
+                statusText = "BELUM DIBAYAR";
+                statusColor = "#d97706";
+            } else if (stDB === "CANCEL" || stDB === "CANCELLED") {
+                statusText = "DIBATALKAN";
+                statusColor = "#ef4444";
+            }
+            
             detailContainer.innerHTML = `
                 <div class="receipt-row"><span class="receipt-label">Tanggal</span><span class="receipt-value">${data.waktu_masuk || '-'}</span></div>
-                <div class="receipt-row"><span class="receipt-label">ID Transaksi</span><span class="receipt-value">${key.slice(-8).toUpperCase()}</span></div>
+                <div class="receipt-row"><span class="receipt-label">ID Transaksi</span><span class="receipt-value">${key}</span></div>
                 <div class="receipt-row"><span class="receipt-label">Produk</span><span class="receipt-value">${data.product}</span></div>
                 <div class="receipt-row"><span class="receipt-label">ID Pelanggan</span><span class="receipt-value">${data.target}</span></div>
-                <div class="receipt-row"><span class="receipt-label">Status</span><span class="receipt-value" style="color:${stDB === 'SUCCESS' ? '#059669' : '#ef4444'}">${stDB}</span></div>
+                <div class="receipt-row"><span class="receipt-label">Status</span><span class="receipt-value" style="color:${statusColor}">${statusText}</span></div>
+                
+                ${data.buyerName ? `<div class="receipt-row"><span class="receipt-label">Nama</span><span class="receipt-value">${data.buyerName}</span></div>` : ''}
+                ${data.golongan ? `<div class="receipt-row"><span class="receipt-label">Golongan</span><span class="receipt-value">${data.golongan}</span></div>` : ''}
+                ${data.daya ? `<div class="receipt-row"><span class="receipt-label">Daya</span><span class="receipt-value">${data.daya}</span></div>` : ''}
+                
                 <div class="receipt-row"><span class="receipt-label">Nominal</span><span class="receipt-value">${data.nominal}</span></div>
                 
                 ${data.sn ? `
                 <div class="receipt-divider"></div>
-                <div class="receipt-row"><span class="receipt-label">Kode/SN</span><span class="receipt-value" style="color:var(--primary); font-size:14px;">${data.sn}</span></div>
+                <div class="receipt-row"><span class="receipt-label">Kode Token/SN</span><span class="receipt-value" style="color:var(--primary); font-size:14px;">${data.sn}</span></div>
                 ` : ''}
 
                 <div class="receipt-divider"></div>
