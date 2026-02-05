@@ -74,7 +74,7 @@
             padding: 0 16px;
         }
         .order-content.active {
-            max-height: 600px;
+            max-height: 1000px; /* Diperbesar untuk menampung form pln */
             padding: 16px;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
@@ -112,6 +112,37 @@
         .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--pending); }
         .status-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
         .status-cancel { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        /* Style Form PLN Baru */
+        .pln-form {
+            background: rgba(139, 92, 246, 0.05);
+            padding: 12px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border: 1px dashed rgba(139, 92, 246, 0.3);
+        }
+        .pln-form input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            margin-bottom: 8px;
+            outline: none;
+        }
+        .btn-save-pln {
+            width: 100%;
+            background: #e91e63;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -245,6 +276,21 @@
                         </div>`;
                 }
                 
+                // Cek apakah produk PLN
+                let plnFormArea = "";
+                if(order.product.toUpperCase().includes("PLN") || order.product.toUpperCase().includes("TOKEN")) {
+                    plnFormArea = `
+                    <div class="pln-form">
+                        <p style="font-size:10px; font-weight:800; color:var(--primary); margin-bottom:8px;">INPUT DATA PLN (OPSIONAL)</p>
+                        <input type="text" id="inp-name-${key}" placeholder="Nama Pelanggan" value="${order.buyerName || ''}">
+                        <input type="text" id="inp-gol-${key}" placeholder="Golongan (Contoh: R1)" value="${order.golongan || ''}">
+                        <input type="text" id="inp-dayameter-${key}" placeholder="Daya Meter (Contoh: 450VA)" value="${order.daya_meter || ''}">
+                        <input type="text" id="inp-dayatoken-${key}" placeholder="Daya Token (Contoh: 43,9 kWh)" value="${order.daya_token || ''}">
+                        <input type="text" id="inp-sn-${key}" placeholder="KODE TOKEN / SN" value="${order.sn || ''}">
+                        <button class="btn-save-pln" onclick="updatePLNData('${key}')">SIMPAN DATA PLN</button>
+                    </div>`;
+                }
+
                 listHTML = `
                 <div class="order-card" style="${stUpper === 'CANCEL' || stUpper === 'CANCELLED' ? 'opacity:0.6;' : ''}">
                     <div class="order-header" onclick="toggleAccordion('${key}')">
@@ -273,6 +319,7 @@
                         <div class="detail-row"><span>Waktu Transaksi:</span> <b>${order.waktu_masuk || "-"}</b></div>
                         <div class="detail-row" style="border:none;"><span>ID TRX:</span> <b style="font-size:8px;">${key}</b></div>
                         
+                        ${plnFormArea}
                         ${actionArea}
                     </div>
                 </div>` + listHTML;
@@ -282,6 +329,28 @@
             document.getElementById('stat-total').innerText = total;
             document.getElementById('stat-income').innerText = "Rp " + income.toLocaleString('id-ID');
         });
+
+        // Fungsi baru untuk update data PLN
+        async function updatePLNData(key) {
+            const name = document.getElementById('inp-name-' + key).value;
+            const gol = document.getElementById('inp-gol-' + key).value;
+            const dm = document.getElementById('inp-dayameter-' + key).value;
+            const dt = document.getElementById('inp-dayatoken-' + key).value;
+            const sn = document.getElementById('inp-sn-' + key).value;
+
+            try {
+                await rdb.ref('orders/' + key).update({
+                    buyerName: name,
+                    golongan: gol,
+                    daya_meter: dm,
+                    daya_token: dt,
+                    sn: sn
+                });
+                alert("Data PLN Berhasil Disimpan!");
+            } catch (e) {
+                alert("Gagal menyimpan: " + e.message);
+            }
+        }
 
         async function toggleStatus(key, currentStatus) {
             const newStatus = currentStatus === 'Pending' ? 'Success' : 'Pending';
