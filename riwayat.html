@@ -27,7 +27,9 @@
             background: var(--white); padding: 18px; border-radius: 24px; 
             margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.02); 
             border: 1px solid rgba(0,0,0,0.02); position: relative;
+            cursor: pointer; transition: 0.2s;
         }
+        .history-card:active { transform: scale(0.98); }
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .product-detail { flex: 1; margin-left: 10px; }
         .product-name { font-size: 15px; font-weight: 800; color: var(--dark); }
@@ -63,6 +65,38 @@
 
         .empty-state { text-align: center; padding: 100px 20px; color: var(--gray); }
         
+        /* Modal Styles */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content {
+            background: white; width: 100%; max-width: 400px;
+            border-radius: 20px; overflow: hidden; animation: slideUp 0.3s ease-out;
+        }
+        .receipt-header {
+            background: #e91e63; color: white; padding: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .receipt-body { padding: 20px; position: relative; }
+        .receipt-body::before {
+            content: ''; position: absolute; top: -10px; left: 0; right: 0;
+            height: 15px; background: radial-gradient(circle, transparent 70%, white 70%);
+            background-size: 20px 20px;
+        }
+        .receipt-title { text-align: center; font-weight: 800; margin-bottom: 20px; color: #333; }
+        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
+        .receipt-label { color: #666; font-weight: 600; }
+        .receipt-value { color: #000; font-weight: 700; text-align: right; flex: 1; margin-left: 20px; }
+        .receipt-divider { border-top: 1px dashed #ddd; margin: 15px 0; }
+        .receipt-price { display: flex; justify-content: space-between; font-weight: 800; font-size: 16px; }
+        .close-modal { cursor: pointer; font-size: 24px; font-weight: bold; }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.7; }
@@ -87,6 +121,22 @@
         </div>
     </div>
 
+    <div id="receiptModal" class="modal">
+        <div class="modal-content">
+            <div class="receipt-header">
+                <span class="close-modal" onclick="closeModal()">×</span>
+                <div style="display:flex; gap: 15px; font-size: 18px;">
+                    <span>🛒</span><span>📤</span><span>🖨️</span>
+                </div>
+            </div>
+            <div class="receipt-body">
+                <h3 class="receipt-title">Rincian Transaksi</h3>
+                <div id="receipt-details">
+                    </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
@@ -105,6 +155,41 @@
 
         let rawID = localStorage.getItem('nox_user_id') || "593086"; 
         const fixUserID = rawID.startsWith("USER-") ? rawID : "USER-" + rawID;
+
+        function openReceipt(data, key) {
+            const detailContainer = document.getElementById('receipt-details');
+            const stDB = (data.status || "PENDING").toUpperCase();
+            
+            detailContainer.innerHTML = `
+                <div class="receipt-row"><span class="receipt-label">Tanggal</span><span class="receipt-value">${data.waktu_masuk || '-'}</span></div>
+                <div class="receipt-row"><span class="receipt-label">ID Transaksi</span><span class="receipt-value">${key.slice(-8).toUpperCase()}</span></div>
+                <div class="receipt-row"><span class="receipt-label">Produk</span><span class="receipt-value">${data.product}</span></div>
+                <div class="receipt-row"><span class="receipt-label">ID Pelanggan</span><span class="receipt-value">${data.target}</span></div>
+                <div class="receipt-row"><span class="receipt-label">Status</span><span class="receipt-value" style="color:${stDB === 'SUCCESS' ? '#059669' : '#ef4444'}">${stDB}</span></div>
+                <div class="receipt-row"><span class="receipt-label">Nominal</span><span class="receipt-value">${data.nominal}</span></div>
+                
+                ${data.sn ? `
+                <div class="receipt-divider"></div>
+                <div class="receipt-row"><span class="receipt-label">Kode/SN</span><span class="receipt-value" style="color:var(--primary); font-size:14px;">${data.sn}</span></div>
+                ` : ''}
+
+                <div class="receipt-divider"></div>
+                <div class="receipt-price">
+                    <span>Harga</span>
+                    <span>Rp ${data.price}</span>
+                </div>
+                <p style="text-align:center; font-size:10px; color:#aaa; margin-top:20px;">Terima kasih telah menggunakan NoxPay</p>
+            `;
+            document.getElementById('receiptModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('receiptModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('receiptModal')) closeModal();
+        }
 
         function loadHistory() {
             const container = document.getElementById('history-container');
@@ -167,11 +252,12 @@
                                 </p>
                             </div>`;
                     } else if (stDB === "PENDING" && !isExpired && !data.balanceCut) {
-                        actionAreaHTML = `<button class="btn-batal" onclick="requestCancelOrder('${key}')">BATALKAN PESANAN</button>`;
+                        actionAreaHTML = `<button class="btn-batal" onclick="event.stopPropagation(); requestCancelOrder('${key}')">BATALKAN PESANAN</button>`;
                     }
 
+                    // Menambahkan onclick pada history-card
                     html = `
-                    <div class="history-card" style="${stDB === 'CANCEL' ? 'opacity:0.7;' : ''}">
+                    <div class="history-card" onclick='openReceipt(${JSON.stringify(data)}, "${key}")' style="${stDB === 'CANCEL' ? 'opacity:0.7;' : ''}">
                         <div class="card-top">
                             <div class="product-detail">
                                 <div class="product-name">${data.product}</div>
