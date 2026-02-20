@@ -12,7 +12,7 @@
 
 <meta name="theme-color" content="#0066ff">
     <style>
-    /* 1. Deklarasi Font dari folder HERO */
+        /* 1. Deklarasi Font dari folder HERO */
 @font-face {
     font-family: 'SketsaRamadhan';
     /* Mengarah ke folder HERO dengan nama file spesifik Anda */
@@ -32,8 +32,7 @@
             
             /* Background Hero Utama */
             --default-hero: linear-gradient(135deg, #0066ff 0%, #00d2ff 100%);
---bg-gradient: url('HERO/bege.jpg');
-
+            --bg-gradient: linear-gradient(180deg, #f8faff 0%, #f1f5f9 100%);
             
             /* Category Colors */
             --cat-game: linear-gradient(135deg, #818cf8, #4f46e5);
@@ -161,25 +160,14 @@
         #main-wrapper { opacity: 0; transition: all 1s; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
         
-body { 
-    /* Mengambil gambar dari variabel --bg-gradient */
-    background: var(--bg-gradient) no-repeat center center fixed !important; 
-    background-size: cover !important; /* Memastikan gambar memenuhi layar */
-    min-height: 100vh;
-    color: var(--dark); 
-    overflow-x: hidden; 
-    position: relative;
-}
+        body { 
+            background: var(--bg-gradient); 
+            min-height: 100vh;
+            color: var(--dark); 
+            overflow-x: hidden; 
+        }
 
-/* Container tetap sama untuk menjaga tata letak */
-.container { 
-    padding: 0 16px; 
-    width: 100%; 
-    max-width: 500px; 
-    margin: 0 auto; 
-    position: relative; 
-}
-
+        .container { padding: 0 16px; width: 100%; max-width: 500px; margin: 0 auto; position: relative; }
 
         header { 
             background: rgba(255, 255, 255, 0.7);
@@ -205,37 +193,21 @@ body {
         .menu-link { text-decoration: none; color: var(--dark); font-size: 13px; font-weight: 700; transition: 0.3s; opacity: 0.8; cursor: pointer; }
         .menu-link:hover { color: var(--primary); opacity: 1; }
 
-        /* --- HERO GLASSMORPHISM TOTAL --- */
+        /* --- HERO --- */
         .hero { 
             position: relative; 
-            /* Menggunakan putih sangat transparan agar hanya efek kaca yang tersisa */
-            background: rgba(255, 255, 255, 0.05) !important;
-            
-            /* Efek Blur Kaca (Wajib ada gambar di belakang body agar terlihat) */
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(20px);
-            
-            /* Border tipis putih untuk mempertegas lekukan kaca */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-
-            color: white; 
-            padding: 50px 0; 
-            border-radius: 0 0 35px 35px; 
-            text-align: left; 
-            overflow: hidden; 
-            margin-bottom: 10px;
-            
-            /* Shadow lembut agar tidak menyatu dengan background utama */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.4s ease;
+            background: var(--default-hero);
+            color: white; padding: 50px 0; border-radius: 0 0 35px 35px; 
+            text-align: left; overflow: hidden; margin-bottom: 10px;
+            box-shadow: 0 10px 30px rgba(0, 102, 255, 0.2);
+            transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hero::before {
-            /* Menghilangkan kotak dekorasi biru agar benar-benar bersih */
-            display: none;
+            content: ''; position: absolute; top: -20px; left: -20px;
+            width: 150px; height: 150px; border-radius: 40px;
+            background: rgba(255,255,255,0.1); transform: rotate(15deg);
         }
-
 
         .hero-shapes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
 
@@ -248,7 +220,6 @@ body {
     margin-bottom: 10px; 
     transition: 0.3s; 
 }
-
         .hero p { font-size: 14px; opacity: 0.9; width: 65%; transition: 0.3s; }
 
         .hero-decor-icon { position: absolute; right: -10px; bottom: -10px; font-size: 110px; opacity: 0.1; transform: rotate(-15deg); z-index: 1; transition: 0.5s; }
@@ -270,54 +241,28 @@ body {
 
         /* --- PRODUK --- */
         .section-header { margin: 25px 0 15px; }
-        .section-header h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: white; }
+        .section-header h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--dark); }
         .section-header h2::before { content: ''; width: 5px; height: 16px; background: var(--primary); border-radius: 10px; }
 
         .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-/* --- UPDATE CATEGORY CARD RAMADAN GLASS --- */
-.category-card { 
-    /* Transparansi tinggi agar menyatu dengan background utama */
-    background: rgba(255, 255, 255, 0.03) !important; 
-    
-    /* Efek Blur Kaca */
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    
+        .category-card { 
+    background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%); /* Gradasi putih ke biru pucat */
     padding: 16px; 
-    border-radius: 20px; 
+    border-radius: 24px; 
     display: flex; 
     align-items: center; 
     gap: 14px; 
     cursor: pointer; 
-    
-    /* Border halus putih transparan */
-    border: 1px solid rgba(255, 255, 255, 0.1) !important; 
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 102, 255, 0.05); /* Border sangat tipis */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
 
-/* Efek saat dipilih (Active) - Menggunakan Glow Emas Ramadan */
-.category-card.active { 
-    border-color: #fbbf24 !important; 
-    background: rgba(251, 191, 36, 0.1) !important; /* Ada sedikit rona emas */
-    transform: scale(1.05); 
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
-}
-
-.category-card span { 
-    font-weight: 700; 
-    font-size: 14px; 
-    color: #ffffff !important; 
-    /* Bayangan teks agar tetap terbaca jelas */
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-/* Hover Effect yang lebih halus */
 .category-card:hover { 
     transform: translateY(-5px); 
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(251, 191, 36, 0.6) !important;
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2); 
+    background: #ffffff;
+    box-shadow: 0 12px 25px rgba(0, 102, 255, 0.1); 
+    border-color: var(--primary);
 }
 
         .category-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
@@ -515,7 +460,7 @@ body {
         .instruction-text { font-size: 11px; color: var(--gray); font-weight: 700; margin-top: 10px; line-height: 1.4; }
         .instruction-text span { color: var(--accent); }
 
-/* --- STYLES PEMANIS --- */
+        /* --- STYLES PEMANIS --- */
         .pemanis-section { margin: 45px 0 20px; text-align: center; }
         
         .title-gradient-animated {
@@ -531,29 +476,22 @@ body {
         }
 
         .pemanis-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        
-        /* UPDATE: Card jadi blur transparan */
         .pemanis-card {
-            background: rgba(255, 255, 255, 0.05) !important;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: var(--white);
             padding: 25px 20px;
             border-radius: 28px;
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
             display: flex;
             flex-direction: column;
             align-items: center; 
         }
-
-        /* UPDATE: Warna teks agar masuk dengan background transparan */
-        .pemanis-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 8px; color: #ffffff !important; }
-        .pemanis-card p { font-size: 12px; color: rgba(255, 255, 255, 0.75) !important; line-height: 1.6; max-width: 90%; }
+        .pemanis-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 8px; color: var(--dark); }
+        .pemanis-card p { font-size: 12px; color: var(--gray); line-height: 1.6; max-width: 90%; }
         
         .grad-line { height: 4px; width: 60px; background: var(--grad-fancy); background-size: 300% 300%; animation: gradientMove 5s ease infinite; border-radius: 10px; margin-top: 18px; }
-
 
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
@@ -766,7 +704,6 @@ button, a, .card, div { /* Ganti selector sesuai class tombolmu */
     0%, 100% { transform: rotate(-6deg); }
     50% { transform: rotate(6deg); }
 }
-
     </style>
 </head>
 <div class="nox-ramadan-sky">
@@ -786,7 +723,6 @@ button, a, .card, div { /* Ganti selector sesuai class tombolmu */
         <img src="https://cdn-icons-png.flaticon.com/512/2800/2800294.png" class="img-lentera">
     </div>
 </div>
-
 <body>
 
     <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -935,7 +871,7 @@ button, a, .card, div { /* Ganti selector sesuai class tombolmu */
             <div class="hero-shapes"></div>
             <div class="hero-decor-icon" id="hero-icon">📱</div>
             <div class="container hero-content">
-                <h2 id="hero-title">Noxpay<br>Ramdhan Edition</h2>
+                <h2 id="hero-title">NoxPay<br>Ramadhan Edition</h2>
                 <p id="hero-desc">Proses kilat 1-5 menit aktif 24 jam.</p>
             </div>
             <div class="hero-character" id="main-character">
@@ -1329,7 +1265,7 @@ localStorage.setItem('nox_user_id', userUniqueId);
 
         // THEMES
         const heroThemes = {
-            default: { bg: 'linear-gradient(135deg, #0066ff 0%, #00d2ff 100%)', icon: '📱', title: 'Noxpay<br>Ramadhan Edition', desc: 'Proses kilat 1-5 menit aktif 24 jam.', char: 'HERO/home1.png' },
+            default: { bg: 'linear-gradient(135deg, #0066ff 0%, #00d2ff 100%)', icon: '📱', title: 'NoxPay<br>Ramadhan Edition', desc: 'Proses kilat 1-5 menit aktif 24 jam.', char: 'HERO/home1.png' },
             game: { bg: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)', icon: '🎮', title: 'Top Up Game<br>Favoritmu', desc: 'Diamond & Point murah setiap hari.', char: 'HERO/home1.png' },
             pulsa: { bg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', icon: '📲', title: 'Isi Pulsa<br>Semua Operator', desc: 'Pulsa murah tanpa antri.', char: 'HERO/home1.png' },
             data: { bg: 'linear-gradient(135deg, #f472b6 0%, #db2777 100%)', icon: '📶', title: 'Paket Data<br>Internet Murah', desc: 'Browsing makin lancar tanpa kendala.', char: 'HERO/home1.png' },
@@ -1752,7 +1688,7 @@ localStorage.setItem('nox_user_id', userUniqueId);
             
             let iconHtml = `<div class="icon-box" style="background:var(--primary-light)">📱</div>`;
             if (prod.img) {
-                iconHtml = `<div class="icon-box" style="background:var(--primary-light)"><img src="${prod.img}" style="width:90%; height:90%; object-fit:contain;"></div>`;
+                iconHtml = `<div class="icon-box" style="background:var(--primary-light)"><img src="${prod.img}" style="width:70%; height:70%; object-fit:contain;"></div>`;
             } else if (cat === 'game') {
                 iconHtml = `<div class="icon-box" style="background:var(--primary-light)">🎮</div>`;
             }
