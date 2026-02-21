@@ -143,6 +143,15 @@
             font-weight: 800;
             cursor: pointer;
         }
+
+        /* Paylater Alert Style */
+        .paylater-alert {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid var(--pending);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -291,6 +300,17 @@
                     </div>`;
                 }
 
+                // Logika Detail Paylater
+                let paylaterArea = "";
+                if(order.payment === "Paylater") {
+                    paylaterArea = `
+                    <div class="paylater-alert">
+                        <p style="font-size:10px; font-weight:800; color:var(--pending); margin-bottom:5px;">⚠️ DATA PAYLATER</p>
+                        <div class="detail-row" style="border-bottom:1px solid rgba(245, 158, 11, 0.2)"><span>Tgl Bayar:</span> <b style="color:var(--pending)">${order.tgl_bayar || "-"}</b></div>
+                        <div class="detail-row" style="border:none"><span>Jadwal Isi:</span> <b style="color:var(--pending)">${order.rencana_isi || "-"}</b></div>
+                    </div>`;
+                }
+
                 listHTML = `
                 <div class="order-card" style="${stUpper === 'CANCEL' || stUpper === 'CANCELLED' ? 'opacity:0.6;' : ''}">
                     <div class="order-header" onclick="toggleAccordion('${key}')">
@@ -305,6 +325,7 @@
                     </div>
 
                     <div id="content-${key}" class="order-content">
+                        ${paylaterArea}
                         <div class="detail-row">
                             <span>Nomor Target:</span> 
                             <div>
@@ -314,6 +335,7 @@
                         </div>
                         <div class="detail-row"><span>Nama Pembeli:</span> <b>${order.buyerName || "Pelanggan"}</b></div>
                         <div class="detail-row"><span>User ID:</span> <b>${order.userID || "-"}</b></div>
+                        <div class="detail-row"><span>Metode Bayar:</span> <b style="color:var(--primary)">${order.payment || "Cash"}</b></div>
                         <div class="detail-row"><span>Nominal Produk:</span> <b>${order.nominal || "-"}</b></div>
                         <div class="detail-row"><span>Harga Modal:</span> <b>Rp ${order.price || "0"}</b></div>
                         <div class="detail-row"><span>Waktu Transaksi:</span> <b>${order.waktu_masuk || "-"}</b></div>
