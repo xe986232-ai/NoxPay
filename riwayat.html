@@ -76,7 +76,7 @@
             border-radius: 20px; overflow: hidden; animation: slideUp 0.3s ease-out;
         }
         .receipt-header {
-            background: #e91e63; color: white; padding: 20px;
+            background: var(--primary-soft); color: var(--primary); padding: 20px;
             display: flex; justify-content: space-between; align-items: center;
         }
         .receipt-body { padding: 20px; position: relative; }
@@ -125,8 +125,10 @@
         <div class="modal-content">
             <div class="receipt-header">
                 <span class="close-modal" onclick="closeModal()">×</span>
-                <div style="display:flex; gap: 15px; font-size: 18px;">
-                    <span>🛒</span><span>📤</span><span>🖨️</span>
+                <div style="display:flex; gap: 15px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
                 </div>
             </div>
             <div class="receipt-body">
@@ -180,8 +182,16 @@
                 <div class="receipt-row"><span class="receipt-label">ID Transaksi</span><span class="receipt-value">${key}</span></div>
                 <div class="receipt-row"><span class="receipt-label">Produk</span><span class="receipt-value">${data.product}</span></div>
                 <div class="receipt-row"><span class="receipt-label">ID Pelanggan</span><span class="receipt-value">${data.target}</span></div>
+                <div class="receipt-row"><span class="receipt-label">Metode Bayar</span><span class="receipt-value" style="color:var(--primary)">${data.payment || 'Saldo NoxPay'}</span></div>
                 <div class="receipt-row"><span class="receipt-label">Status</span><span class="receipt-value" style="color:${statusColor}">${statusText}</span></div>
                 
+                ${data.payment === "Paylater" ? `
+                <div class="receipt-divider"></div>
+                <div class="receipt-row"><span class="receipt-label">Rencana Isi</span><span class="receipt-value" style="color:var(--warning)">${data.rencana_isi || '-'}</span></div>
+                <div class="receipt-row"><span class="receipt-label">Jatuh Tempo</span><span class="receipt-value" style="color:var(--danger)">${data.tgl_bayar || '-'}</span></div>
+                ` : ''}
+
+                <div class="receipt-divider"></div>
                 ${data.buyerName ? `<div class="receipt-row"><span class="receipt-label">Nama</span><span class="receipt-value">${data.buyerName}</span></div>` : ''}
                 ${data.golongan ? `<div class="receipt-row"><span class="receipt-label">Golongan</span><span class="receipt-value">${data.golongan}</span></div>` : ''}
                 ${data.daya_meter ? `<div class="receipt-row"><span class="receipt-label">Daya Meter</span><span class="receipt-value">${data.daya_meter}</span></div>` : ''}
